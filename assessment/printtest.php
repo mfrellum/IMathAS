@@ -52,7 +52,7 @@
 	}
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$questions = explode(",",$line['questions']);
 	$seeds = explode(",",$line['seeds']);
 	$scores = explode(",",$line['scores']);
@@ -70,7 +70,7 @@
 	
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
+	$testsettings = mysql_fetch_assoc($result);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 	
 	$now = time();

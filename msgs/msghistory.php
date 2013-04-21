@@ -66,7 +66,7 @@
 	$query = "SELECT imas_msgs.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_msgs,imas_users ";
 	$query .= "WHERE imas_msgs.msgfrom=imas_users.id AND (imas_msgs.id='$baseid' OR imas_msgs.baseid='$baseid') ORDER BY imas_msgs.id";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line =  mysql_fetch_assoc($result)) {
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['senddate'];
 		$n = 0;

@@ -155,7 +155,7 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array();
-	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line =  mysql_fetch_assoc($result)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
 				$allowreply = ($isteacher || (time()<$line['replyby']));

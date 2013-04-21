@@ -519,7 +519,7 @@ function enditem($canedit) {
 		   }
 		   $query = "SELECT itemtype,typeid FROM imas_items WHERE id='{$items[$i]}'";
 		   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+		   $line = mysql_fetch_assoc($result);
 		   
 		   if ($canedit) {
 			   echo generatemoveselect($i,count($items),$parent,$blocklist);
@@ -541,7 +541,7 @@ function enditem($canedit) {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $line = mysql_fetch_assoc($result);
 			   //do time limit mult
 			   if (isset($studentinfo['timelimitmult'])) {
 				$line['timelimit'] *= $studentinfo['timelimitmult'];
@@ -731,7 +731,7 @@ function enditem($canedit) {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT title,text,startdate,enddate,fileorder,avail FROM imas_inlinetext WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $line = mysql_fetch_assoc($result);
 			
 			   if (strpos($line['text'],'<p>')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
@@ -865,7 +865,7 @@ function enditem($canedit) {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT name,summary,startdate,enddate,avail FROM imas_drillassess WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $line = mysql_fetch_assoc($result);
 			  
 			   if (strpos($line['summary'],'<p>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
@@ -951,7 +951,7 @@ function enditem($canedit) {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $line = mysql_fetch_assoc($result);
 			  
 			   if (strpos($line['summary'],'<p>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
@@ -1078,7 +1078,7 @@ function enditem($canedit) {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $line = mysql_fetch_assoc($result);
 			   /*$dofilter = false;
 			   if ($line['grpaid']>0) {
 				if (!$viewall) {
@@ -1231,7 +1231,7 @@ function enditem($canedit) {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $line = mysql_fetch_assoc($result);
 			   if ($ispublic && $line['groupsetid']>0) { continue;}
 			   if (strpos($line['description'],'<p>')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';

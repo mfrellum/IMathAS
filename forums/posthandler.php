@@ -242,7 +242,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo "Modify Posting</div>\n";
 			$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			echo '<div id="headerposthandler" class="pagetitle"><h2>Modify Post</h2></div>';
 		} else {
 			if ($_GET['modify']=='reply') {
@@ -490,7 +490,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName from imas_forum_posts,imas_users ";
 				$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid')";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+				while ($line =  mysql_fetch_assoc($result)) {
 					$parent[$line['id']] = $line['parent'];
 					$date[$line['id']] = $line['postdate'];
 					$subject[$line['id']] = $line['subject'];
@@ -620,7 +620,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$threadid = intval($_POST['thread']);
 		$query = "SELECT * FROM imas_forum_posts WHERE threadid='$threadid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line =  mysql_fetch_assoc($result)) {
 			$children[$line['parent']][] = $line['id'];
 		}
 		$tochange = array();

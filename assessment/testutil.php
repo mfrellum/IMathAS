@@ -15,7 +15,7 @@ function getquestioninfo($qns,$testsettings) {
 	$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_libraries as il ";
 	$query .= "ON iq.category=il.id WHERE iq.id IN ($qnlist)";
 	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if ($line['name']!=null && is_numeric($line['category'])) {
 			$line['category'] = $line['name'];
 		}

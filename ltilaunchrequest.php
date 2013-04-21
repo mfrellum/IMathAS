@@ -96,7 +96,7 @@ $now = time();
 if ($itemtype==0) { //accessing single assessment
 	$query = "SELECT courseid,startdate,enddate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$cid = $line['courseid'];
 	if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
 		returnstudentnotice("This assessment is closed");
@@ -105,7 +105,7 @@ if ($itemtype==0) { //accessing single assessment
 } else if ($itemtype==1) { //accessing whole course
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	if (!($line['avail']==0 || $line['avail']==2)) {
 		returnstudentnotice("This course is not available");
 	}

@@ -52,7 +52,7 @@ if ($overwriteBody==1) {
 	
 	$query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	
 	$ioquestions = explode(",",$line['itemorder']);
 	$questions = array();
@@ -394,7 +394,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	$qdata = mysql_fetch_assoc($result);
 	
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";

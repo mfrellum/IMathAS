@@ -71,7 +71,7 @@
 		}
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$cnt = 0;
-		while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while($line=mysql_fetch_assoc($result)) {
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
 				$scores = explode(",",$line['bestscores']);
 				if ($onepergroup) {
@@ -347,7 +347,7 @@
 	require_once("../includes/filehandler.php");
 	if (mysql_num_rows($result)>0) {
 		
-	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while($line=mysql_fetch_assoc($result)) {
 		if ($page != -1) {
 			echo '<input type="hidden" name="userid" value="'.$line['userid'].'"/>';
 		}

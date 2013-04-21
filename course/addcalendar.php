@@ -56,7 +56,7 @@ if (!(isset($teacherid))) {
 	$itemid = mysql_insert_id();
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$items = unserialize($line['itemorder']);
 	
 	$blocktree = explode('-',$block);

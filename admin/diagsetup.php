@@ -161,7 +161,7 @@ if ($myrights<60) {
 	if (isset($_GET['id'])) { 
 		$query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($result);
 		$diagname = $line['name'];
 		$cid = $line['cid'];
 		$public = $line['public'];

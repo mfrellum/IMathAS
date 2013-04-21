@@ -18,7 +18,7 @@ if (mysql_num_rows($result)==0) {
 	echo '<html><body>Invalid tool</body></html>';
 	exit;
 }
-$line = mysql_fetch_array($result, MYSQL_ASSOC);	
+$line = mysql_fetch_assoc($result);	
 
 require_once("blti_util.php");
 $parms = array();

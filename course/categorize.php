@@ -63,7 +63,7 @@ END;
 	$descriptions = array();
 	$category = array();
 	$extracats = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$descriptions[$line['id']] = $line['description'];
 		$category[$line['id']] = $line['category'];
 		if (!is_numeric($line['category']) && trim($line['category'])!='' && !in_array($line['category'],$extracats)) {

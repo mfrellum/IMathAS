@@ -727,7 +727,7 @@ if ($myrights<20) {
 		$lastlib = -1;
 		$ln=1;
 		
-		while ($line = mysql_fetch_array($resultLibs, MYSQL_ASSOC)) {
+		while ($line = mysql_fetch_assoc($resultLibs)) {
 			if (isset($page_questionTable[$line['id']])) {
 				continue;
 			}

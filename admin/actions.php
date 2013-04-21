@@ -65,7 +65,7 @@ switch($_GET['action']) {
 	case "chgpwd":
 		$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($result);
 	
 		if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2'])) {
 			$md5pw =md5($_POST['newpw1']);

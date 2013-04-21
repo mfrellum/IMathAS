@@ -130,7 +130,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$page_courseSelect = array();
 	$i=0;
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$page_courseSelect['val'][$i] = $line['id'];
 		$page_courseSelect['label'][$i] = $line['name'];
 		$i++;

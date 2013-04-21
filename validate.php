@@ -208,7 +208,7 @@ END;
 	 } else {
 		 $query = "SELECT id,password,rights,groupid FROM imas_users WHERE SID = '{$_POST['username']}'";
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		 $line = mysql_fetch_array($result, MYSQL_ASSOC);
+		 $line = mysql_fetch_assoc($result);
 	 }
 	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
 	 if (($line != null) && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password'])) )) {
@@ -324,7 +324,7 @@ END;
 	}
 	$query .= " FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
 	$groupid = $line['groupid'];
@@ -377,7 +377,7 @@ END;
 		$cid = $_GET['cid'];
 		$query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($result);
 		if ($line != null) {
 			$studentid = $line['id'];
 			$studentinfo['timelimitmult'] = $line['timelimitmult'];
@@ -406,7 +406,7 @@ END;
 		} else {
 			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			if ($line != null) {
 				if ($myrights>19) {
 					$teacherid = $line['id'];
@@ -433,7 +433,7 @@ END;
 				
 				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($result, MYSQL_ASSOC);
+				$line = mysql_fetch_assoc($result);
 				if ($line != null) {
 					$tutorid = $line['id'];
 					$tutorsection = trim($line['section']);

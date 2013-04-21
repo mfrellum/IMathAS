@@ -61,7 +61,7 @@ if ($showmessagesgadget) {
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
 	$query .= "ORDER BY senddate DESC ";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if (!isset($newmsgcnt[$line['courseid']])) {
 			$newmsgcnt[$line['courseid']] = 1;
 		} else {
@@ -90,7 +90,7 @@ if (mysql_num_rows($result)==0) {
 	$noclass = true;
 } else {
 	$noclass = false;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$page_studentCourseData[] = $line;	
 		$page_coursenames[$line['id']] = $line['name'];
 		$postcheckstucids[] = $line['id'];
@@ -110,7 +110,7 @@ if ($myrights>10) {
 		$noclass = false;
 		$tchcids = array();
 		
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = mysql_fetch_assoc($result)) {
 			$page_teacherCourseData[] = $line;	
 			$page_coursenames[$line['id']] = $line['name'];
 			$postcheckcids[] = $line['id'];
@@ -129,7 +129,7 @@ if (mysql_num_rows($result)==0) {
 } else {
 	$noclass = false;
 	$tchcids = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$page_tutorCourseData[] = $line;	
 		$page_coursenames[$line['id']] = $line['name'];
 		$postcheckstucids[] = $line['id'];
@@ -153,7 +153,7 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
 		} else {
@@ -205,7 +205,7 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
 		} else {
@@ -399,7 +399,7 @@ function printPostsGadget() {
 	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
 	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($tline = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($tline = mysql_fetch_assoc($result)) {
 		$threaddata[$tline['id']] = $tline;
 	}
 	

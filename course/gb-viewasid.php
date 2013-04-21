@@ -53,7 +53,7 @@
 		} else {
 			$query = "SELECT * FROM imas_assessments WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$adata = mysql_fetch_array($result, MYSQL_ASSOC);
+			$adata = mysql_fetch_assoc($result);
 			
 			$stugroupmem = array();
 			$agroupid = 0;
@@ -206,7 +206,7 @@
 			
 			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			
 			$scores = explode(",",$line['scores']);
 			$attempts = explode(",",$line['attempts']);
@@ -370,7 +370,7 @@
 			echo "uh oh.  Bad assessment id";
 			exit;
 		}
-		$line=mysql_fetch_array($result, MYSQL_ASSOC);
+		$line=mysql_fetch_assoc($result);
 		
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
@@ -849,7 +849,7 @@
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line=mysql_fetch_array($result, MYSQL_ASSOC);
+		$line=mysql_fetch_assoc($result);
 		
 		echo "<h4>{$line['name']}</h4>\n";
 		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";

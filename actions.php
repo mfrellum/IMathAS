@@ -136,7 +136,7 @@
 				} else {
 					$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['courseid']}' AND available<4";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$line = mysql_fetch_array($result, MYSQL_ASSOC);
+					$line = mysql_fetch_assoc($result);
 					if ($line==null) {
 						$error = 'Course not found';
 					} else if (($line['allowunenroll']&2)==2) {
@@ -265,7 +265,7 @@
 	} else if ($_GET['action']=="chgpwd") {
 		$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($result);
 		if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
 			$md5pw =md5($_POST['newpw1']);
 			$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
@@ -293,7 +293,7 @@
 		}
 		$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($result);
 		if ($line == null) {
 			echo "<html><body>\n";
 			echo "Course not found.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -472,7 +472,7 @@
 		if (isset($_POST['dochgpw'])) {
 			$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
 				$md5pw =md5($_POST['newpw1']);
 				$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";

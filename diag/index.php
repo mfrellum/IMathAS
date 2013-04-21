@@ -40,7 +40,7 @@ END;
 	
 	$query = "SELECT * from imas_diags WHERE id='$diagid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$pcid = $line['cid'];
 	$diagid = $line['id'];
 	if ($line['term']=='*mo*') {

@@ -35,7 +35,7 @@
 		
 		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
+		$adata = mysql_fetch_assoc($result);
 		$now = time();
 		$assessmentclosed = false;
 		
@@ -132,7 +132,7 @@
 		
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($result);
 		
 		if ($line == null) { //starting test
 			//get question set
@@ -337,7 +337,7 @@
 	}
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$questions = explode(",",$line['questions']);
 
 	$seeds = explode(",",$line['seeds']);
@@ -371,7 +371,7 @@
 	
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
+	$testsettings = mysql_fetch_assoc($result);
 	if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
 		$testsettings['displaymethod']= 'Embed';
 	}
@@ -2450,7 +2450,7 @@ if (!isset($_POST['embedpostback'])) {
 			global $userid;
 			$query = "SELECT * from imas_users WHERE id='$userid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$userinfo = mysql_fetch_array($result, MYSQL_ASSOC);
+			$userinfo = mysql_fetch_assoc($result);
 			echo "<h3>{$userinfo['LastName']}, {$userinfo['FirstName']}: ";
 			echo substr($userinfo['SID'],0,strpos($userinfo['SID'],'~'));
 			echo "</h3>\n";

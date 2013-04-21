@@ -252,7 +252,7 @@ function gbtable() {
 	$name = array();
 	$possible = array();
 	$courseorder = array();
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$assessments[$kcnt] = $line['id'];
 		$timelimits[$kcnt] = $line['timelimit'];
 		$minscores[$kcnt] = $line['minscore'];
@@ -329,7 +329,7 @@ function gbtable() {
 	}
 	$query .= "ORDER BY showdate";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$grades[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Offline";
 		$category[$kcnt] = $line['gbcategory'];
@@ -357,7 +357,7 @@ function gbtable() {
 	}
 	$query .= "ORDER BY enddate,postby,replyby,startdate";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
@@ -712,7 +712,7 @@ function gbtable() {
 	$alt = 0;
 	$sturow = array();
 	$timelimitmult = array();
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) { //foreach student
+	while ($line=mysql_fetch_assoc($result)) { //foreach student
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		$cattotpast[$ln] = array();
 		$cattotpastec[$ln] = array();
@@ -768,7 +768,7 @@ function gbtable() {
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
 	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+	while ($l = mysql_fetch_assoc($result2)) {
 		if (!isset($assessidx[$l['assessmentid']]) || !isset($sturow[$l['userid']]) || !isset($assesscol[$l['assessmentid']])) {
 			continue;
 		}
@@ -918,7 +918,7 @@ function gbtable() {
 		//$query .= "imas_grades.gradetypeid=imas_gbitems.id AND imas_gbitems.courseid='$cid'";
 		if ($limuser>0) { $query .= " AND userid='$limuser' ";}
 		$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+		while ($l = mysql_fetch_assoc($result2)) {
 			if ($l['gradetype']=='offline') {
 				if (!isset($gradeidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($gradecol[$l['gradetypeid']])) {
 					continue;

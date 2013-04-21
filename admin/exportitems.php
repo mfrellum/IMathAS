@@ -126,7 +126,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			case ($row[0]==="InlineText"):
 				$query = "SELECT * FROM imas_inlinetext WHERE id='{$row[1]}'";
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$line = mysql_fetch_assoc($r2);
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
 				echo "TEXT\n";
@@ -162,7 +162,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			case ($row[0]==="LinkedText"):
 				$query = "SELECT * FROM imas_linkedtext WHERE id='{$row[1]}'";
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$line = mysql_fetch_assoc($r2);
 				if (substr($line['text'],0,5)=='file:') {
 					$coursefiles[] = substr($line['text'],5);
 					$line['text'] = 'file:'.basename(substr($line['text'],5));
@@ -191,7 +191,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			case ($row[0]==="Forum"):
 				$query = "SELECT * FROM imas_forums WHERE id='{$row[1]}'";
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$line = mysql_fetch_assoc($r2);
 				echo "NAME\n";
 				echo $line['name'] . "\n";
 				echo "SUMMARY\n";
@@ -215,7 +215,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			case ($row[0]==="Assessment"):
 				$query = "SELECT * FROM imas_assessments WHERE id='{$row[1]}'";
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$line = mysql_fetch_assoc($r2);
 				echo "NAME\n";
 				echo $line['name'] . "\n";
 				echo "SUMMARY\n";
@@ -267,7 +267,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$query = "SELECT imas_questions.*,imas_questionset.uniqueid from imas_questions,imas_questionset ";
 		$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($r2);
 		
 		if (!empty($line['uniqueid'])) {
 			echo "UQID\n";
@@ -295,7 +295,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		
 		$query = "SELECT * from imas_questionset WHERE id='$qsetid'";
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($r2);
 		echo "UNIQUEID\n";
 		echo $line['uniqueid'] . "\n";
 		echo "LASTMOD\n";
@@ -323,7 +323,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$includedqs = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
 			$includedqs = array_merge($includedqs,$matches[1]);
 		}
@@ -344,7 +344,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$qcnt = 0;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
 		$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
 		echo "BEGIN QSET\n";

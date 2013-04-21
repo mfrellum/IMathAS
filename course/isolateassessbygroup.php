@@ -76,7 +76,7 @@
 	$query .= "imas_assessment_sessions AS ias WHERE ias.assessmentid='$aid' GROUP BY ias.agroupid";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$scoredata = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$scoredata[$line['agroupid']] = $line;
 	}
 	

@@ -185,7 +185,7 @@
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line =  mysql_fetch_assoc($result)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
 				echo '</div>';

@@ -414,7 +414,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	 if ($page_hasGroups) {
 				$lastteacher = 0;
 				$lastgroup = -1;
-				while ($line = mysql_fetch_array($courseGroupResults, MYSQL_ASSOC)) {
+				while ($line = mysql_fetch_assoc($courseGroupResults)) {
 					if ($line['groupid']!=$lastgroup) {
 						if ($lastgroup!=-1) {
 							echo "				</ul>\n			</li>\n";
@@ -534,7 +534,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 //group's courses
 		if (mysql_num_rows($courseTreeResult)>0) {
-			while ($line = mysql_fetch_array($courseTreeResult, MYSQL_ASSOC)) {
+			while ($line = mysql_fetch_assoc($courseTreeResult)) {
 				if ($line['userid']!=$lastteacher) {
 					if ($lastteacher!=0) {
 						echo "				</ul>\n			</li>\n";

@@ -61,7 +61,7 @@ if ($myrights < 40) {
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error()); 
 	$page_courseList = array();
 	$i=0;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$page_courseList[$i]['id'] = $line['id']; 
 		$page_courseList[$i]['name'] = $line['name']; 
 		$page_courseList[$i]['LastName'] = $line['LastName']; 
@@ -132,7 +132,7 @@ if ($myrights < 40) {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	$i=0;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$page_userDataId[$i] = $line['id'];
 		$page_userDataSid[$i] = $line['SID'];
 		$page_userDataEmail[$i] = $line['email'];

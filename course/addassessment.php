@@ -288,7 +288,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 			
 			$blocktree = explode('-',$block);
@@ -319,7 +319,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$taken = (mysql_result($result,0,0)>0);
 			$query = "SELECT * FROM imas_assessments WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			list($testtype,$showans) = explode('-',$line['deffeedback']);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];

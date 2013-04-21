@@ -68,7 +68,7 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumdata = array();
 	$anyforumsgroup = false;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$forumdata[$line['id']] = $line;
 		if ($line['groupsetid']>0) {
 			$anyforumsgroup = true;
@@ -211,7 +211,7 @@ if ($searchtype == 'thread') {
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$threaddata = array();
 	$threadids = array();
-	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line =  mysql_fetch_assoc($result)) {
 		$threaddata[$line['id']] = $line;
 		$threadids[] = $line['id'];
 	}
@@ -323,7 +323,7 @@ if ($searchtype == 'thread') {
 	
 	$query .= " ORDER BY imas_forum_posts.postdate DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line =  mysql_fetch_assoc($result)) {
 		echo "<div class=block>";
 		echo "<b>{$line['subject']}</b>";
 		echo ' (in '.$line['name'].')';
@@ -417,7 +417,7 @@ if ($searchtype == 'thread') {
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumdata = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		$forumdata[$line['id']] = $line;
 	}
 	

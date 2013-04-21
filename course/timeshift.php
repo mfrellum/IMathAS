@@ -125,7 +125,7 @@ if (!(isset($teacherid))) {
 		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=0;
-		while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line=mysql_fetch_assoc($result)) {
 			$page_assessmentList['val'][$i] = $line['id'];
 			$page_assessmentList['label'][$i] = $line['name'];
 			$i++;

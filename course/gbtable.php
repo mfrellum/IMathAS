@@ -210,7 +210,7 @@ function gbtable() {
 	$category = array();
 	$name = array();
 	$possible = array();
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$assessments[$kcnt] = $line['id'];
 		$timelimits[$kcnt] = $line['timelimit'];
 		$minscores[$kcnt] = $line['minscore'];
@@ -272,7 +272,7 @@ function gbtable() {
 	}
 	$query .= "ORDER BY showdate";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$grades[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Offline";
 		$category[$kcnt] = $line['gbcategory'];
@@ -295,7 +295,7 @@ function gbtable() {
 	}
 	$query .= "ORDER BY enddate";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
@@ -518,7 +518,7 @@ function gbtable() {
 	}
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$alt = 0;
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) { //foreach student
+	while ($line=mysql_fetch_assoc($result)) { //foreach student
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		//Student ID info
 		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
@@ -545,7 +545,7 @@ function gbtable() {
 		//Get assessment scores
 		$query = "SELECT id,assessmentid,bestscores,starttime,endtime,feedback FROM imas_assessment_sessions WHERE userid='{$line['id']}'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+		while ($l = mysql_fetch_assoc($result2)) {
 			$asid[$l['assessmentid']] = $l['id'];
 			$scores = explode(",",$l['bestscores']);
 			$total = 0;

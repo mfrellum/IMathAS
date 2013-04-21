@@ -25,7 +25,7 @@ if (mysql_num_rows($result)==0) {
 	echo "Invalid drill assessment id";
 	exit;
 }
-$dadata = mysql_fetch_array($result, MYSQL_ASSOC);
+$dadata = mysql_fetch_assoc($result);
 $n = $dadata['n'];
 $sa = $dadata['showtype'];
 $showscore = ($sa==0 || $sa==1 || $sa==4);
@@ -55,7 +55,7 @@ if (mysql_num_rows($result)==0) {
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$starttime = 0;
 } else {
-	$sessdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	$sessdata = mysql_fetch_assoc($result);
 	$curitem = $sessdata['curitem'];
 	$curitemid = $itemids[$curitem];
 	$seed = $sessdata['seed'];

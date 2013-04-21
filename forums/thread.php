@@ -489,7 +489,7 @@
 	if (mysql_num_rows($result)==0) {
 		echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 	}
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if (isset($postcount[$line['id']])) {
 			$posts = $postcount[$line['id']];
 			$lastpost = tzdate("F j, Y, g:i a",$maxdate[$line['id']]);

@@ -113,7 +113,7 @@
 		$query .= " AND imas_students.section='$secfilter' ";
 	}
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$questions = explode(',',$line['questions']);
 		$scores = explode(',',$line['bestscores']);
 		$attp = explode(',',$line['bestattempts']);

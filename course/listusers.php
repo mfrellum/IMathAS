@@ -255,7 +255,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$lineStudent = mysql_fetch_array($result, MYSQL_ASSOC);
+			$lineStudent = mysql_fetch_assoc($result);
 			
 		}
 		
@@ -380,7 +380,7 @@ if ($overwriteBody==1) {
 			</thead>
 			<tbody>
 <?php	
-		while ($line=mysql_fetch_array($resultStudentList, MYSQL_ASSOC)) {
+		while ($line=mysql_fetch_assoc($resultStudentList)) {
 ?>
 			<tr>
 				<td><?php echo $line['LastName'] . ", " . $line['FirstName'] ?></td>
@@ -560,7 +560,7 @@ if ($overwriteBody==1) {
 <?php		
 		$alt = 0;
 		$numstu = 0;
-		while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
+		while ($line=mysql_fetch_assoc($resultDefaultUserList)) {
 			if ($line['section']==null) {
 				$line['section'] = '';
 			}

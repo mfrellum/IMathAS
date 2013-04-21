@@ -28,7 +28,7 @@ if (mysql_num_rows($result)==0) {
 	$itemdescr = array();
 	$daid = 0;
 } else {
-	$dadata = mysql_fetch_array($result, MYSQL_ASSOC);
+	$dadata = mysql_fetch_assoc($result);
 	$n = $dadata['n'];
 	$showtype = $dadata['showtype'];
 	$scoretype = $dadata['scoretype'];
@@ -291,7 +291,7 @@ if (!$beentaken) {
 			$page_libqids = array();
 			$page_useavgtimes = false;
 			
-			while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			while ($line = mysql_fetch_assoc($result)) {
 				if ($newonly && in_array($line['id'],$itemids)) {
 					continue;
 				}

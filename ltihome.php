@@ -253,7 +253,7 @@ if (!$hascourse) {
 } else if ($placementtype=='assess') {
 	$query = "SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id='$typeid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	echo "<h3>LTI Placement of {$line['name']}</h3>";
 	echo "<p><a href=\"assessment/showtest.php?cid=$cid&id=$typeid\">Preview assessment</a> | ";
 	echo "<a href=\"course/isolateassessgrade.php?cid=$cid&aid=$typeid\">Grade list</a> ";

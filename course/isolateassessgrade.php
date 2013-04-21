@@ -137,7 +137,7 @@
 	$ntime = 0;
 	$tot = 0;
 	$tottime = 0;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if ($lc%2!=0) {
 			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">"; 
 		} else {

@@ -66,7 +66,7 @@ if (!isset($_GET['userid'])) {
 	}*/
 	$query = "SELECT * FROM mc_sessions WHERE userid='{$_GET['userid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$mcsession = mysql_fetch_array($result, MYSQL_ASSOC);	
+	$mcsession = mysql_fetch_assoc($result);	
 }
 $mcsession['useed'] = 1;
 

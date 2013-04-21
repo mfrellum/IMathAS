@@ -90,7 +90,7 @@
 		require("../footer.php");
 		exit;
 	}
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($line['hasuserimg']==1) {

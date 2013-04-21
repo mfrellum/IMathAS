@@ -79,7 +79,7 @@ switch($_GET['action']) {
 	case "chguserinfo":
 		$query = "SELECT * FROM imas_users WHERE id='$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$line = mysql_fetch_assoc($result);
 		echo '<script type="text/javascript">function togglechgpw(val) { if (val) {document.getElementById("pwinfo").style.display="";} else {document.getElementById("pwinfo").style.display="none";} } </script>';
 		
 		echo '<div id="headerforms" class="pagetitle"><h2>User Info</h2></div>';

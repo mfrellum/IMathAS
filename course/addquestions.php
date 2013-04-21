@@ -139,7 +139,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "SELECT id,questions,scores,attempts,lastanswers,bestscores,bestattempts,bestlastanswers ";
 				$query .= "FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+				while ($line = mysql_fetch_assoc($result)) {
 					$questions = explode(',',$line['questions']);
 					$qloc = array_search($clearid,$questions);
 					if ($qloc!==false) {
@@ -364,7 +364,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints FROM imas_questions,imas_questionset,imas_users ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			$existingq[] = $line['questionsetid'];
 			if ($j>0) {
 				$jsarr .= ',';
@@ -567,7 +567,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_libqids = array();
 					$page_useavgtimes = false;
 					
-					while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+					while ($line = mysql_fetch_assoc($result)) {
 						if ($newonly && in_array($line['id'],$existingq)) {
 							continue;
 						}
@@ -797,7 +797,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$i=0;
 			$page_assessmentList = array();
-			while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			while ($line = mysql_fetch_assoc($result)) {
 				$page_assessmentList[$i]['id'] = $line['id'];
 				$page_assessmentList[$i]['name'] = $line['name'];
 				$line['summary'] = strip_tags($line['summary']);

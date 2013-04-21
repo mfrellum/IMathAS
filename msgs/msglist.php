@@ -519,7 +519,7 @@ function chgfilter() {
 	if (mysql_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = mysql_fetch_assoc($result)) {
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';
 		}

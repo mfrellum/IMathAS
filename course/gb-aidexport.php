@@ -184,7 +184,7 @@ if (isset($_POST['options'])) {
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=mysql_fetch_assoc($result)) {
 		$questions = explode(',',$line['questions']);
 		$scores = explode(',',$line['bestscores']);
 		$seeds = explode(',',$line['bestseeds']);

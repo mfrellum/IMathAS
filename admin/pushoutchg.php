@@ -18,7 +18,7 @@ if ($myrights==100) {
    	   	   $qset = array();
    	   	   $toset = explode(',','points,attempts');
    	   	   $nq = 0;
-   	   	   while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+   	   	   while ($line = mysql_fetch_assoc($result)) {
    	   	   	   $sets = array();
    	   	   	   foreach ($toset as $it) {
    	   	   	   	   $sets[] = $it."='".addslashes($line[$it])."'";
@@ -36,7 +36,7 @@ if ($myrights==100) {
    	   	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
    	   	   $n = 0;
    	   	   $na = 0;
-   	   	   while ($row = mysql_fetch_array($result)) {
+   	   	   while ($row = mysql_fetch_assoc($result)) {
    	   	   	   $query = "UPDATE imas_assessments SET intro='".addslashes($row[1])."' WHERE name='{$row[0]}'";
    	   	   	   mysql_query($query) or die("Query failed : " . mysql_error());
    	   	   	   $n += mysql_affected_rows();
@@ -49,7 +49,7 @@ if ($myrights==100) {
    	   	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
    	   	   $n = 0;
    	   	   $na = 0;
-   	   	   while ($row = mysql_fetch_array($result)) {
+   	   	   while ($row = mysql_fetch_assoc($result)) {
    	   	   	   $query = "UPDATE imas_assessments SET caltag='".addslashes($row[1])."',calrtag='".addslashes($row[2])."' WHERE name='{$row[0]}'";
    	   	   	   mysql_query($query) or die("Query failed : " . mysql_error());
    	   	   	   $n += mysql_affected_rows();
@@ -65,7 +65,7 @@ if ($myrights==100) {
    	   echo '<p>Select the course to push out from: <select name="cid">';
    	   $query = "SELECT ic.id,ic.name FROM imas_courses as ic JOIN imas_teachers ON imas_teachers.courseid=ic.id WHERE imas_teachers.userid='$userid' ORDER BY ic.name";
    	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-   	   while ($row = mysql_fetch_array($result)) {
+   	   while ($row = mysql_fetch_assoc($result)) {
    	   	   echo '<option value="'.$row[0].'">'.$row[1].'</option>';
    	   }
    	   echo '</select></p>';

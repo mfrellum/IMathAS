@@ -244,7 +244,7 @@ if ($myrights<20) {
 		$query = "SELECT imas_questionset.*,imas_users.groupid FROM imas_questionset,imas_users WHERE ";
 		$query .= "imas_questionset.ownerid=imas_users.id AND imas_questionset.id='$qsetid'";	
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$lineQSet = mysql_fetch_array($result, MYSQL_ASSOC);
+		$lineQSet = mysql_fetch_assoc($result);
 		$myq = (intval($lineQSet['ownerid'])==$userid);
 		if ($isadmin || ($isgrpadmin && intval($lineQSet['groupid'])==$groupid) || $lineQSet['userights']==4) {
 			$myq = true;

@@ -736,7 +736,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 	$cid = intval($keyparts[1]);
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	if ($_SESSION['ltirole']!='instructor') {
 		if (!($line['avail']==0 || $line['avail']==2)) {
 			reporterror("This course is not available");
@@ -746,7 +746,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 	$aid = intval($keyparts[1]);
 	$query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	$cid = $line['courseid'];
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {

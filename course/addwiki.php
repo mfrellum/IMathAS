@@ -92,7 +92,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 				
 			$blocktree = explode('-',$block);
@@ -128,7 +128,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) { //MODIFY MODE
 			$query = "SELECT * FROM imas_wikis WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$line = mysql_fetch_assoc($result);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 			$revisedate = $line['editbydate'];

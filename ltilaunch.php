@@ -106,7 +106,7 @@ if (mysql_num_rows($result)==0) {
 		reporterror("Bad id or code, or being rerun");
 	}
 } else {
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$line = mysql_fetch_assoc($result);
 	if (abs($line['created'] - $now)>900) {
 		reporterror("Access has expired - please refresh and try again");
 	}

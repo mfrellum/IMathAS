@@ -13,7 +13,7 @@
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbmode = mysql_result($result,0,0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
@@ -78,7 +78,7 @@
 	$regens = array();
 	
 	$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$defpoints = mysql_result($result,0,0);
 	echo mysql_result($result,0,1).'</h2></div>';
 	$itemorder = mysql_result($result,0,2);
@@ -104,7 +104,7 @@
 	if ($secfilter!=-1) {
 		$query .= " AND imas_students.section='$secfilter' ";
 	}
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 	$totstucnt = mysql_result($result,0,0);
 	
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
@@ -112,7 +112,7 @@
 	if ($secfilter!=-1) {
 		$query .= " AND imas_students.section='$secfilter' ";
 	}
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 	while ($line=mysql_fetch_assoc($result)) {
 		$questions = explode(',',$line['questions']);
 		$scores = explode(',',$line['bestscores']);
@@ -162,7 +162,7 @@
 		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($qslist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$descrips = array();
 		$points = array();
 		$withdrawn = array();
@@ -282,7 +282,7 @@
 	echo 'All averages only include those who have started the assessment</p>';
 	
 	$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 	if (mysql_result($result,0,0)>0) {
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints);

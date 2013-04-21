@@ -63,7 +63,7 @@
 					} else {
 						$query .= "0";
 					}
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($result)>0) {
 						$cuserid=mysql_result($result,0,0);
 						if ($comtype=='stu') {
@@ -71,7 +71,7 @@
 						} else if ($comtype=='instr') {
 							$query = "UPDATE imas_students SET gbinstrcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
 						}
-						mysql_query($query) or die("Query failed : " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 						$successes++;
 					} else {
 						$failures[] = $data[$usercol];
@@ -125,7 +125,7 @@
 	
 	if (isset($_GET['record'])) {
 		$query = "SELECT id FROM imas_students WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			//if ($_POST[$row[0]]!='') {
 				if ($comtype=='stu') {
@@ -133,7 +133,7 @@
 				} else if ($comtype=='instr') {
 					$query = "UPDATE imas_students SET gbinstrcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 				}
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			//}
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid");
@@ -177,7 +177,7 @@
 		$query = "SELECT i_s.id,iu.LastName,iu.FirstName,i_s.gbinstrcomment FROM imas_students AS i_s, imas_users as iu ";
 	}
 	$query .= "WHERE i_s.userid=iu.id AND i_s.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		echo "<span class=form>{$row[1]}, {$row[2]}</span><span class=formright><textarea cols=50 rows=3 name=\"{$row[0]}\">{$row[3]}</textarea></span><br class=form>";
 	}

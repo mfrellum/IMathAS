@@ -250,7 +250,7 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 	}
 	$lookforstr = implode(' OR ',$lookfor);
 	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$skip = array();
 	while ($row = mysql_fetch_row($result)) {
 		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$exmatch);
@@ -307,7 +307,7 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 		$searchwhere .= " LIMIT $lim";
 	}
 	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchwhere";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {return 0;}
 	$todel = array();
 	while ($row = mysql_fetch_row($result)) {
@@ -326,7 +326,7 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 	}
 	$lookforstr = implode(' OR ',$lookfor);
 	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$skip = array();
 	while ($row = mysql_fetch_row($result)) {
 		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$exmatch);
@@ -376,7 +376,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 		}
 		$cond = implode(' AND ',$conds);
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions WHERE $cond";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$cnt = 0;
 		while (($row = mysql_fetch_row($result)) && ($lim==0 || $cnt<$lim)) {
 			if (strpos($row[2].$row[3].$row[4],'FILE:')===false) { continue;}

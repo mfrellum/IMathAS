@@ -54,11 +54,11 @@
 	}
 	
 	$query = "SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid='{$_GET['id']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$itemid = mysql_result($result,0,0);
 	
 	$query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$items = unserialize(mysql_result($result,0,0));
 	if ($fcid==0) {
 		$coursename = mysql_result($result,0,1);
@@ -81,7 +81,7 @@
 		exit;
 	}
 	$query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$text = mysql_result($result, 0,0);
 	$title = mysql_result($result,0,1);
 	$titlesimp = strip_tags($title);

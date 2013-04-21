@@ -53,7 +53,7 @@
 	if ($type!='allstu' || !$isteacher) {
 		$query .= " AND (msgto='$userid' OR msgfrom='$userid')";
 	}
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo "Message not found";
 		require("../footer.php");
@@ -65,7 +65,7 @@
 	}
 	$query = "SELECT imas_msgs.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_msgs,imas_users ";
 	$query .= "WHERE imas_msgs.msgfrom=imas_users.id AND (imas_msgs.id='$baseid' OR imas_msgs.baseid='$baseid') ORDER BY imas_msgs.id";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($line =  mysql_fetch_assoc($result)) {
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['senddate'];
@@ -95,7 +95,7 @@
 	}
 	if ($line['courseid']>0) {
 		$query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$msgset = mysql_result($result,0,0);
 		$msgmonitor = floor($msgset/5);
 		$msgset = $msgset%5;
@@ -103,13 +103,13 @@
 			$cansendmsgs = true;
 			if ($msgset==1 && !$isteacher) { //check if sending to teacher 
 				$query = "SELECT id FROM imas_teachers WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)==0) {
 					$cansendmsgs = false;
 				}
 			} else if ($msgset==2 && !$isteacher) { //check if sending to stu
 				$query = "SELECT id FROM imas_students WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)==0) {
 					$cansendmsgs = false;
 				}

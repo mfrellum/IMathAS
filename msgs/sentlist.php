@@ -59,20 +59,20 @@ Read   Deleted   Deleted by Sender   Tagged
 	if (isset($_POST['remove'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&2)=2";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id IN ($checklist)";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	if (isset($_POST['unsend'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist)";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	if (isset($_GET['removeid'])) {
 		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&2)=2";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id='{$_GET['removeid']}'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	
 	$pagetitle = "Messages";
@@ -92,7 +92,7 @@ Read   Deleted   Deleted by Sender   Tagged
 	if ($filteruid>0) {
 		$query .= " AND msgto='$filteruid'";
 	}
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	if ($numpages==0 && $filteruid>0) {
 		//might have changed filtercid w/o changing user.
@@ -102,7 +102,7 @@ Read   Deleted   Deleted by Sender   Tagged
 		if ($filtercid>0) {
 			$query .= " AND courseid='$filtercid'";
 		}
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	}
 	$prevnext = '';
@@ -168,7 +168,7 @@ function chgfilter() {
 	echo ">All courses</option>";
 	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom='$userid'";
 	$query .= " ORDER BY imas_courses.name";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		echo "<option value=\"{$row[0]}\" ";
 		if ($filtercid==$row[0]) {
@@ -188,7 +188,7 @@ function chgfilter() {
 		$query .= " AND imas_msgs.courseid='$filtercid'";
 	}
 	$query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		echo "<option value=\"{$row[0]}\" ";
 		if ($filteruid==$row[0]) {
@@ -223,7 +223,7 @@ function chgfilter() {
 	$query .= " ORDER BY senddate DESC ";
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td><td></td></tr>";
 	}

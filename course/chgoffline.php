@@ -21,11 +21,11 @@ if (isset($_POST['checked'])) { //form submitted
 				$gbi = intval($gbi);
 				$checked[$k] = $gbi;
 				$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='$gbi'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			$checkedlist = "'".implode("','",$checked)."'";
 			$query = "DELETE FROM imas_gbitems WHERE id IN ($checkedlist)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		} else {
 			$checkedlist = implode(',',$checked);
 			require("../header.php");
@@ -36,7 +36,7 @@ if (isset($_POST['checked'])) { //form submitted
 			echo 'and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first.</p><p>';
 			$checkedlist = "'".implode("','",$checked)."'";
 			$query = "SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				echo $row[0].'<br/>';
 			}
@@ -70,7 +70,7 @@ if (isset($_POST['checked'])) { //form submitted
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
 			$query = "UPDATE imas_gbitems SET $setslist WHERE id IN ($checkedlist)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 	}
 	
@@ -80,7 +80,7 @@ if (isset($_POST['checked'])) { //form submitted
 
 //Prep for output
 $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $i=0;
 $page_gbcatSelect = array();
 if (mysql_num_rows($result)>0) {
@@ -108,7 +108,7 @@ echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 
 $gbitems = array();
 $query = "SELECT id,name FROM imas_gbitems WHERE courseid='$cid' ORDER BY name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$gbitems[$row[0]] = $row[1];
 }

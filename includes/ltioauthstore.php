@@ -25,7 +25,7 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[0]}' AND (rights=11 OR rights=76)";
 	}
 	
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		$secret = mysql_result($result,0,0);
 		if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
@@ -51,7 +51,7 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
     // Return $nonce if the nonce was previously used
     function lookup_nonce($consumer, $token, $nonce, $timestamp) {
         $query = "SELECT id FROM imas_ltinonces WHERE nonce='$nonce'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		return mysql_result($result,0,0);
 	} else {
@@ -63,11 +63,11 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
     function record_nonce($nonce) {
 	    $now = time();
 	    $query = "INSERT INTO imas_ltinonces (nonce,time) VALUES ('$nonce','$now')";
-	    mysql_query($query) or die("Query failed : " . mysql_error());
+	    mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	    
 	    $old = $now - 5400; //old stuff - 90 minutes
 	    $query = "DELETE FROM imas_ltinonces WHERE time<$old";
-	    mysql_query($query) or die("Query failed : " . mysql_error());
+	    mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
     }
 
     function mark_nonce_used($request) {

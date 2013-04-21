@@ -53,7 +53,7 @@ if ($myrights<20) {
 				
 				if ($isadmin) {
 					$query = "DELETE FROM imas_library_items WHERE qsetid IN ($remlist)";
-					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 					/*foreach (explode(',',$_POST['remove']) as $qid) {
 						delqimgs($qid);
 					}*/
@@ -61,30 +61,30 @@ if ($myrights<20) {
 					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
 					$query .= "imas_questionset.id IN ($remlist) AND imas_questionset.ownerid=imas_users.id ";
 					$query .= "AND imas_users.groupid='$groupid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($result)) {
 						$query = "DELETE FROM imas_library_items WHERE qsetid='$row[0]'";
-						mysql_query($query) or die("Query failed : $query" . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 						//delqimgs($row[0]);
 					}
 					
 				} else {
 					$query = "SELECT id FROM imas_questionset WHERE id IN ($remlist) AND ownerid='$userid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($result)) {
 						$query = "DELETE FROM imas_library_items WHERE qsetid='$row[0]'";
-						mysql_query($query) or die("Query failed : $query" . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 						//delqimgs($row[0]);
 					}
 				}
 				
 				if ($isgrpadmin) {
 					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($remlist) AND imas_users.groupid='$groupid'";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($result)) {
 						//$query = "DELETE FROM imas_questionset WHERE id='{$row[0]}'";
 						$query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$row[0]}'";
-						mysql_query($query) or die("Query failed : " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					}
 				} else {
 					$query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($remlist)";
@@ -92,7 +92,7 @@ if ($myrights<20) {
 					if (!$isadmin) {
 						$query .= " AND ownerid='$userid'";
 					}
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 				
 			}
@@ -117,10 +117,10 @@ if ($myrights<20) {
 				
 				if ($isgrpadmin) {
 					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($translist) AND imas_users.groupid='$groupid'";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($result)) {
 						$query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id='{$row[0]}'";
-						mysql_query($query) or die("Query failed : $query " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 					}
 
 				} else {
@@ -128,7 +128,7 @@ if ($myrights<20) {
 					if (!$isadmin) {
 						$query .= " AND ownerid='$userid'";
 					}
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				}
 		
 			}
@@ -148,7 +148,7 @@ if ($myrights<20) {
 			}
 			
 			$query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$i=0;
 			$page_transferUserList = array();
 			while ($row = mysql_fetch_row($result)) {
@@ -178,7 +178,7 @@ if ($myrights<20) {
 				
 				$alllibs = array();
 				$query = "SELECT qsetid,libid FROM imas_library_items WHERE qsetid IN ($chglist)";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$alllibs[$row[0]][] = $row[1];	
 				}
@@ -195,7 +195,7 @@ if ($myrights<20) {
 					}
 				}
 				$mylibs = array();
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$mylibs[$row[0]][] = $row[1];	
 				}
@@ -213,11 +213,11 @@ if ($myrights<20) {
 						foreach($toadd as $libid) {
 							if ($libid==0) { continue;} //no need to add to unassigned using "keep existing" 
 							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());	
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	
 						}
 						if (count($toadd)>1 || (count($toadd)>0 && $toadd[0]!=0)) {
 							$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid=0";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());	
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	
 						}
 					}
 				} else if ($_POST['action']==1) { //add, remove existing
@@ -233,22 +233,22 @@ if ($myrights<20) {
 						//and add them
 						foreach($toadd as $libid) {
 							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());	
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	
 						}
 						//determine which libraries to remove from; my lib assignments - newlibs
 						if (isset($mylibs[$qsetid])) {
 							$toremove = array_diff($mylibs[$qsetid],$newlibs);
 							foreach($toremove as $libid) {
 								$query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
-								mysql_query($query) or die("Query failed :$query " . mysql_error());	
+								mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	
 							}
 						
 							//check for unassigneds
 							$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
-							$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+							$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 							if (mysql_num_rows($result)==0) {
 								$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
-								mysql_query($query) or die("Query failed :$query " . mysql_error());
+								mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 							}
 						}
 					}
@@ -266,14 +266,14 @@ if ($myrights<20) {
 							$toremove = array_diff($mylibs[$qsetid],$newlibs);
 							foreach($toremove as $libid) {
 								$query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
-								mysql_query($query) or die("Query failed :$query " . mysql_error());	
+								mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	
 							}
 							//check for unassigneds
 							$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
-							$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+							$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 							if (mysql_num_rows($result)==0) {
 								$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
-								mysql_query($query) or die("Query failed :$query " . mysql_error());
+								mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 							}
 						}
 					}
@@ -282,7 +282,7 @@ if ($myrights<20) {
 /*
 				if ($_POST['onlyadd']==1) { //only adding to newly check libs
 					$query = "SELECT libid FROM imas_library_items WHERE qsetid IN ($chglist)";
-					$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($result)) {
 						$checked[] = $row[0];	
 					}
@@ -292,7 +292,7 @@ if ($myrights<20) {
 						foreach ($libarray as $qsetid) {
 							foreach($toadd as $libid) { 
 								$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-								mysql_query($query) or die("Query failed :$query " . mysql_error());
+								mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 							} 
 						}
 					}
@@ -309,7 +309,7 @@ if ($myrights<20) {
 							$query .= " AND (ownerid='$userid' OR libid=0)";
 						}
 					}
-					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 					$existing = array();
 					while($row = mysql_fetch_row($result)) { 
 						$existing[] = $row[0]; 
@@ -325,25 +325,25 @@ if ($myrights<20) {
 						$tochange = array_shift($toremove); 
 						$torep = array_shift($toadd); 
 						$query = "UPDATE imas_library_items SET libid='$torep' WHERE qsetid='$qsetid' AND libid='$tochange'";
-						mysql_query($query) or die("Query failed :$query " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 					} 
 					if (count($toadd)>0) { 
 						foreach($toadd as $libid) { 
 							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 						} 
 					} else if (count($toremove)>0) { 
 						foreach($toremove as $libid) { 
 							$query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 						} 
 					} 
 					//if (count($newlibs)==0) {
 						$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
-						$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 						if (mysql_num_rows($result)==0) {
 							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 						}
 					//}
 					
@@ -367,7 +367,7 @@ if ($myrights<20) {
 			} else {
 				$clist = implode(",",$_POST['nchecked']);
 				$query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist)";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$checked[] = $row[0];	
 				}
@@ -376,14 +376,14 @@ if ($myrights<20) {
 			/*
 			if (!$isadmin && !$isgrpadmin) {
 				$query = "SELECT libid FROM imas_library_items WHERE qsetid IN ($clist) AND ownerid!='$userid'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$locked[] = $row[0];	
 				}
 			} else if ($isgrpadmin) {
 				$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ";
 				$query .= "ili.ownerid=imas_users.id AND imas_users.groupid!='$groupid' AND ili.qsetid IN ($clist)";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$locked[] = $row[0];	
 				}
@@ -415,28 +415,28 @@ if ($myrights<20) {
 			$qtochg = explode(',',$_POST['qtochg']);
 			$now = time();
 			$query = "SELECT firstName,lastName FROM imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			$myname = $row[1].','.$row[0];
 			foreach ($qtochg as $k=>$qid) {
 				$query = "SELECT description,userights,qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qid'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				$row = mysql_fetch_row($result);
 				$row[0] .= " (copy by $userfullname)";
 				$mt = microtime();
 				$uqid = substr($mt,11).substr($mt,2,3).$k;
 				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,author,description,userights,qtype,control,qcontrol,qtext,answer,hasimg) VALUES ";
 				$query .= "('$uqid','$now','$now','$userid','$myname','".implode("','",addslashes_deep($row))."')";
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$nqid = mysql_insert_id();
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
+				$nqid = mysqli_insert_id($GLOBALS['link'])();
 				$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','$nqid','$userid')";
-				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				
 				$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qid'";
-				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$query = "INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES ('$nqid','{$row[0]}','{$row[1]}','{$row[2]}')";
-					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				}
 				
 			}
@@ -461,7 +461,7 @@ if ($myrights<20) {
 		if (isset($_POST['qtochg'])) {
 			if ($isgrpadmin) {
 				$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($chglist) AND imas_users.groupid='$groupid'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				$tochg = array();
 				while ($row = mysql_fetch_row($result)) {
 					$tochg[] = $row[0];
@@ -469,7 +469,7 @@ if ($myrights<20) {
 				if (count($tochg)>0) {
 					$chglist = implode(',',$tochg);
 					$query = "UPDATE imas_questionset SET userights='{$_POST['newrights']}' WHERE id IN ($chglist)";
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				}
 			} else {
 				$chglist = "'".implode("','",explode(',',$_POST['qtochg']))."'";
@@ -477,7 +477,7 @@ if ($myrights<20) {
 				if (!$isadmin) {
 					$query .= " AND ownerid='$userid'";
 				}
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			}
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			exit;
@@ -499,7 +499,7 @@ if ($myrights<20) {
 				$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
 				$query .= "imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ";
 				$query .= "imas_questionset.id='{$_GET['remove']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) {
 					$query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$_GET['remove']}'";
 					//$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
@@ -515,10 +515,10 @@ if ($myrights<20) {
 					$query .= " AND ownerid='$userid'";
 				}
 			}
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_affected_rows($link)>0) {
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+			if (mysqli_affected_rows($GLOBALS['link'])($link)>0) {
 				$query = "DELETE FROM imas_library_items WHERE qsetid='{$_GET['remove']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				//delqimgs($_GET['remove']);
 			}
 			
@@ -536,10 +536,10 @@ if ($myrights<20) {
 			
 			if ($isgrpadmin) {
 				$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id='{$_GET['transfer']}' AND imas_users.groupid='$groupid'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) {
 					$query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id='{$_GET['transfer']}'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 
 			} else {
@@ -547,7 +547,7 @@ if ($myrights<20) {
 				if (!$isadmin) {
 					$query .= " AND ownerid='$userid'";
 				}
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
@@ -558,7 +558,7 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; Transfer QSet";
 			
 			$query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$i=0;
 			$page_transferUserList = array();
 			while ($row = mysql_fetch_row($result)) {
@@ -671,7 +671,7 @@ if ($myrights<20) {
 		}
 		
 		$query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$lnamesarr[$row[1]] = $row[0];
 			$libsortorder[$row[1]] = $row[2];
@@ -719,7 +719,7 @@ if ($myrights<20) {
 			}
 		}
 		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id LIMIT 500";
-		$resultLibs = mysql_query($query) or die("Query failed : " . mysql_error());
+		$resultLibs = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		$page_questionTable = array();
 		$page_libstouse = array();
@@ -816,7 +816,7 @@ if ($myrights<20) {
 		if (count($page_questionTable)>0) {
 			$allusedqids = implode(',', array_keys($page_questionTable));
 			$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$page_questionTable[$row[0]]['times'] = $row[1];
 			}
@@ -1152,15 +1152,15 @@ require("../footer.php");
 
 function delqimgs($qsid) {
 	$query = "SELECT id,filename,var FROM imas_qimages WHERE qsetid='$qsid'";
-	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
-		$r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($r2)==1) { //don't delete if file is used in other questions
 			unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
 		}
 		$query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
-		mysql_query($query) or die("Query failed :$query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 	}
 }
 ?>

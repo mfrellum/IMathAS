@@ -41,7 +41,7 @@ if ($canviewall) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbmode = mysql_result($result,0,0);
 		
 		
@@ -50,7 +50,7 @@ if ($canviewall) {
 		$colorize = $_COOKIE["colorize-$cid"];
 	} else {
 		$query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$colorize = mysql_result($result,0,0);
 		setcookie("colorize-$cid",$colorize);
 	}
@@ -109,11 +109,11 @@ if ($isteacher) {
 	if (isset($_GET['togglenewflag'])) {
 		//recording a toggle.  Called via AHAH
 		$query = "SELECT newflag FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$newflag = mysql_result($result,0,0);
 		$newflag = $newflag ^ 1;  //XOR
 		$query = "UPDATE imas_courses SET newflag = $newflag WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (($newflag&1)==1) {
 			echo 'New';
 		} 
@@ -166,7 +166,7 @@ if ($isteacher) {
 	}
 	if (isset($_POST['usrcomments']) && $stu>0) {
 			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			//echo "<p>Comment Updated</p>";
 	}
 	if (isset($_POST['score']) && $stu>0) {
@@ -176,7 +176,7 @@ if ($isteacher) {
 			} else {
 				$query = "UPDATE imas_grades SET score='$val',feedback='{$_POST['feedback'][$id]}' WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
 			}
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 	}
 	if (isset($_POST['newscore']) && $stu>0) {
@@ -184,11 +184,11 @@ if ($isteacher) {
 		foreach ($_POST['newscore'] as $id=>$val) {
 			if (trim($val)=="") {continue;}
 			$toins[] = "('$id','offline','$stu','$val','{$_POST['feedback'][$id]}')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		if (count($toins)>0) {
 			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
@@ -434,7 +434,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		if ($catfilter==0) { echo "selected=1";}
 		echo '>Default</option>';
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			echo '<option value="'.$row[0].'"';
 			if ($catfilter==$row[0]) {echo "selected=1";}
@@ -570,7 +570,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	if ($catfilter==0) { echo "selected=1";}
 	echo '>Default</option>';
 	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		echo '<option value="'.$row[0].'"';
 		if ($catfilter==$row[0]) {echo "selected=1";}
@@ -648,7 +648,7 @@ function gbstudisp($stu) {
 	
 	if ($stu>0) {
 		$query = "SELECT showlatepass FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$showlatepass = mysql_result($result,0,0);
 		
 		if ($isteacher) {
@@ -663,7 +663,7 @@ function gbstudisp($stu) {
 		echo '<h3>' . strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span></h3>';
 		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		echo '<div style="clear:both">';
 		if (mysql_num_rows($result)>0) {
 			if ($isteacher) {
@@ -856,7 +856,7 @@ function gbstudisp($stu) {
 	echo '</tbody></table>';	
 	if (!$hidepast) {
 		$query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$show = mysql_result($result,0,0);
 		//echo '</tbody></table><br/>';
 		if ($isteacher && $stu>0) {
@@ -1100,7 +1100,7 @@ function gbinstrdisp() {
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";

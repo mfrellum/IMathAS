@@ -26,20 +26,20 @@
 	if (isset($_POST['read'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	if (isset($_POST['remove'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	if (isset($_GET['removeid'])) {
 		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&4)=4";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id='{$_GET['removeid']}'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	
 	$pagetitle = "New Messages";
@@ -65,7 +65,7 @@
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&3)=0 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo "<p>No new messages</p>";
 	} else {

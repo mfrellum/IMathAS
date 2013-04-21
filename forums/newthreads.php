@@ -23,7 +23,7 @@
 	}
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))";
 	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$forumname = array();
 	$forumids = array();
 	$lastpost = array();
@@ -39,7 +39,7 @@
 		if (count($forumids)>0) {
 			$forumidlist = implode(',',$forumids);
 			$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			
 			$threadids = array();
 			while ($row = mysql_fetch_row($result)) {
@@ -49,14 +49,14 @@
 				$threadlist = implode(',',$threadids);
 				$toupdate = array();
 				$query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$toupdate[] = $row[0];
 				}
 				if (count($toupdate)>0) {
 					$touplodatelist= implode(',',$toupdate);
 					$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				}
 				$toinsert = array_diff($threadids,$toupdate);
 				if (count($toinsert)>0) {
@@ -70,7 +70,7 @@
 							$first = false;
 						}
 					}
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				}
 			}
 		}
@@ -89,7 +89,7 @@
 		$threadids = implode(',',array_keys($lastpost));
 		$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
 		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_posts.forumid";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 
 		while ($line = mysql_fetch_assoc($result)) {
 			if ($forumname[$line['threadid']]!=$lastforum) {

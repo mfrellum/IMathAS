@@ -79,7 +79,7 @@ if ($myrights<20) {
 	
 	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid,imas_questionset.broken ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$email = mysql_result($result,0,0);
 	$author = mysql_result($result,0,1);
 	$descr = mysql_result($result,0,2);
@@ -100,7 +100,7 @@ if ($myrights<20) {
 	}
 	
 	$query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='{$_GET['qsetid']}'";
-	$resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());
+	$resultLibNames = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }
 
 /******* begin html output ********/

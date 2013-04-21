@@ -14,15 +14,15 @@
 	
 	/*if (isset($_POST['addnew'])) {
 		$query = "INSERT INTO imas_gbcats (courseid) VALUES ('$cid')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}*/
 	if (isset($_GET['remove'])) {
 		$query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$query = "UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$query = "DELETE FROM imas_gbcats WHERE id='{$_GET['remove']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
 		//WORK ON ME
@@ -70,19 +70,19 @@
 				if (trim($name)!='') {
 					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
 					$query .= "('$cid','$name','$scale','$st','$chop','$drop','$weight',$hide)";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			} else if ($id==0) {
 				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide";
 			} else {
 				$query = "UPDATE imas_gbcats SET name='$name',scale='$scale',scaletype='$st',chop='$chop',dropn='$drop',weight='$weight',hidden=$hide WHERE id='$id'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		}
 		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
 		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (isset($_POST['submit'])) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&gbmode=$defgbmode");
 			exit;
@@ -152,7 +152,7 @@
 		
 	
 	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode,colorize FROM imas_gbscheme WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = mysql_fetch_row($result);
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
@@ -264,7 +264,7 @@
 	
 	disprow(0,$row);
 	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$id = array_shift($row);
 		disprow($id,$row);

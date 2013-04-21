@@ -26,13 +26,13 @@ echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 echo '<div id="headerloginlog" class="pagetitle"><h2>'.$pagetitle. '</h2></div>';
 
 $query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $row = mysql_fetch_row($result);
 echo '<h3>Login Log for '.$row[1].', '.$row[0].'</h3>';
 echo '<ul class="nomark">';
 
 $query = "SELECT logintime,lastaction FROM imas_login_log WHERE userid='$uid' AND courseid='$cid' ORDER BY logintime DESC";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	echo '<li>'.tzdate("l, F j, Y, g:i a",$row[0]);
 	if ($row[1]>0) {

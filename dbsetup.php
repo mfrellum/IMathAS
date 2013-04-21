@@ -13,12 +13,12 @@
 $dbsetup = true;
 include("config.php");
 $link = mysql_connect($dbserver,$dbusername, $dbpassword) 
-  or die("Could not connect : " . mysql_error());
+  or die("Could not connect : " . mysqli_error($GLOBALS['link']));
 mysql_select_db($dbname) 
   or die("Could not select database");
   
 $query = "SELECT ver FROM imas_dbschema WHERE id=1";
-$result = mysql_query($query);
+$result = mysqli_query($GLOBALS['link'],$query);
 if ($result!==false) {
 	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
 	echo "rerun the setup, clear out your database";
@@ -104,7 +104,7 @@ $sql = 'CREATE TABLE `imas_users` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'User Information\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 
 echo 'imas_users created<br/>';
 
@@ -125,7 +125,7 @@ $sql = 'CREATE TABLE `imas_students` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Which courses each student is enrolled in\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_students created<br/>';
 
 $sql = 'CREATE TABLE `imas_teachers` ('
@@ -136,7 +136,7 @@ $sql = 'CREATE TABLE `imas_teachers` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Which courses each teacher is teaching\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_teachers created<br/>';
 
 $sql = 'CREATE TABLE `imas_tutors` ('
@@ -147,7 +147,7 @@ $sql = 'CREATE TABLE `imas_tutors` ('
 	. 'INDEX (`userid`), INDEX(`courseid`) '
 	. ' ) ENGINE = InnoDB '
 	. 'COMMENT = \'course tutors\'';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_tutors created<br/>';
 
 $sql = 'CREATE TABLE `imas_courses` ('
@@ -177,7 +177,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Course list\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_courses created<br/>';
 
 $sql = 'CREATE TABLE `imas_assessments` ('
@@ -230,7 +230,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Assessment info\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_assessments created<br/>';
 
 $sql = 'CREATE TABLE `imas_questions` ('
@@ -250,7 +250,7 @@ $sql = 'CREATE TABLE `imas_questions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Questions in an assessment\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_questions created<br/>';
 
 $sql = 'CREATE TABLE `imas_questionset` ('
@@ -277,7 +277,7 @@ $sql = 'CREATE TABLE `imas_questionset` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Actual set of questions\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_questionset created<br/>';
 
 $sql = 'CREATE TABLE `imas_qimages` ('
@@ -290,7 +290,7 @@ $sql = 'CREATE TABLE `imas_qimages` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Static image ref for questionset\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_qimages created<br/>';
 
 $sql = 'CREATE TABLE `imas_items` ('
@@ -302,7 +302,7 @@ $sql = 'CREATE TABLE `imas_items` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Items within a course\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_items created<br/>';
 
 $sql = 'CREATE TABLE `imas_assessment_sessions` ('
@@ -334,7 +334,7 @@ $sql = 'CREATE TABLE `imas_assessment_sessions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Assessment Sessions\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_assessment_sessions created<br/>';
 
 $sql = 'CREATE TABLE `imas_sessions` ('
@@ -347,7 +347,7 @@ $sql = 'CREATE TABLE `imas_sessions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Session data\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_sessions created<br/>';
 
 $sql = 'CREATE TABLE `imas_inlinetext` ('
@@ -365,7 +365,7 @@ $sql = 'CREATE TABLE `imas_inlinetext` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Inline text items\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_inlinetext created<br/>';
 
 $sql = 'CREATE TABLE `imas_instr_files` ('
@@ -377,7 +377,7 @@ $sql = 'CREATE TABLE `imas_instr_files` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Inline text file attachments\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_instr_files created<br/>';
 
 $sql = 'CREATE TABLE `imas_linkedtext` ('
@@ -396,7 +396,7 @@ $sql = 'CREATE TABLE `imas_linkedtext` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Linked Text Items\';'; 
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_linkedtext created<br/>';
 
 $sql = 'CREATE TABLE `imas_exceptions` ('
@@ -410,7 +410,7 @@ $sql = 'CREATE TABLE `imas_exceptions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Per student exceptions to assessment start/end date\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_exceptions created<br/>';
 
 $sql = 'CREATE TABLE `imas_libraries` ('
@@ -428,7 +428,7 @@ $sql = 'CREATE TABLE `imas_libraries` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'QuestionSet Libraries\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_libraries created<br/>';
 
 $sql = 'CREATE TABLE `imas_library_items` ('
@@ -441,7 +441,7 @@ $sql = 'CREATE TABLE `imas_library_items` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Library assignments\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_library_items created<br/>';
 
 $sql = 'CREATE TABLE `imas_forums` ('
@@ -471,7 +471,7 @@ $sql = 'CREATE TABLE `imas_forums` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forums\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_forums created<br/>';
 
 $sql = 'CREATE TABLE `imas_forum_threads` ('
@@ -484,7 +484,7 @@ $sql = 'CREATE TABLE `imas_forum_threads` ('
 	. ' PRIMARY KEY (`id`), INDEX (`forumid`), INDEX(`lastposttime`), INDEX(`stugroupid`) ) '
 	. ' ENGINE = InnoDB '
 	. ' COMMENT = \'Forum threads\'';	
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_forum_threads created<br/>';	
 			
 $sql = 'CREATE TABLE `imas_forum_posts` ('
@@ -506,7 +506,7 @@ $sql = 'CREATE TABLE `imas_forum_posts` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forum Postings\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_forum_posts created<br/>';
 
 $sql = 'CREATE TABLE `imas_forum_views` ('
@@ -519,7 +519,7 @@ $sql = 'CREATE TABLE `imas_forum_views` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forum last viewings\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_forum_views created<br/>';
 
 $sql = 'CREATE TABLE `imas_forum_likes` (
@@ -529,7 +529,7 @@ $sql = 'CREATE TABLE `imas_forum_likes` (
 	`postid` INT(10) UNSIGNED NOT NULL, 
 	`type` TINYINT(1) UNSIGNED NOT NULL
 	) ENGINE = InnoDB';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_forum_likes created<br/>';
 
 $sql = 'CREATE TABLE `imas_wikis` ('
@@ -548,7 +548,7 @@ $sql = 'CREATE TABLE `imas_wikis` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Wikis\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_wikis created<br/>';
 
 $sql = 'CREATE TABLE `imas_wiki_revisions` ('
@@ -562,7 +562,7 @@ $sql = 'CREATE TABLE `imas_wiki_revisions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Wiki revisions\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_wiki_revisions created<br/>';
 
 $sql = 'CREATE TABLE `imas_wiki_views` ('
@@ -575,7 +575,7 @@ $sql = 'CREATE TABLE `imas_wiki_views` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Wiki last viewings\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_wiki_views created<br/>';
 
 $sql = 'CREATE TABLE `imas_groups` ('
@@ -583,7 +583,7 @@ $sql = 'CREATE TABLE `imas_groups` ('
         . ' `name` VARCHAR(255) NOT NULL'
         . ' )'
         . ' ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_groups created<br/>';
 
 $sql = 'CREATE TABLE `imas_rubrics` ('
@@ -597,7 +597,7 @@ $sql = 'CREATE TABLE `imas_rubrics` ('
 	. ' )'
 	. ' ENGINE = InnoDB'
 	. ' COMMENT = \'Rubrics\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));	
 echo 'imas_rubrics created<br/>';
 
 $sql = 'CREATE TABLE `imas_diags` ('
@@ -621,7 +621,7 @@ $sql = 'CREATE TABLE `imas_diags` ('
         . ' INDEX (`ownerid`), INDEX(`public`), INDEX(`cid`)'
         . ' )'
         . ' ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_diags created<br/>';
 
 $sql = 'CREATE TABLE `imas_diag_onetime` ('
@@ -633,7 +633,7 @@ $sql = 'CREATE TABLE `imas_diag_onetime` ('
         . ' INDEX (`diag`), INDEX(`time`), INDEX(`code`)'
         . ' )'
         . ' ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_diag_onetime created<br/>';
 
 $sql = 'CREATE TABLE `imas_msgs` ('
@@ -652,7 +652,7 @@ $sql = 'CREATE TABLE `imas_msgs` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Internal messages\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_msgs created<br/>';
 
 $sql = 'CREATE TABLE `imas_forum_subscriptions` ('
@@ -663,7 +663,7 @@ $sql = 'CREATE TABLE `imas_forum_subscriptions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forum subscriptions\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_forum_subscriptions created<br/>';
 
 
@@ -681,7 +681,7 @@ $sql = 'CREATE TABLE `imas_gbscheme` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Gradebook scheme\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_gbscheme created<br/>';
 
 $sql = 'CREATE TABLE `imas_gbitems` ('
@@ -698,7 +698,7 @@ $sql = 'CREATE TABLE `imas_gbitems` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Gradebook offline items\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_gbitems created<br/>';
 
 $sql = 'CREATE TABLE `imas_grades` ('
@@ -713,7 +713,7 @@ $sql = 'CREATE TABLE `imas_grades` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Offline grades\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_grades created<br/>';
 
 $sql = 'CREATE TABLE `imas_gbcats` ('
@@ -730,7 +730,7 @@ $sql = 'CREATE TABLE `imas_gbcats` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Gradebook Categories\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_gbcats created<br/>';
 
 $sql = 'CREATE TABLE `imas_calitems` ('
@@ -743,7 +743,7 @@ $sql = 'CREATE TABLE `imas_calitems` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Calendar Items\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_calitems created<br/>';
 
 $sql = 'CREATE TABLE `imas_stugroupset` ('
@@ -755,7 +755,7 @@ $sql = 'CREATE TABLE `imas_stugroupset` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Student Group Sets\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_stugroupset created<br/>';
 
 $sql = 'CREATE TABLE `imas_stugroups` ('
@@ -766,7 +766,7 @@ $sql = 'CREATE TABLE `imas_stugroups` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Student Groups\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_stugroups created<br/>';
 
 $sql = 'CREATE TABLE `imas_stugroupmembers` ('
@@ -777,7 +777,7 @@ $sql = 'CREATE TABLE `imas_stugroupmembers` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Student Group Members\';';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_stugroupmembers created<br/>';
 
 $sql = 'CREATE TABLE `imas_ltiusers` ('
@@ -787,7 +787,7 @@ $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' `userid` INT(10) NOT NULL'
         . ' )'
         . ' ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_ltiusers created<br/>';
 
 $sql = 'CREATE TABLE `imas_ltinonces` ('
@@ -796,7 +796,7 @@ $sql = 'CREATE TABLE `imas_ltinonces` ('
         . ' `time` INT(10) UNSIGNED NOT NULL'
         . ' )'
         . ' ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_ltinonces created<br/>';
 
 $sql = 'CREATE TABLE `imas_lti_courses` (
@@ -806,7 +806,7 @@ $sql = 'CREATE TABLE `imas_lti_courses` (
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 	 INDEX(`org`,`contextid`)
 	) ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_lti_courses created<br/>';
 
 $sql = 'CREATE TABLE `imas_lti_placements` (
@@ -818,7 +818,7 @@ $sql = 'CREATE TABLE `imas_lti_placements` (
 	`placementtype` VARCHAR( 10 ) NOT NULL ,
 	 INDEX(`org`, `contextid`, `linkid`)
 	) ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_lti_placements created<br/>';
 
 $sql = 'CREATE TABLE `mc_sessions` ('
@@ -832,7 +832,7 @@ $sql = 'CREATE TABLE `mc_sessions` ('
         . ' INDEX ( `sessionid` ), INDEX( `room` ), INDEX( `lastping` )'
         . ' ) ENGINE = InnoDB;';
 	
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'mc_sessions created<br/>';
 
 $sql = 'CREATE TABLE `mc_msgs` ('
@@ -842,7 +842,7 @@ $sql = 'CREATE TABLE `mc_msgs` ('
         . ' `time` INT( 10 ) UNSIGNED NOT NULL ,'
         . ' INDEX ( `userid` ), INDEX ( `time` )'
         . ' ) ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'mc_msgs created<br/>';
 
 $sql = 'CREATE TABLE `imas_drillassess` (
@@ -859,7 +859,7 @@ $sql = 'CREATE TABLE `imas_drillassess` (
 	`showtostu` TINYINT( 1 ) UNSIGNED NOT NULL ,
 	INDEX ( `courseid` )
 	) ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_drillassess created<br/>';
 				
 $sql = 'CREATE TABLE `imas_drillassess_sessions` (
@@ -873,7 +873,7 @@ $sql = 'CREATE TABLE `imas_drillassess_sessions` (
 	`scorerec` TEXT NOT NULL ,
 	INDEX ( `drillassessid`), INDEX(`userid` )
 	) ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_drillassess_sessions created<br/>';
 
 $sql = 'CREATE TABLE `imas_login_log` (
@@ -884,7 +884,7 @@ $sql = 'CREATE TABLE `imas_login_log` (
 	`lastaction` INT( 10 ) UNSIGNED NOT NULL ,
 	 INDEX(`userid` ), INDEX(`courseid`)
 	) ENGINE = InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_login_log created<br/>';
 
 $sql = 'CREATE TABLE `imas_log` (
@@ -892,7 +892,7 @@ $sql = 'CREATE TABLE `imas_log` (
 	`time` INT( 10 ) UNSIGNED NOT NULL ,
 	`log` TEXT NOT NULL 
 	) ENGINE = InnoDB';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_log created<br/>';
 
 $sql = 'CREATE TABLE `imas_external_tools` (
@@ -907,7 +907,7 @@ $sql = 'CREATE TABLE `imas_external_tools` (
 	`groupid` INT( 10 ) UNSIGNED NOT NULL ,
 	INDEX ( `url` ), INDEX( `courseid` ), INDEX( `groupid` )
 	) ENGINE = InnoDB COMMENT = \'LTI external tools\'';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_external_tools created<br/>';
 
 $sql = 'CREATE TABLE `imas_badgesettings` (
@@ -920,7 +920,7 @@ $sql = 'CREATE TABLE `imas_badgesettings` (
 	  `requirements` text NOT NULL,
 	  INDEX(`courseid`)
 	) ENGINE=InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_badgesettings created<br/>';	
 
 $sql = 'CREATE TABLE `imas_badgerecords` (
@@ -930,7 +930,7 @@ $sql = 'CREATE TABLE `imas_badgerecords` (
 	  `data` text NOT NULL,
 	  INDEX (`userid`), INDEX(`badgeid`)
 	) ENGINE=InnoDB;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_badgerecords created<br/>';
 
 $sql = 'CREATE TABLE `imas_bookmarks` (
@@ -941,22 +941,22 @@ $sql = 'CREATE TABLE `imas_bookmarks` (
 	`value` TEXT NOT NULL ,
 	INDEX ( `courseid`) , INDEX( `userid`) , INDEX( `name` )
 	) ENGINE = InnoDB';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_bookmarks created<br/>';
 
 $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
 	`ver` SMALLINT( 4 ) UNSIGNED NOT NULL
 	) ENGINE = InnoDB';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest account counter
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo 'imas_dbschema created<br/>';
 
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+mysqli_query($GLOBALS['link'],$sql) or die("Query failed : $sql " . mysqli_error($GLOBALS['link']));
 echo "user $username created<br/>";
 
 //write upgradecounter

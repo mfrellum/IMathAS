@@ -29,7 +29,7 @@
 	}
 	function getpointspossible($qn,$defpts,$defatt) {
 		$query = "SELECT points,attempts FROM imas_questions WHERE id='$qn'";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 		 	if ($row[0] == 9999) {
 				$possible = $defpts;
@@ -51,7 +51,7 @@
 		$testid = addslashes($sessiondata['sessiontestid']);
 	}
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	$questions = explode(",",$line['questions']);
 	$seeds = explode(",",$line['seeds']);
@@ -61,7 +61,7 @@
 	if ($isteacher) {
 		if ($line['userid']!=$userid) {
 			$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
-			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			$userfullname = $row[1]." ".$row[0];
 		}
@@ -69,7 +69,7 @@
 	}
 	
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$testsettings = mysql_fetch_assoc($result);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 	
@@ -77,7 +77,7 @@
 	$isreview = false;
 	if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
-		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result2);
 		if ($row!=null) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -132,7 +132,7 @@
 		echo '<div class="nobreak">';
 		if (isset($_GET['descr'])) {
 			$query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
-			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 			echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
 		} else {
 			list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);

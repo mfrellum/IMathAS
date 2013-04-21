@@ -30,7 +30,7 @@ if ($isteacher) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbmodet = mysql_result($result,0,0);
 		$gbmode = 2;
 		if (($gbmodet&8)==8) { $gbmode += 1000;}
@@ -189,7 +189,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	if ($catfilter==0) { echo "selected=1";}
 	echo '>Default</option>';
 	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		echo '<option value="'.$row[0].'"';
 		if ($catfilter==$row[0]) {echo "selected=1";}
@@ -272,13 +272,13 @@ function gbstudisp($stu) {
 	if ($stu>0) {
 		if ($isteacher && isset($_POST['usrcomments'])) {
 			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			echo "<p>Comment Updated</p>";
 		}
 		echo '<h3>' . strip_tags($gbt[1][0][0]) . '</h3>';
 		$query = "SELECT imas_students.gbcomment,imas_users.email FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			if ($isteacher) {
 				echo '<a href="mailto:'.mysql_result($result,0,1).'">Email</a> | ';
@@ -451,7 +451,7 @@ function gbinstrdisp() {
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {

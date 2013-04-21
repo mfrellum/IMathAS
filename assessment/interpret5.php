@@ -30,7 +30,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 
 function getquestionqtext($m) {
 	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo "bad question id in includeqtextfrom";
 		return "";
@@ -574,7 +574,7 @@ function tokenize($str,$anstype,$countcnt) {
 			} else if ($lastsym[0] == 'importcodefrom' || $lastsym[0] == 'includecodefrom') {
 				$out = intval(substr($out,1,strlen($out)-2));
 				$query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)==0) {
 					//was an error, return error token
 					return array(array('',9));

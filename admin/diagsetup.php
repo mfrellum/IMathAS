@@ -60,7 +60,7 @@ if ($myrights<60) {
 	$sel2 = array();
 	if (isset($_POST['id'])) {
 		$query = "SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id='{$_POST['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		$s1l = explode(',',$row[0]);
 		$s2l = explode(';',$row[2]);
@@ -85,7 +85,7 @@ if ($myrights<60) {
 		$i=0;
 
 		$query = "SELECT id,name FROM imas_assessments WHERE courseid='{$_POST['cid']}'";
-		$result = mysql_query($query);
+		$result = mysqli_query($GLOBALS['link'],$query);
 		
 		while ($row = mysql_fetch_row($result)) {
 			$page_selectValList[$k][$i] = $row[0];
@@ -143,15 +143,15 @@ if ($myrights<60) {
 		$query .= "ips='{$_POST['iplist']}',pws='{$_POST['pwlist']}',idprompt='{$_POST['idprompt']}',sel1name='{$_POST['sel1name']}',";
 		$query .= "sel1list='{$_POST['sel1list']}',aidlist='$aidlist',sel2name='{$_POST['sel2name']}',sel2list='$sel2list',entryformat='{$_POST['entryformat']}',forceregen='$forceregen',reentrytime='{$_POST['reentrytime']}' ";
 		$query .= " WHERE id='{$_POST['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$id = $_POST['id'];
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
 	} else {
 		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime) VALUES ";
 		$query .= "('$userid','{$_POST['diagname']}','{$_POST['cid']}','{$_POST['term']}','{$_POST['public']}','{$_POST['iplist']}',";
 		$query .= "'{$_POST['pwlist']}','{$_POST['idprompt']}','{$_POST['sel1name']}','{$_POST['sel1list']}','$aidlist','{$_POST['sel2name']}','$sel2list','{$_POST['entryformat']}','$forceregen','{$_POST['reentrytime']}')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$id = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+		$id = mysqli_insert_id($GLOBALS['link'])();
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
 	}
 	$page_diagLink = "<p>Direct link to diagnostic:  <b>http://{$_SERVER['HTTP_HOST']}$imasroot/diag/index.php?id=$id</b></p>";
@@ -160,7 +160,7 @@ if ($myrights<60) {
 } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
 	if (isset($_GET['id'])) { 
 		$query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($result);
 		$diagname = $line['name'];
 		$cid = $line['cid'];
@@ -208,7 +208,7 @@ if ($myrights<60) {
 	
 	$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
 	$query .= "AND imas_teachers.userid='$owner' ORDER BY imas_courses.name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 	$i=0;
 	$page_courseSelectList = array();

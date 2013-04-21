@@ -23,13 +23,13 @@
 		if (count($_POST['remove'])>0) {
 			$toremove = "'".implode("','",$_POST['remove'])."'";
 			$query = "DELETE FROM imas_tutors WHERE id IN ($toremove) AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		//update sections
 		if (count($_POST['section'])>0) {
 			foreach ($_POST['section'] as $id=>$val) {
 				$query = "UPDATE imas_tutors SET section='$val' WHERE id='$id' AND courseid='$cid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		}
 		//add new tutors
@@ -37,13 +37,13 @@
 			//gotta check if they're already a tutor
 			$existingsids = array();
 			$query = "SELECT u.SID FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$existingsids[] = $row[0];
 			}
 			//also don't want students enrolled as tutors
 			$query = "SELECT u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$existingsids[] = $row[0];
 			}
@@ -56,7 +56,7 @@
 				$tutsids = "'".implode("','",$sidstouse)."'";
 				//check if SID exists
 				$query = "SELECT id,SID FROM imas_users WHERE SID in ($tutsids)";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) {
 					while ($row = mysql_fetch_row($result)) {
 						$inspt[] = "('{$row[0]}','$cid','')";
@@ -65,7 +65,7 @@
 					$ins = implode(',',$inspt);
 					//insert them
 					$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES $ins";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$notfound = array_diff($sids,$foundsid);
 					if (count($notfound)>0) {
 						$err .= "<p>Some usernames not found:<br/>";
@@ -91,7 +91,7 @@
 	//if diagnostic, then we'll use level-2 selectors in place of sections.  level-2 selector is recorded into the
 	//imas_students.section field, so filter will act the same.
 	$query = "SELECT sel2name,sel2list FROM imas_diags WHERE cid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		$isdiag = true;
 		$limitname = mysql_result($result,0,0);
@@ -103,7 +103,7 @@
 	//if not diagnostic, we'll work off the sections
 	if (!$isdiag) {
 		$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' AND section IS NOT NULL";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$sections[] = $row[0];
 		}
@@ -116,7 +116,7 @@
 	$tutorlist = array();
 	$i = 0;
 	$query = "SELECT tut.id,u.LastName,u.FirstName,tut.section FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid='$cid' ORDER BY u.LastName,u.FirstName";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$tutorlist[$i]['id'] = $row[0];
 		$tutorlist[$i]['name'] = $row[1].', '.$row[2];

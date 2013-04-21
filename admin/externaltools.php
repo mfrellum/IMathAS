@@ -70,7 +70,7 @@ if (isset($_POST['tname'])) {
 				$query .= "AND groupid='$groupid'";
 			}
 		}
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
@@ -85,7 +85,7 @@ if (isset($_POST['tname'])) {
 		} else if ($isgrpadmin) {
 			$query .= "AND groupid='$groupid'";
 		}
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
@@ -104,7 +104,7 @@ if (isset($_POST['tname'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Delete Tool</div>";
 		echo "<h2>Delete Tool</h2>";
 		$query = "SELECT name FROM imas_external_tools WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$name = mysql_result($result,0,0);
 		
 		echo '<p>Are you SURE you want to delete the tool <b>'.$name.'</b>?  Doing so will break ALL placements of this tool.</p>';
@@ -125,7 +125,7 @@ if (isset($_POST['tname'])) {
 			} else if ($isgrpadmin) {
 				$query .= " AND groupid='$groupid'";
 			}
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)==0) { die("invalid id");}
 			list($name,$url,$key,$secret,$custom,$privacy,$grp) = mysql_fetch_row($result);
 			$custom = str_replace('&',"\n",$custom);
@@ -189,7 +189,7 @@ if (isset($_POST['tname'])) {
 			echo '<p><b>Course Tools</b></p>';
 			$query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ORDER BY name";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		echo '<ul class="nomark">';
 		if (mysql_num_rows($result)==0) {
 			echo '<li>No tools</li>';

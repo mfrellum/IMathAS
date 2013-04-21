@@ -38,12 +38,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}*/
 	
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref FROM imas_questionset WHERE id='$qidx'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$qdata = mysql_fetch_assoc($result);
 	
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
@@ -372,7 +372,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;	
 	$query = "SELECT qtype,control,answer FROM imas_questionset WHERE id='$qidx'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$qdata = mysql_fetch_assoc($result);
 
 	if (isset($GLOBALS['lastanswers'])) {
@@ -4632,7 +4632,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 function getqsetid($questionid) {
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
 	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$row = mysql_fetch_row($result);
 	if ($row[2]==null) {
 		return (array($row[0],$row[1]));
@@ -4648,7 +4648,7 @@ function getallqsetid($questions) {
 	$out = array();
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
 	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$out[0][$order[$row[3]]] = $row[0];// = array($row[0],$row[1]);
 		if ($row[2]==null) {

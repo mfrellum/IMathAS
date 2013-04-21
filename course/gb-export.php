@@ -13,7 +13,7 @@
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbmode = mysql_result($result,0,0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
@@ -155,7 +155,7 @@
 			$headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"";
 			if ($_GET['emailgb']=="me") {
 				$query = "SELECT email FROM imas_users WHERE id='$userid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$_GET['emailgb'] = mysql_result($result,0,0);
 			}
 			if ($_GET['emailgb']!='') {
@@ -301,7 +301,7 @@ function gbinstrexport() {
 	//get gb comments;
 	$gbcomments = array();
 	$query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$gbcomments[$row[0]] = array($row[1],$row[2]);
 	}
@@ -671,7 +671,7 @@ function gbinstrdisp() {
 	//get gb comments;
 	$gbcomments = array();
 	$query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$gbcomments[$row[0]] = array($row[1],$row[2]);
 	}

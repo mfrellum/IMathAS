@@ -10,10 +10,10 @@ if ($sessiondata['ltiitemtype']==0) {
 	$placementtype = 'assess';
 	$typeid = $sessiondata['ltiitemid'];
 	$query = "SELECT courseid FROM imas_assessments WHERE id='$typeid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$cid = mysql_result($result,0,0);
 	$query = "SELECT id FROM imas_teachers WHERE courseid='$cid' AND userid='$userid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		$role = 'tutor';
 	} else {
@@ -22,7 +22,7 @@ if ($sessiondata['ltiitemtype']==0) {
 } else {
 	$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$sessiondata['lti_context_id']}' ";
 	$query .= "AND org='{$sessiondata['ltiorg']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		$hascourse = false;
 		if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['cid'])) {
@@ -30,7 +30,7 @@ if ($sessiondata['ltiitemtype']==0) {
 			if ($cid>0) {
 				$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
 				$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$hascourse = true;
 			} 
 		}
@@ -41,7 +41,7 @@ if ($sessiondata['ltiitemtype']==0) {
 	if ($hascourse) {
 		$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid='{$sessiondata['lti_context_id']}' ";
 		$query .= "AND org='{$sessiondata['ltiorg']}' AND linkid='{$sessiondata['lti_resource_link_id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)==0) {
 			$hasplacement = false;
 			if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['aid'])) {
@@ -51,8 +51,8 @@ if ($sessiondata['ltiitemtype']==0) {
 					$typeid = $aid;
 					$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
 					$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
-					$placementid = mysql_insert_id();
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+					$placementid = mysqli_insert_id($GLOBALS['link'])();
 					$hasplacement = true;
 				} 
 			} 
@@ -67,7 +67,7 @@ if ($sessiondata['ltiitemtype']==0) {
 //handle form postbacks
 if (isset($_POST['createcourse'])) {
 	$query = "SELECT courseid FROM imas_teachers WHERE courseid='{$_POST['createcourse']}' AND userid='$userid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		$cid = $_POST['createcourse'];
 	} else {
@@ -93,11 +93,11 @@ if (isset($_POST['createcourse'])) {
 		$lockaid = 0;
 		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
 		$query .= "('{$sessiondata['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$cid = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+		$cid = mysqli_insert_id($GLOBALS['link'])();
 		//if ($myrights==40) {
 			$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		//}
 		$useweights = intval(isset($CFG['GBS']['useweights'])?$CFG['GBS']['useweights']:0);
 		$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
@@ -105,43 +105,43 @@ if (isset($_POST['createcourse'])) {
 		$usersort = intval(isset($CFG['GBS']['usersort'])?$CFG['GBS']['usersort']:0);
 		
 		$query = "INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES ('$cid',$useweights,$orderby,$defgbmode,$usersort)";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		
 		
 		$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='{$_POST['createcourse']}'";
-		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$cid'";
-		mysql_query($query) or die("Query failed :$query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		
 		$gbcats = array();
 		$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='{$_POST['createcourse']}'";
-		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES ";
 			$frid = array_shift($row);
 			$irow = "'".implode("','",addslashes_deep($row))."'";
 			$query .= "('$cid',$irow)";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
-			$gbcats[$frid] = mysql_insert_id();
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
+			$gbcats[$frid] = mysqli_insert_id($GLOBALS['link'])();
 		}
 		$copystickyposts = true;
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['createcourse']}'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		$newitems = array();
 		require("includes/copyiteminc.php");
 		copyallsub($items,'0',$newitems,$gbcats);
 		$itemorder = addslashes(serialize($newitems));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		copyrubrics();
 	}
 	
 	$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
 	$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$hascourse = true;
 	
 } else if (isset($_POST['setplacement'])) {
@@ -156,7 +156,7 @@ if (isset($_POST['createcourse'])) {
 		//Canvas custom LTI selection return
 		if ($placementtype=='assess') {
 			$query = "SELECT name FROM imas_assessments WHERE id='$typeid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$atitle = mysql_result($result,0,0);
 			
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_place_aid=$typeid";
@@ -169,12 +169,12 @@ if (isset($_POST['createcourse'])) {
 	}
 	if ($hasplacement) {
 		$query = "UPDATE imas_lti_placements SET placementtype='$placementtype',typeid='$typeid' WHERE id='$placementid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	} else {
 		$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
 		$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$placementid = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+		$placementid = mysqli_insert_id($GLOBALS['link'])();
 		$hasplacement = true;
 	}
 }
@@ -195,7 +195,7 @@ if (!$hascourse) {
 	echo "<p>This course on your LMS has not yet been linked to a course on $installname.";
 	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse"> ';
 	$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' ORDER BY ic.name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		echo '<optgroup label="Your Courses">';
 		while ($row = mysql_fetch_row($result)) {
@@ -205,7 +205,7 @@ if (!$hascourse) {
 	}
 	if (isset($templateuser)) {
 		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			echo '<optgroup label="Template Courses">';
 			while ($row = mysql_fetch_row($result)) {
@@ -234,7 +234,7 @@ if (!$hascourse) {
 		echo '<option value="course">Whole course Placement</option>';
 	}
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		echo '<optgroup label="Assessment">';
 		while ($row = mysql_fetch_row($result)) {
@@ -252,7 +252,7 @@ if (!$hascourse) {
 	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 } else if ($placementtype=='assess') {
 	$query = "SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id='$typeid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	echo "<h3>LTI Placement of {$line['name']}</h3>";
 	echo "<p><a href=\"assessment/showtest.php?cid=$cid&id=$typeid\">Preview assessment</a> | ";

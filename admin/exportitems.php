@@ -56,7 +56,7 @@ function getsubinfo($items,$parent,$pre) {
 
 function getiteminfo($itemid) {
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']) . " queryString: " . $query);
 	$itemtype = mysql_result($result,0,0);
 	$typeid = mysql_result($result,0,1);
 	switch($itemtype) {
@@ -73,7 +73,7 @@ function getiteminfo($itemid) {
 			$query = "SELECT name FROM imas_assessments WHERE id=$typeid";
 			break;
 	}
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$name = mysql_result($result,0,0);
 	return array($itemtype,$name);
 }
@@ -96,7 +96,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$checked = $_POST['checked'];
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 
 	$itemcnt = 0;
 	$toexport = array();
@@ -118,14 +118,14 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo "ID\n";
 		echo $exportid."\n";
 		$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		echo "TYPE\n";
 		echo $row[0] . "\n";
 		switch ($row[0]) {
 			case ($row[0]==="InlineText"):
 				$query = "SELECT * FROM imas_inlinetext WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$line = mysql_fetch_assoc($r2);
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
@@ -142,7 +142,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "CALTAG\n";
 				echo $line['caltag'] . "\n";
 				$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($r2)>0) {
 					   $filenames = array();
 					   $filedescr = array();
@@ -161,7 +161,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				break;
 			case ($row[0]==="LinkedText"):
 				$query = "SELECT * FROM imas_linkedtext WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$line = mysql_fetch_assoc($r2);
 				if (substr($line['text'],0,5)=='file:') {
 					$coursefiles[] = substr($line['text'],5);
@@ -190,7 +190,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				break;
 			case ($row[0]==="Forum"):
 				$query = "SELECT * FROM imas_forums WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$line = mysql_fetch_assoc($r2);
 				echo "NAME\n";
 				echo $line['name'] . "\n";
@@ -214,7 +214,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				break;
 			case ($row[0]==="Assessment"):
 				$query = "SELECT * FROM imas_assessments WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$line = mysql_fetch_assoc($r2);
 				echo "NAME\n";
 				echo $line['name'] . "\n";
@@ -266,7 +266,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		
 		$query = "SELECT imas_questions.*,imas_questionset.uniqueid from imas_questions,imas_questionset ";
 		$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
-		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($r2);
 		
 		if (!empty($line['uniqueid'])) {
@@ -294,7 +294,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo "BEGIN QSET\n";
 		
 		$query = "SELECT * from imas_questionset WHERE id='$qsetid'";
-		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($r2);
 		echo "UNIQUEID\n";
 		echo $line['uniqueid'] . "\n";
@@ -321,7 +321,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	//first, lets pull any questions that have include__from so we can lookup backrefs
 	$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 	$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$includedqs = array();
 	while ($line = mysql_fetch_assoc($result)) {
 		if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
@@ -335,14 +335,14 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	if (count($includedqs)>0) {
 		$includedlist = implode(',',$includedqs);
 		$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
-		$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$includedbackref[$row[0]] = $row[1];		
 		}
 	}
 	$imgfiles = array();
 	$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$qcnt = 0;
 	while ($line = mysql_fetch_assoc($result)) {
 		$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
@@ -372,7 +372,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		if ($line['hasimg']==1) {
 			echo "\nQIMGS\n";
 			$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($r2)) {
 				echo $row[0].','.$row[1]. "\n";
 				
@@ -384,7 +384,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	include("../includes/filehandler.php");
 	
 	$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
-	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($r2)) {
 		if ($GLOBALS['filehandertypecfiles'] == 's3') {
 			copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
@@ -421,7 +421,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 
 } else { //STEP 1 DATA PROCESSING, INITIAL LOAD
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 
 	$items = unserialize(mysql_result($result,0,0));
 	$ids = array();

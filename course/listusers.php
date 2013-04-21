@@ -62,7 +62,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			foreach ($keys as $stuid) {
 				$query = "UPDATE imas_students SET section={$_POST['sec'][$stuid]},code={$_POST['code'][$stuid]} WHERE id='$stuid' AND courseid='$cid' ";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
@@ -71,7 +71,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query = "SELECT imas_students.id,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
 			$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-			$resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
+			$resultStudentList = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 	} elseif (isset($_GET['enroll'])) {
 
@@ -80,7 +80,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		
 		if (isset($_POST['username'])) {
 			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['username']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)==0) {
 				$overwriteBody = 1;
 				$body = "Error, username doesn't exist. <a href=\"listusers.php?cid=$cid&enroll=student\">Try again</a>\n";
@@ -92,7 +92,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					exit;
 				}
 				$query = "SELECT id FROM imas_tutors WHERE userid='$id' AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) {
 					echo "Tutors can't be enrolled as students.";
 					exit;
@@ -108,7 +108,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$vals .= ",'".$_POST['code']."'";
 				}
 				$query .= ") VALUES ($vals)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 				exit;
 			}
@@ -120,7 +120,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	
 		if (isset($_POST['SID'])) {
 			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$overwriteBody = 1;
 				$body = "$loginprompt '{$_POST['SID']}' is used.  <a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
@@ -128,8 +128,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$md5pw = md5($_POST['pw1']);
 				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
 				$query .= "VALUES ('{$_POST['SID']}','$md5pw',10,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',0);";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$newuserid = mysql_insert_id();
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+				$newuserid = mysqli_insert_id($GLOBALS['link'])();
 				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ($newuserid,'$cid')";
 				$vals = "$newuserid,'$cid'";
 				$query = "INSERT INTO imas_students (userid,courseid";
@@ -142,7 +142,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$vals .= ",'".$_POST['code']."'";
 				}
 				$query .= ") VALUES ($vals)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 				exit;
 			}
@@ -155,7 +155,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
 			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid='$cid' AND imas_users.id IN ($ulist)";
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$stuemails = array();
 			while ($row = mysql_fetch_row($result)) {
 				$stuemails[] = $row[0].' '.$row[1]. ' &lt;'.$row[2].'&gt;';
@@ -171,7 +171,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$un = preg_replace('/[^\w\.@]*/','',$_POST['username']);
 			$updateusername = true;
 			$query = "SELECT id FROM imas_users WHERE SID='$un'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$updateusername = false;
 			}
@@ -185,7 +185,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			
 			$query .= " WHERE id='{$_GET['uid']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
 			
 			$code = "'{$_POST['code']}'";
@@ -210,12 +210,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			
 			if ($locked==0) {
 				$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			} else {
 				$query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}	
 		
 			require('../includes/userpics.php');
@@ -232,7 +232,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			if ($chguserimg != '') {
 				$query = "UPDATE imas_users SET $chguserimg WHERE id='{$_GET['uid']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			
 			
@@ -254,7 +254,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		} else {
 			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$lineStudent = mysql_fetch_assoc($result);
 			
 		}
@@ -271,7 +271,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		if (isset($_GET['confirmed'])) {
 			$newpw = "5f4dcc3b5aa765d61d8327deb882cf99";  //md5("password")
 			$query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['uid']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		} else {
 			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
 			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
@@ -291,7 +291,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$pagetitle = "Student Roster";
 		
 		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			$hassection = true;
 			$sectionselect = "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
@@ -309,7 +309,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$hassection = false;
 		}
 		$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0)>0) {
 			$hascode = true;
 		} else {
@@ -326,7 +326,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		} else {
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		}
-		$resultDefaultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
+		$resultDefaultUserList = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$hasSectionRowHeader = ($hassection)? "<th>Section$sectionselect</th>" : "";
 		$hasCodeRowHeader = ($hascode) ? "<th>Code</th>" : "";
 		$hasSectionSortTable = ($hassection) ? "'S'," : "";

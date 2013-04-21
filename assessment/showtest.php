@@ -34,7 +34,7 @@
 		$isreview = false;
 		
 		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		$adata = mysql_fetch_assoc($result);
 		$now = time();
 		$assessmentclosed = false;
@@ -45,7 +45,7 @@
 	
 		if (!$actas) { 
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
-			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result2);
 			if ($row!=null) {
 				if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -82,7 +82,7 @@
 				list($atype,$sa) = explode('-',$adata['deffeedback']);
 				if ($sa!='N') {
 					$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid'";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 					echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'">View your assessment</p>';
 				}
 			}
@@ -121,7 +121,7 @@
 		//get latepass info
 		if (!isset($teacherid) && !isset($tutorid) && !$actas && !isset($sessiondata['stuview'])) {
 		   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='{$adata['courseid']}'";
-		   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		   $sessiondata['latepasses'] = mysql_result($result,0,0);
 		} else {
 			$sessiondata['latepasses'] = 0;
@@ -131,7 +131,7 @@
 		$_SESSION['choicemap'] = array();
 		
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($result);
 		
 		if ($line == null) { //starting test
@@ -161,7 +161,7 @@
 			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid) && !isset($tutorid)) {
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid={$adata['groupsetid']}";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) {
 					$stugroupid = mysql_result($result,0,0);
 					$sessiondata['groupid'] = $stugroupid;
@@ -171,15 +171,15 @@
 						exit;
 					}
 					$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$stugroupid = mysql_insert_id();
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+					$stugroupid = mysqli_insert_id($GLOBALS['link'])();
 					//if ($adata['isgroup']==3) {
 					//	$sessiondata['groupid'] = $stugroupid;
 					//} else {
 						$sessiondata['groupid'] = 0;  //leave as 0 to trigger adding group members
 					//}
 					$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid',$stugroupid)";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 					
 			}
@@ -191,15 +191,15 @@
 			}
 			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid) ";
 			$query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext','$ltisourcedid');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$sessiondata['sessiontestid'] = mysql_insert_id();
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+			$sessiondata['sessiontestid'] = mysqli_insert_id($GLOBALS['link'])();
 			
 			if ($stugroupid==0) {
 				$sessiondata['groupid'] = 0;
 			} else {
 				//if a group assessment and already in a group, we'll create asids for all the group members now
 				$query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid=$stugroupid AND userid<>$userid";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback) VALUES ";
 				$cnt = 0;
 				if (mysql_num_rows($result)>0) {
@@ -208,7 +208,7 @@
 						$query .= "('{$row[0]}','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext')";
 						$cnt++;
 					}
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 		
 			}
@@ -231,7 +231,7 @@
 			}
 			
 			$query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
@@ -255,7 +255,7 @@
 				//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
 				deleteasidfilesbyquery2('userid',$userid,$aid,1);
 				$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
-				$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$_GET['cid']}&id=$aid");
 				exit;
 			}
@@ -279,8 +279,8 @@
 			} else if (!isset($teacherid) && !isset($tutorid)) { //isgroup>0 && agroupid==0
 				//already has asid, but broken from group
 				$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$stugroupid = mysql_insert_id();
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+				$stugroupid = mysqli_insert_id($GLOBALS['link'])();
 				if ($adata['isgroup']==3) {
 					$sessiondata['groupid'] = $stugroupid;
 				} else {
@@ -288,14 +288,14 @@
 				}
 				
 				$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid',$stugroupid)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				
 				$query = "UPDATE imas_assessment_sessions SET agroupid=$stugroupid WHERE id={$line['id']}";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		
 			$query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
@@ -312,7 +312,7 @@
 				if ($altltisourcedid != $line['lti_sourcedid']) {
 					$altltisourcedid = addslashes($altltisourcedid);
 					$query = "UPDATE imas_assessment_sessions SET lti_sourcedid='$altltisourcedid' WHERE id='{$line['id']}'";
-					mysql_query($query) or die("Query failed : $query: " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 				}
 			}
 			
@@ -336,7 +336,7 @@
 		$userid = $sessiondata['actas'];
 	}
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	$questions = explode(",",$line['questions']);
 
@@ -366,11 +366,11 @@
 	if ($starttime == 0) {
 		$starttime = time();
 		$query = "UPDATE imas_assessment_sessions SET starttime=$starttime WHERE id='$testid'";
-		mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	}
 	
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$testsettings = mysql_fetch_assoc($result);
 	if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
 		$testsettings['displaymethod']= 'Embed';
@@ -409,7 +409,7 @@
 	}
 	if (!isset($sessiondata['actas'])) { 
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
-		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result2);
 		if ($row!=null) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -443,7 +443,7 @@
 		}
 	} else {
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='{$sessiondata['actas']}' AND assessmentid='{$line['assessmentid']}'";
-		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result2);
 		if ($row!=null) {
 			$exceptionduedate = $row[1];
@@ -645,7 +645,7 @@
 			//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
 			deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
 			$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
-			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
 			exit;	
 		}
@@ -678,7 +678,7 @@
 	if (isset($CFG['GEN']['keeplastactionlog']) && isset($sessiondata['loginlog'.$testsettings['courseid']])) {
 		$now = time();
 		$query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$testsettings['courseid']];
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 		
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
@@ -756,7 +756,7 @@ if (!isset($_POST['embedpostback'])) {
 		echo "<span style=\"float:right;\">";
 		if ($testsettings['msgtoinstr']==1) {
 			$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$msgcnt = mysql_result($result,0,0);
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('This will discard any unsaved work.');\">Messages ";
 			if ($msgcnt>0) {
@@ -785,7 +785,7 @@ if (!isset($_POST['embedpostback'])) {
 			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting';
 				
 			$query = "SELECT $fieldstocopy FROM imas_assessment_sessions WHERE id='$testid'";
-			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 			$rowgrptest = mysql_fetch_row($result);
 			$rowgrptest = addslashes_deep($rowgrptest);
 			$insrow = "'".implode("','",$rowgrptest)."'";
@@ -793,7 +793,7 @@ if (!isset($_POST['embedpostback'])) {
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 					$query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
-					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 					$thisusername = mysql_result($result,0,2) . ' ' . mysql_result($result,0,1);	
 					if ($testsettings['isgroup']==1) {
 						$md5pw = md5($_POST['pw'.$i]);
@@ -806,7 +806,7 @@ if (!isset($_POST['embedpostback'])) {
 						
 					$thisuser = $_POST['user'.$i];
 					$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='{$_POST['user'.$i]}' AND assessmentid={$testsettings['id']}";
-					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($result)>0) {      
 						$row = mysql_fetch_row($result);
 						if ($row[1]>0) { 
@@ -814,7 +814,7 @@ if (!isset($_POST['embedpostback'])) {
 							$loginfo .= "$thisusername already in group. ";
 						} else {
 							$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid','{$sessiondata['groupid']}')";
-							mysql_query($query) or die("Query failed : $query:" . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 							
 							$fieldstocopy = explode(',',$fieldstocopy);
 							$sets = array();
@@ -829,17 +829,17 @@ if (!isset($_POST['embedpostback'])) {
 							//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
 							//$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
 							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
-							mysql_query($query) or die("Query failed : $query:" . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 							echo "<p>$thisusername added to group, overwriting existing attempt.</p>";
 							$loginfo .= "$thisusername switched to group. ";
 						}
 					} else {
 						$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('{$_POST['user'.$i]}','{$sessiondata['groupid']}')";
-						mysql_query($query) or die("Query failed : $query:" . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 						
 						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
 						$query .= "VALUES ('{$_POST['user'.$i]}',$insrow)";
-						mysql_query($query) or die("Query failed : $query:" . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 						echo "<p>$thisusername added to group.</p>";
 						$loginfo .= "$thisusername added to group. ";
 					}
@@ -848,7 +848,7 @@ if (!isset($_POST['embedpostback'])) {
 			$now = time();
 			if (isset($GLOBALS['CFG']['log'])) {
 				$query = "INSERT INTO imas_log (time,log) VALUES ($now,'".addslashes($loginfo)."')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		} else {
 			echo '<div id="headershowtest" class="pagetitle"><h2>Select group members</h2></div>';
@@ -856,7 +856,7 @@ if (!isset($_POST['embedpostback'])) {
 				//a group should already exist
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid={$testsettings['groupsetid']}";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)==0) {
 					echo '<p>Group error.  Please try reaccessing the assessment from the course page</p>';
 				}
@@ -872,7 +872,7 @@ if (!isset($_POST['embedpostback'])) {
 			$curgrp = array();
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ";
 			$query .= "imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
-			$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$curgrp[0] = $row[0];
 				echo "<li>{$row[2]}, {$row[1]}</li>";
@@ -882,7 +882,7 @@ if (!isset($_POST['embedpostback'])) {
 			$curinagrp = array();
 			$query = 'SELECT i_sgm.userid FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 			$query .= "WHERE i_sg.groupsetid={$testsettings['groupsetid']}";
-			$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$curinagrp[] = $row[0];
 			}
@@ -892,7 +892,7 @@ if (!isset($_POST['embedpostback'])) {
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='{$testsettings['courseid']}' ";
 			$query .= "AND imas_users.id NOT IN ($curids) ORDER BY imas_users.LastName,imas_users.FirstName";
-			$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$selops .= "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
 			}
@@ -922,11 +922,11 @@ if (!isset($_POST['embedpostback'])) {
 	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && $testsettings['isgroup']==3  && $sessiondata['groupid']==0) {
 		//double check not already added to group by someone else
 		$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$testid'";
-		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 		$agroupid = mysql_result($result,0,0);
 		if ($agroupid==0) { //really has no group, create group
 			$query = "UPDATE imas_assessment_sessions SET agroupid='$testid' WHERE id='$testid'";
-			mysql_query($query) or die("Query failed : $query:" . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 			$agroupid = $testid;
 		} else {
 			echo "<p>Someone already added you to a group.  Using that group.</p>";
@@ -942,7 +942,7 @@ if (!isset($_POST['embedpostback'])) {
 	if (isset($sessiondata['actas'])) {
 		echo '<p style="color: red;">Teacher Acting as ';
 		$query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$sessiondata['actas']}'";
-		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		echo $row[1].' '.$row[0];
 		echo '<p>';
@@ -1716,7 +1716,7 @@ if (!isset($_POST['embedpostback'])) {
 				
 				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
 				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
-				$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$curgrp[] = $row[0];
 					$testsettings['intro'] .= "<li>{$row[2]}, {$row[1]}</li>";
@@ -2449,7 +2449,7 @@ if (!isset($_POST['embedpostback'])) {
 		if ($isdiag) {
 			global $userid;
 			$query = "SELECT * from imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$userinfo = mysql_fetch_assoc($result);
 			echo "<h3>{$userinfo['LastName']}, {$userinfo['FirstName']}: ";
 			echo substr($userinfo['SID'],0,strpos($userinfo['SID'],'~'));

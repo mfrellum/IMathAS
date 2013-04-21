@@ -8,7 +8,7 @@
 	$ispublic = true;
 	$cid = $_GET['cid'];
 	$query = "SELECT name,theme,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	if ($line == null) {
 		echo "Course cannot be found";

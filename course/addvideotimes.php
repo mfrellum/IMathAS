@@ -44,7 +44,7 @@ if (isset($_POST['vidid'])) {
 	}
 	$data = addslashes(serialize($data));
 	$query = "UPDATE imas_assessments SET viddata='$data' WHERE id='$aid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 	exit;			
@@ -59,7 +59,7 @@ echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</
 
 
 $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $row = mysql_fetch_row($result);
 $qorder = explode(',',$row[0]);
 $viddata = $row[1];
@@ -81,7 +81,7 @@ for ($i=0;$i<count($qorder);$i++) {
 $qtitlebyid = array();
 $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	if (strlen($row[1])<30) {
 		$qtitle[$row[0]] = $row[1];

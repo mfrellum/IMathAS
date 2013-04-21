@@ -11,7 +11,7 @@ $badgeid = intval($_GET['badgeid']);
 if (!empty($_GET['userid'])) {
 	$userid = intval($_GET['userid']);
 	$query = "SELECT SID FROM imas_users WHERE id='$userid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		$s = mysql_result($result,0,0);
 		if (empty($_GET['v']) || $_GET['v'] != hash('sha256', $s . $userid)) {
@@ -25,7 +25,7 @@ if (!empty($_GET['userid'])) {
 }
 
 $query = "SELECT courseid, name, badgetext, description, longdescription, requirements FROM imas_badgesettings WHERE id=$badgeid";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) { 
 	echo "Invalid Badge";
 	exit;
@@ -42,10 +42,10 @@ if (mysql_num_rows($result)==0) {
 		print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout);
 	} else { //student specific
 		$query = "SELECT id FROM imas_students WHERE courseid=$cid AND userid=$userid";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)==0) {  //no longer in the student records - go to imas_badgerecords for backup
 			$query = "SELECT data FROM imas_badgerecords WHERE userid=$userid AND badgeid=$badgeid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_fetch_row($result)==0) {  //no records.  Uh oh!
 				exit;
 			} else {
@@ -120,7 +120,7 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 	
 	/*$query = "SELECT imas_courses.name AS cname, imas_users.LastName, imas_users.FirstName, imas_users.email, imas_groups.name FROM imas_courses JOIN imas_teachers ON imas_courses.id=imas_teachers.courseid ";
 	$query .= "JOIN imas_users ON imas_teachers.userid=imas_users.id LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_courses.id='$cid' LIMIT 1";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		$org = ' ';
 		$email = ' ';
@@ -190,7 +190,7 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 	}
 	
 	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$gtypes = array('0'=>'Past Due', '3'=>'Past and Attempted', '1'=>'Past and Available', '2'=>'All Items'); 
 	$gbcats = array();
 	
@@ -261,7 +261,7 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 	if ($reqmet) {
 		if (isset($userid) && $userid!=0) {
 			$query = "SELECT FirstName, LastName, email FROM imas_users WHERE id=$userid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			$stuname = $row[1]. ', '.$row[0];
 			$email = $row[2];
@@ -269,10 +269,10 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 			
 			$data = addslashes(serialize($data));
 			$query = "UPDATE imas_badgerecords SET data='$data' WHERE badgeid='$badgeid' AND userid='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_affected_rows()==0) {//no existing record
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+			if (mysqli_affected_rows($GLOBALS['link'])()==0) {//no existing record
 				$query = "INSERT INTO imas_badgerecords (badgeid,userid,data) VALUES ('$badgeid','$userid','$data')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		} else {
 			$stuname = '';

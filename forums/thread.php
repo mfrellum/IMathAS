@@ -28,14 +28,14 @@
 	if ($isteacher && isset($_POST['score'])) {
 		$existingscores = array();
 		$query = "SELECT refid,id FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid'";
-		$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($res)) {
 			$existingscores[$row[0]] = $row[1];
 		}
 		$postuserids = array();
 		$refids = "'".implode("','",array_keys($_POST['score']))."'";
 		$query = "SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids)";
-		$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($res)) {
 			$postuserids[$row[0]] = $row[1];
 		}
@@ -52,11 +52,11 @@
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score,feedback) VALUES ";
 					$query .= "('forum','$forumid','{$postuserids[$k]}','$k','$v','$feedback')";
 				}
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			} else {
 				if (isset($existingscores[$k])) {
 					$query = "DELETE FROM imas_grades WHERE id='{$existingscores[$k]}'";
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				}
 			}
 		}
@@ -70,7 +70,7 @@
 			exit;	
 	}
 	$query = "SELECT name,postby,settings,groupsetid,sortby,taglist FROM imas_forums WHERE id='$forumid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$forumname = mysql_result($result,0,0);
 	$postby = mysql_result($result,0,1);
 	$allowmod = ((mysql_result($result,0,2)&2)==2);
@@ -89,7 +89,7 @@
 		if (!$isteacher) {
 			$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$groupid = mysql_result($result,0,0);
 			} else {
@@ -112,7 +112,7 @@
 			} else {
 				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid=0 OR stugroupid='$groupid'";
 			}
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$limthreads[] = $row[0];
 			}
@@ -140,7 +140,7 @@
 		if ($dofilter) {
 			$query .= " AND threadid IN ($limthreads)";
 		}
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$limthreads = array();
 		while ($row = mysql_fetch_row($result)) {
 			$limthreads[] = $row[0];
@@ -182,7 +182,7 @@
 		}
 		
 		$query .= " ORDER BY imas_forum_posts.postdate DESC";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			echo "<div class=block>";
 			echo "<b>{$row[2]}</b>";
@@ -211,18 +211,18 @@
 		if ($dofilter) {
 			$query .= " AND threadid IN ($limthreads)";
 		}
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$now = time();
 		while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
-			$r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($r2)>0) {
 				$r2id = mysql_result($r2,0,0);
 				$query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			} else{
 				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','{$row[0]}',$now)";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			}
 		}
 	}
@@ -249,7 +249,7 @@
 	}
 
 	$query .= "GROUP BY threadid";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$postcount = array();
 	$maxdate = array();
 	
@@ -263,7 +263,7 @@
 		$query .= " AND threadid IN ($limthreads)";
 	}
 
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$lastview = array();
 	$flags = array();
 	while ($row = mysql_fetch_row($result)) {
@@ -293,7 +293,7 @@
 			$query .= " AND threadid IN ($limthreads)";
 		}
 	
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 		
 		if ($numpages > 1) {
@@ -359,7 +359,7 @@
 		$groupnames = array();
 		$groupnames[0] = "Non-group-specific";
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY id";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$grpnums = 1;
 		while ($row = mysql_fetch_row($result)) {
 			if ($row[1] == 'Unnamed group') { 
@@ -371,7 +371,7 @@
 		natsort($groupnames);
 		
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY id";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		/*echo "<script type=\"text/javascript\">";
 		echo 'function chgfilter() {';
 		echo '  var ffilter = document.getElementById("ffilter").value;';
@@ -460,7 +460,7 @@
 		$query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
 	} 
 	$query .= "GROUP BY imas_forum_posts.id";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$uniqviews[$row[0]] = $row[1]-1;
 	}
@@ -485,7 +485,7 @@
 	if ($page>0) {
 		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
 	}
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 	}

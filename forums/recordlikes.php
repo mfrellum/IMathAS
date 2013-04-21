@@ -21,22 +21,22 @@ $like = intval($_GET['like']);
 
 if ($like==0) {
 	$query = "DELETE FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";	
-	$result = mysql_query($query);
-	$aff =  mysql_affected_rows();
+	$result = mysqli_query($GLOBALS['link'],$query);
+	$aff =  mysqli_affected_rows($GLOBALS['link'])();
 } else {
 	$query = "SELECT id FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";
-	$result = mysql_query($query);
+	$result = mysqli_query($GLOBALS['link'],$query);
 	if (mysql_num_rows($result)>0) {
 		$aff =0;
 	} else {
 		$query = "SELECT threadid FROM imas_forum_posts WHERE id=$postid";
-		$result = mysql_query($query);
+		$result = mysqli_query($GLOBALS['link'],$query);
 		if (mysql_num_rows($result)==0) {echo "fail";exit;}
 		$threadid = mysql_result($result,0,0);
 		
 		$query = "INSERT INTO imas_forum_likes (userid,threadid,postid,type) VALUES ";
 		$query .= "('$userid',$threadid,$postid,$isteacher)";
-		mysql_query($query);
+		mysqli_query($GLOBALS['link'],$query);
 		$aff = 1;
 	}
 }
@@ -44,7 +44,7 @@ if ($like==0) {
 $likes = array(0,0,0);
 $query = "SELECT type,count(*) FROM imas_forum_likes WHERE postid='$postid'";
 $query .= "GROUP BY type";	
-$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$likes[$row[0]] = $row[1];
 }

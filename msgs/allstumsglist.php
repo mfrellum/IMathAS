@@ -35,11 +35,11 @@
 	if (isset($_POST['remove'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist)";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	if (isset($_GET['removeid'])) {
 		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	
 	$pagetitle = "Student Messages";
@@ -56,7 +56,7 @@
 	if ($filterstu>0) {
 		$query .= " AND msgto='$filterstu'";
 	}
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	
 	$prevnext = '';
@@ -121,7 +121,7 @@ function chgfilter() {
 	echo ">All students</option>";
 	$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_students WHERE ";
 	$query .= "imas_students.userid=imas_users.id AND imas_students.courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$stulist = array();
 	while ($row = mysql_fetch_row($result)) {
 		$stulist[$row[0]] = "{$row[1]}, {$row[2]}";
@@ -135,7 +135,7 @@ function chgfilter() {
 	
 	$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_teachers.userid=imas_users.id AND imas_teachers.courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$stulist[$row[0]] = "{$row[1]}, {$row[2]}";
 	}
@@ -159,7 +159,7 @@ function chgfilter() {
 	$query .= "ORDER BY senddate DESC ";
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}

@@ -27,13 +27,13 @@ if (isset($_GET['delete'])) {
 	$linktype = $_GET['type'];
 	$iteminfo = array();
 	$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
-	$r = mysql_query($query) or die("Query failed : " . mysql_error());
+	$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($r)) {
 		$iteminfo[$row[0]] = array($row[1],$row[2]);
 	}
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
-	$r = mysql_query($query) or die("Query failed : " . mysql_error());
+	$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$items = unserialize(mysql_result($r,0,0));
 	
 	$newdir = $path . '/CCEXPORT'.$cid;
@@ -113,12 +113,12 @@ if (isset($_GET['delete'])) {
 			} else {
 				if ($iteminfo[$item][0]=='InlineText') {
 					$query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
+					$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$row = mysql_fetch_row($r);
 					if ($row[2]!='') {
 						$files = explode(',',$row[2]);
 						$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$iteminfo[$item][1]}'";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 						$filesout = array();
 						while ($r = mysql_fetch_row($result)) {
 							//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
@@ -164,7 +164,7 @@ if (isset($_GET['delete'])) {
 					$res[] = $resitem;
 				} else if ($iteminfo[$item][0]=='LinkedText') {
 					$query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
+					$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$row = mysql_fetch_row($r);
 					if ((substr($row[1],0,4)=="http") && (strpos(trim($row[1])," ")===false)) { //is a web link
 						$alink = trim($row[1]);
@@ -234,7 +234,7 @@ if (isset($_GET['delete'])) {
 					}
 				} else if ($iteminfo[$item][0]=='Forum') {
 					$query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
+					$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$row = mysql_fetch_row($r);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
@@ -278,7 +278,7 @@ if (isset($_GET['delete'])) {
 					
 				} else if ($iteminfo[$item][0]=='Assessment') {
 					$query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
+					$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$row = mysql_fetch_row($r);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
@@ -308,7 +308,7 @@ if (isset($_GET['delete'])) {
 							}
 						}
 						$query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$iteminfo[$item][1]}'";
-						$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+						$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 						$totalpossible = 0;
 						while ($r = mysql_fetch_row($result2)) {
 							if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	

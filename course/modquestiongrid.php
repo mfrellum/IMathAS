@@ -9,7 +9,7 @@
 	if ($_GET['process']== true) {
 		if (isset($_POST['add'])) { //adding new questions
 			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$itemorder = mysql_result($result,0,0);
 			$viddata = mysql_result($result,0,1);
 			
@@ -26,8 +26,8 @@
 					if ($attempts=='') {$attempts = 9999;}
 					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
 					$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$qid = mysql_insert_id();
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+					$qid = mysqli_insert_id($GLOBALS['link'])();
 					if ($newitemorder=='') {
 						$newitemorder = $qid;
 					} else {
@@ -71,11 +71,11 @@
 			
 			
 			$query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		} else if (isset($_POST['mod'])) { //modifying existing
 			
 			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$itemorder = mysql_result($result,0,0);
 			
 			//what qsetids do we need for adding copies?
@@ -89,7 +89,7 @@
 			$qidtoqsetid = array();
 			if (count($lookupid)>0) {
 				$query = "SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$qidtoqsetid[$row[0]] = $row[1];
 				}
@@ -102,14 +102,14 @@
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
 				$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
 					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
 						$qsetid = $qidtoqsetid[$qid];
 						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
 						$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						$newqid = mysql_insert_id();
+						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+						$newqid = mysqli_insert_id($GLOBALS['link'])();
 						
 						$itemarr = explode(',',$itemorder);
 						$key = array_search($qid,$itemarr);
@@ -123,7 +123,7 @@
 				}
 			}
 			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		
 	} else {
@@ -160,7 +160,7 @@ Leave items blank to use the assessment's default values<br/>
 			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
 			$query .= "imas_questions.id IN ('".implode("','",$qids)."')";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				if ($row[2]==9999) {
 					$row[2] = '';
@@ -210,7 +210,7 @@ Leave items blank to use the assessment's default values<br/>
 			echo "<tbody>";
 			
 			$query = "SELECT id,description,extref FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				echo '<tr><td>'.$row[1].'</td>';
 				if ($row[2]!='') {

@@ -29,10 +29,10 @@ if (!(isset($teacherid))) {
 	$itemid = $_GET['id'];
 	
 	$query = "DELETE FROM imas_items WHERE id='$itemid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$items = unserialize(mysql_result($result,0,0));
 	
 	$blocktree = explode('-',$block);
@@ -44,18 +44,18 @@ if (!(isset($teacherid))) {
 	array_splice($sub,$key,1);
 	$itemorder = addslashes(serialize($items));
 	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 } else {
 	$block = $_GET['block'];
 	$cid = $_GET['cid'];
 	
 	$query = "INSERT INTO imas_items (courseid,itemtype) VALUES ";
 	$query .= "('$cid','Calendar');";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
-	$itemid = mysql_insert_id();
+	$itemid = mysqli_insert_id($GLOBALS['link'])();
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	$items = unserialize($line['itemorder']);
 	
@@ -72,7 +72,7 @@ if (!(isset($teacherid))) {
 	
 	$itemorder = addslashes(serialize($items));
 	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 } 
 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");

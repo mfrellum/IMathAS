@@ -69,7 +69,7 @@
 		if ($page != -1 && isset($_GET['userid'])) {
 			$query .= " AND userid='{$_POST['userid']}'";
 		}
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		$cnt = 0;
 		while($line=mysql_fetch_assoc($result)) {
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
@@ -97,7 +97,7 @@
 				$scorelist = implode(",",$scores);
 				
 				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
@@ -121,20 +121,20 @@
 	list ($qsetid,$cat) = getqsetid($qid);
 	
 	$query = "SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysql_fetch_row($result);
 	
 	if ($isgroup>0) {
 		$groupnames = array();
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$groupnames[$row[0]] = $row[1];
 		}
 		$grplist = implode(',',array_keys($groupnames));
 		$groupmembers = array();
 		$query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
 			$groupmembers[$row[0]][] = $row[2].' '.$row[1];
@@ -144,7 +144,7 @@
 	
 	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$points = mysql_result($result,0,0);
 	$qcontrol = mysql_result($result,0,1);
 	$rubric = mysql_result($result,0,2);
@@ -294,7 +294,7 @@
 <?php
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id='$qid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		echo printrubrics(array(mysql_fetch_row($result)));
 	}
@@ -329,7 +329,7 @@
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$stulist[] = $row[0].', '.$row[1];
 		}
@@ -341,7 +341,7 @@
 	if ($page != -1) {
 		$query .= " LIMIT $page,1";
 	}
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");

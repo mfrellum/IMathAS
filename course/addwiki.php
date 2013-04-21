@@ -35,7 +35,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_GET['clearattempts']=='true') {
 			$id = $_GET['id'];
 			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";	
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addwiki.php?cid=$cid&id=$id");	
 			exit;
 		} else {
@@ -76,22 +76,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "UPDATE imas_wikis SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";
 			$query .= "editbydate=$revisedate,avail='{$_POST['avail']}',groupsetid='{$_POST['groupsetid']}',settings=$settings ";
 			$query .= "WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$newwikiid = $_GET['id'];	
 		} else { //add new
 			$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$revisedate,'{$_POST['avail']}',$settings,'{$_POST['groupsetid']}');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$newwikiid = mysql_insert_id();
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+			$newwikiid = mysqli_insert_id($GLOBALS['link'])();
 			
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','Wiki','$newwikiid');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$itemid = mysql_insert_id();
+			$itemid = mysqli_insert_id($GLOBALS['link'])();
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 				
@@ -107,7 +107,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$itemorder = addslashes(serialize($items));
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
 			
 		}
@@ -127,14 +127,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		if (isset($_GET['id'])) { //MODIFY MODE
 			$query = "SELECT * FROM imas_wikis WHERE id='{$_GET['id']}';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 			$revisedate = $line['editbydate'];
 			$settings = $line['settings'];
 			$query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='{$_GET['id']}';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$started = true;
 			} else {
@@ -179,7 +179,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		
 		$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
 		$page_groupSelect = array();
 		while ($row = mysql_fetch_row($result)) {

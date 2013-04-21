@@ -25,7 +25,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
 			
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		$sub =& $items;
 		if (count($blocktree)>1) {
@@ -50,7 +50,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		}
 		$itemlist = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$obarr = explode(',',$_COOKIE['openblocks-'.$_GET['cid']]);
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
@@ -62,7 +62,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
 			
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		$sub =& $items;
 		if (count($blocktree)>1) {

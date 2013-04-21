@@ -114,14 +114,14 @@ if (isset($_POST['checked'])) { //form submitted
 	if (count($sets)>0 & count($checked)>0) {
 		$setslist = implode(',',$sets);
 		$query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 	if (isset($_POST['chgsubscribe'])) {
 		
 		if (isset($_POST['subscribe'])) {
 			//add any subscriptions we don't already have
 			$query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$hassubscribe = array();
 			if (mysql_num_rows($result)>0) {
 				while ($row = mysql_fetch_row($result)) {
@@ -133,13 +133,13 @@ if (isset($_POST['checked'])) { //form submitted
 				$fid = intval($fid);
 				if ($fid>0) {
 					$query = "INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES ('$fid','$userid')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			}
 		} else {
 			//remove any existing subscriptions
 			$query = "DELETE FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
 		}
 			
@@ -151,13 +151,13 @@ if (isset($_POST['checked'])) { //form submitted
 //prep for output
 $forumitems = array();
 $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$forumitems[$row[0]] = $row[1];
 }
 
 $query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $i=0;
 $page_groupSelect = array();
 while ($row = mysql_fetch_row($result)) {
@@ -167,7 +167,7 @@ while ($row = mysql_fetch_row($result)) {
 }
 
 $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $page_gbcatSelect = array();
 $i=0;
 if (mysql_num_rows($result)>0) {

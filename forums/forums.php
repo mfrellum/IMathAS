@@ -65,7 +65,7 @@
 	//get general forum info and page order
 	$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$forumdata = array();
 	$anyforumsgroup = false;
 	while ($line = mysql_fetch_assoc($result)) {
@@ -76,7 +76,7 @@
 	}
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$itemorder = unserialize(mysql_result($result,0,0));
 	$itemsimporder = array();
 	function flattenitems($items,&$addto) {
@@ -93,7 +93,7 @@
 	
 	$itemsassoc = array();
 	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$itemsassoc[$row[0]] = $row[1];
 		if (!in_array($row[0],$itemsimporder)) {
@@ -208,7 +208,7 @@ if ($searchtype == 'thread') {
 	}
 	
 	$query .= " ORDER BY imas_forum_threads.lastposttime DESC";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$threaddata = array();
 	$threadids = array();
 	while ($line =  mysql_fetch_assoc($result)) {
@@ -221,7 +221,7 @@ if ($searchtype == 'thread') {
 		$limthreads = implode(',',$threadids);
 		$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
 		$query .= "WHERE threadid IN ($limthreads) GROUP BY threadid";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$postcount = array();
 		$maxdate = array();
 		while ($row = mysql_fetch_row($result)) {
@@ -322,7 +322,7 @@ if ($searchtype == 'thread') {
 	}
 	
 	$query .= " ORDER BY imas_forum_posts.postdate DESC";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($line =  mysql_fetch_assoc($result)) {
 		echo "<div class=block>";
 		echo "<b>{$line['subject']}</b>";
@@ -376,7 +376,7 @@ if ($searchtype == 'thread') {
 	
 	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$threadcount[$row[0]] = $row[1];
 	}
@@ -384,7 +384,7 @@ if ($searchtype == 'thread') {
 	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) AS postcount,MAX(imas_forum_posts.postdate) AS maxdate FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
 
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$postcount[$row[0]] = $row[1];
 		$maxdate[$row[0]] = $row[2];
@@ -408,21 +408,21 @@ if ($searchtype == 'thread') {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	}
 	$query .= "GROUP BY imas_forum_threads.forumid";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$newcnt[$row[0]] = $row[1];
 	}
 	
 	/*$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$forumdata = array();
 	while ($line = mysql_fetch_assoc($result)) {
 		$forumdata[$line['id']] = $line;
 	}
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$itemorder = unserialize(mysql_result($result,0,0));
 	$itemsimporder = array();
 	function flattenitems($items,&$addto) {
@@ -439,7 +439,7 @@ if ($searchtype == 'thread') {
 	
 	$itemsassoc = array();
 	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$itemsassoc[$row[0]] = $row[1];
 	}

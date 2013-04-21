@@ -67,11 +67,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$rubricstring = addslashes(serialize($rubric));
 		if ($_GET['id']!='new') { //MODIFY
 			$query = "UPDATE imas_rubrics SET name='{$_POST['rubname']}',rubrictype='{$_POST['rubtype']}',groupid=$rubgrp,rubric='$rubricstring' WHERE id='{$_GET['id']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		} else {
 			$query = "INSERT INTO imas_rubrics (ownerid,name,rubrictype,groupid,rubric) VALUES ";
 			$query .= "($userid,'{$_POST['rubname']}','{$_POST['rubtype']}',$rubgrp,'$rubricstring')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addrubric.php?cid=$cid$fromstr");
@@ -88,7 +88,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$rubid = intval($_GET['id']);
 				$query = "SELECT name,groupid,rubrictype,rubric FROM imas_rubrics WHERE id=$rubid";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				list($rubname,$rubgrp,$rubtype,$rubric) = mysql_fetch_row($result);
 				$rubric = unserialize($rubric);
 			}
@@ -114,7 +114,7 @@ if ($overwriteBody==1) {
 if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	echo '<p>Select a rubric to edit or <a href="addrubric.php?cid='.$cid.'&amp;id=new">Add a new rubric</a></p><p>';
 	$query = "SELECT id, name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$groupid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		echo "{$row[1]} <a href=\"addrubric.php?cid=$cid&amp;id={$row[0]}$fromstr\">Edit</a><br/>";
 	}

@@ -21,7 +21,7 @@
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbmode = mysql_result($result,0,0);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
@@ -34,7 +34,7 @@
 	
 	$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 	$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	if (mysql_result($result,0,0)>0) {
 		$hassection = true;
 	} else {
@@ -43,7 +43,7 @@
 	
 	if ($hassection) {
 		$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0)==0) {
 			$sortorder = "sec";
 		} else {
@@ -54,7 +54,7 @@
 	}
 	
 	$query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder) = mysql_fetch_row($result);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
@@ -78,7 +78,7 @@
 	}
 		
 	$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-	$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$totalpossible = 0;
 	while ($r = mysql_fetch_row($result2)) {
 		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
@@ -101,7 +101,7 @@
 
 	//get exceptions
 	$query = "SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid='$aid'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$exceptions = array();
 	while ($row = mysql_fetch_row($result)) {
 		$exceptions[$row[0]] = array($row[1],$row[2]);
@@ -121,7 +121,7 @@
 	} else {
 		 $query .= " ORDER BY iu.LastName,iu.FirstName";
 	}
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			
 	
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";

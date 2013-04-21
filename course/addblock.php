@@ -96,7 +96,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//$_POST['title'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['title']);
 
 	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$items = unserialize(mysql_result($result,0,0));
 	$blockcnt = mysql_result($result,0,1);
 
@@ -165,7 +165,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	$itemorder = addslashes(serialize($items));
 	$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=$blockcnt WHERE id='$cid';";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		
 	exit;
@@ -173,7 +173,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 	if (isset($_GET['id'])) { //teacher modifying existing block, load form with block data
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 			
 		$blocktree = explode('-',$_GET['id']);
@@ -235,7 +235,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$fixedheight = 0;
 		$grouplimit = array();
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 	}
 
@@ -248,7 +248,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_sectionlistval = array("none");
 	$page_sectionlistlabel = array("No restriction");
 	$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$page_sectionlistval[] = 's-'.$row[0];
 		$page_sectionlistlabel[] = 'Section '.$row[0];

@@ -27,7 +27,7 @@ if ($cid==0) {
 	$body = "Error - need wiki id";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$query = "SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$id'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$row = mysql_fetch_row($result);
 	$wikiname = $row[0];
 	$now = time();
@@ -45,7 +45,7 @@ if ($cid==0) {
 		$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
 		$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 		$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY i_w_r.id DESC";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$numrevisions = mysql_num_rows($result);
 		
 		$row = mysql_fetch_row($result);

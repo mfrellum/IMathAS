@@ -35,10 +35,10 @@ if (isset($_POST['assess'])) {
         $err = true;
     } else {
         $query = "SELECT itemorder FROM imas_assessments WHERE id='$dest'";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+        $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
         $sourceitemord = mysql_result($result,0,0);
         $query = "SELECT itemorder,name FROM imas_assessments WHERE id IN (".implode(',',$source).")";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+        $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
         while ($row = mysql_fetch_row($result)) {
             if (substr_count($row[0],',') != substr_count($sourceitemord,',')) {
                 echo 'one of this things is not like the others.... '.$row[1].' does not match same number of questions.   assessments cannot be merged';
@@ -49,7 +49,7 @@ if (isset($_POST['assess'])) {
     }
     if (!$err) {
         $query = "SELECT userid,bestseeds,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions WHERE assessmentid='$dest'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$adata = array();
         while ($row = mysql_fetch_row($result)) {
 		$adata[$row[0]] = array();
@@ -60,7 +60,7 @@ if (isset($_POST['assess'])) {
 	}
 	
 	$query = "SELECT userid,bestseeds,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions WHERE assessmentid IN (".implode(',',$source).")";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$seeds = explode(',',$row[1]);
 		$scores = explode(',',$row[2]);
@@ -83,7 +83,7 @@ if (isset($_POST['assess'])) {
 		$bestlalist = addslashes(stripslashes($bestlalist));
 		$query = "UPDATE imas_assessment_sessions SET bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist' ";
 		$query .= "WHERE userid='$uid' AND assessmentid='$dest'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 	echo "Merge complete";
     } 
@@ -98,7 +98,7 @@ if (isset($_POST['assess'])) {
    
     echo '<form method="post" action="mergescores.php?cid='.$cid.'">';
     $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+    $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
     echo '<p>';
     while ($row = mysql_fetch_row($result)) {
         echo '<input type="input" size="1" name="assess['.$row[0].']" />'.$row[1].'<br/>';

@@ -16,7 +16,7 @@ ini_set("max_execution_time", "600");
 			$tounenroll = explode(",",$_POST['tounenroll']);
 		} else if ($_GET['uid']=="all") {
 			$query = "SELECT userid FROM imas_students WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$tounenroll[] = $row[0];
 			}
@@ -59,13 +59,13 @@ ini_set("max_execution_time", "600");
 				//not quite sure why we're doing this check... makes sure all students were actually selected..
 				//if not, convert to selected type
 				$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (count($_POST['checked']) < mysql_result($result,0,0)) {
 					$_GET['uid'] = 'selected';
 				}
 			}*/
 			$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (count($_POST['checked']) == mysql_result($result,0,0)) {
 				$_GET['uid'] = 'all';
 			} else {
@@ -75,14 +75,14 @@ ini_set("max_execution_time", "600");
 		
 		if ($_GET['uid']=="all") {
 			$query = "SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
-			$resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
+			$resultUserList = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		} else if ($_GET['uid']=="selected") {
 			if (count($_POST['checked'])>0) {
 				$ulist = "'".implode("','",$_POST['checked'])."'";
 				$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)";
-				$resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
+				$resultUserList = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
 					$delForumMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
 					$delWikiMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> wiki revisions: ";
@@ -96,7 +96,7 @@ ini_set("max_execution_time", "600");
 			}
 		} else {
 			$query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			$unenrollConfirm =  "Are you SURE you want to unenroll {$row[0]} {$row[1]} ($row[2])?";
 		}

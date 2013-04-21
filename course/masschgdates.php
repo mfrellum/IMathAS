@@ -23,7 +23,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 	if (isset($_POST['chgcnt'])) {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		
 		$cnt = $_POST['chgcnt'];
@@ -85,27 +85,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($type=='Assessment') {
 				if ($id>0) {
 					$query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			} else if ($type=='Forum') {
 				if ($id>0) {
 					$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			} else if ($type=='Wiki') {
 				if ($id>0) {
 					$query = "UPDATE imas_wikis SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			} else if ($type=='InlineText') {
 				if ($id>0) {
 					$query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			} else if ($type=='LinkedText') {
 				if ($id>0) {
 					$query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			} else if ($type=='Block') {
 				$blocktree = explode('-',$id);
@@ -125,7 +125,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($blockchg>0) {
 			$itemorder = addslashes(serialize($items));
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
@@ -243,13 +243,13 @@ if ($overwriteBody==1) {
 	if ($orderby==3) {  //course page order
 		$itemsassoc = array();
 		$query = "SELECT id,typeid,itemtype FROM imas_items WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$itemsassoc[$row[0]] = $row[2].$row[1];
 		}
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$itemorder = unserialize(mysql_result($result,0,0));
 		$itemsimporder = array();
 		function flattenitems($items,&$addto,$parent) {
@@ -280,7 +280,7 @@ if ($overwriteBody==1) {
 	
 	if ($filter=='all' || $filter=='assessments') {
 		$query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "Assessment";
 			$names[] = $row[0];
@@ -294,7 +294,7 @@ if ($overwriteBody==1) {
 	}
 	if ($filter=='all' || $filter=='inlinetext') {
 		$query = "SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "InlineText";
 			$names[] = $row[0];
@@ -308,7 +308,7 @@ if ($overwriteBody==1) {
 	}
 	if ($filter=='all' || $filter=='linkedtext') {
 		$query = "SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "LinkedText";
 			$names[] = $row[0];
@@ -322,7 +322,7 @@ if ($overwriteBody==1) {
 	}
 	if ($filter=='all' || $filter=='forums') {
 		$query = "SELECT name,startdate,enddate,id,avail FROM imas_forums WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "Forum";
 			$names[] = $row[0];
@@ -336,7 +336,7 @@ if ($overwriteBody==1) {
 	}
 	if ($filter=='all' || $filter=='wikis') {
 		$query = "SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "Wiki";
 			$names[] = $row[0];
@@ -350,7 +350,7 @@ if ($overwriteBody==1) {
 	}
 	if ($filter=='all' || $filter=='blocks') {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		
 		function getblockinfo($items,$parent) {

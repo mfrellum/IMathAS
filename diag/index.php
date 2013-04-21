@@ -13,7 +13,7 @@
 	
 	if (!isset($_GET['id'])) {
 		$query = "SELECT id,name FROM imas_diags WHERE public=3 OR public=7";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		//echo "<html><body><h1>Diagnostics</h1><ul>";
 		$nologo = true;
 		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
@@ -39,7 +39,7 @@ END;
 	$diagid = $_GET['id'];
 	
 	$query = "SELECT * from imas_diags WHERE id='$diagid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	$pcid = $line['cid'];
 	$diagid = $line['id'];
@@ -77,11 +77,11 @@ END;
 	}
 	
 	$query = "SELECT sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result =  mysql_query($query) or die("Query failed : " . mysql_error());
+	$result =  mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	//if (isset($sessiondata['mathdisp'])) {
 	if (mysql_num_rows($result)>0) {
 	   $query = "DELETE FROM imas_sessions WHERE sessionid='$sessionid'";
-	   mysql_query($query) or die("Query failed : " . mysql_error());
+	   mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	   $sessiondata = array();
 	   if (isset($_COOKIE[session_name()])) {
 		   setcookie(session_name(), '', time()-42000, '/');
@@ -98,7 +98,7 @@ if (isset($_POST['SID'])) {
 			exit; 
 	}
 	$query = "SELECT entryformat,sel1list from imas_diags WHERE id='$diagid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$entryformat = mysql_result($result,0,0);
 	$sel1 = explode(',',mysql_result($result,0,1));
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
@@ -163,24 +163,24 @@ if (isset($_POST['SID'])) {
 	if (!$noproctor) {
 		if (!in_array(strtolower($_POST['passwd']),$basicpw) && !in_array(strtolower($_POST['passwd']),$superpw)) {
 			$query = "SELECT id,goodfor FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$passwordnotfound = false;
 			if (mysql_num_rows($result)>0) {
 				$row = mysql_fetch_row($result); //[0] = id, [1] = goodfor
 				if ($row[1]==0) {  //onetime
 					$query = "DELETE FROM imas_diag_onetime WHERE id={$row[0]}";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				} else { //set time expiry
 					$now = time();
 					if ($row[1]<100000000) { //is time its good for - not yet used
 						$expiry = $now + $row[1]*60;
 						$query = "UPDATE imas_diag_onetime SET goodfor=$expiry WHERE id={$row[0]}";
-						mysql_query($query) or die("Query failed : " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					} else if ($now<$row[1]) {//is expiry time and we're within it
 						//alls good
 					} else { //past expiry
 						$query = "DELETE FROM imas_diag_onetime WHERE id={$row[0]}";
-						mysql_query($query) or die("Query failed : " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 						$passwordnotfound = true;
 					}
 				}
@@ -189,7 +189,7 @@ if (isset($_POST['SID'])) {
 			}
 			if ($passwordnotfound) {
 				$query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0 && strtoupper(mysql_result($result,0,0))==strtoupper($_POST['passwd'])) {
 					
 				} else {
@@ -203,7 +203,7 @@ if (isset($_POST['SID'])) {
 	$now = time();
 	
 	$query = "SELECT id FROM imas_users WHERE SID='$diagSID'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		$userid = mysql_result($result,0,0);
 		$allowreentry = ($line['public']&4);
@@ -211,7 +211,7 @@ if (isset($_POST['SID'])) {
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
 			$query = "SELECT id,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($r2)>0) {
 				if (!$allowreentry) {
 					echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
@@ -236,16 +236,16 @@ if (isset($_POST['SID'])) {
 			$sessiondata['isdiag'] = $diagid;
 			$enc = base64_encode(serialize($sessiondata));
 			$query = "INSERT INTO imas_sessions VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
 			if ((intval($line['forceregen']) & (1<<intval($_POST['course'])))>0) {
 				$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid' LIMIT 1";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 
 			$query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
-		 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
 			exit;
@@ -260,10 +260,10 @@ if (isset($_POST['SID'])) {
 	
 	$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
 	$query .= "VALUES ('$diagSID','{$_POST['passwd']}',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	$userid = mysql_insert_id();
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+	$userid = mysqli_insert_id($GLOBALS['link'])();
 	$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$pcid','{$_POST['teachers']}');";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 	$sessiondata['mathdisp'] = $_POST['mathdisp'];//1;
 	$sessiondata['graphdisp'] = $_POST['graphdisp'];//1;
@@ -271,7 +271,7 @@ if (isset($_POST['SID'])) {
 	$sessiondata['isdiag'] = $diagid;
 	$enc = base64_encode(serialize($sessiondata));
 	$query = "INSERT INTO imas_sessions VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 	

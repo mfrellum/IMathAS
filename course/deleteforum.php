@@ -28,18 +28,18 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		$forumid = $_GET['id'];
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$forumid' AND itemtype='Forum'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$itemid = mysql_result($result,0,0);
 		
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		$query = "DELETE FROM imas_forums WHERE id='$forumid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		
 		$blocktree = explode('-',$block);
@@ -51,24 +51,24 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		array_splice($sub,$key,1);
 		$itemorder = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		
 		$query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$forumid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		require_once("../includes/filehandler.php");
 		$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND files<>''";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			deleteallpostfiles($row[0]);
 		}
 		
 		$query = "DELETE FROM imas_forum_posts WHERE forumid='$forumid'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		
 		$query = "DELETE FROM imas_forum_threads WHERE forumid='$forumid'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		
 		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
@@ -76,7 +76,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		exit;
 	} else {
 		$query = "SELECT name FROM imas_forums WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$itemname = mysql_result($result,0,0);
 	}	
 }

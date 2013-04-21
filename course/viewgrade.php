@@ -10,7 +10,7 @@
 	
 	$query = "SELECT iu.LastName,iu.FirstName,ig.score,ig.feedback,igi.name FROM imas_users as iu, imas_grades AS ig, imas_gbitems AS igi WHERE ";
 	$query .= "iu.id=ig.userid AND igi.id=ig.gradetypeid AND ig.gradetype='offline' AND ig.id='$gid' AND ig.userid='$userid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$row = mysql_fetch_row($result);
 	$pagetitle = "View Grade";
 	require("../header.php");

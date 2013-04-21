@@ -14,7 +14,7 @@ require("./validate.php");
 //pagelayout:  array of arrays.  pagelayout[0] = fullwidth header, [1] = left bar 25%, [2] = rigth bar 75%
 //[3]: 0 for newmsg note next to courses, 1 for newpost note next to courses
 $query = "SELECT homelayout FROM imas_users WHERE id='$userid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $homelayout = mysql_result($result,0,0);
 
 $pagelayout = explode('|',$homelayout);
@@ -60,7 +60,7 @@ if ($showmessagesgadget) {
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
 	$query .= "ORDER BY senddate DESC ";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($line = mysql_fetch_assoc($result)) {
 		if (!isset($newmsgcnt[$line['courseid']])) {
 			$newmsgcnt[$line['courseid']] = 1;
@@ -73,7 +73,7 @@ if ($showmessagesgadget) {
 	//check for new messages    
 	
 	$query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$newmsgcnt[$row[0]] = $row[1];
 	}
@@ -85,7 +85,7 @@ $page_studentCourseData = array();
 $query = "SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_courses ";
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	$noclass = true;
 } else {
@@ -103,7 +103,7 @@ if ($myrights>10) {
 	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
 	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		$noclass = true;
 	} else {
@@ -123,7 +123,7 @@ $page_tutorCourseData = array();
 $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
 $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	$noclass = true;
 } else {
@@ -152,7 +152,7 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($line = mysql_fetch_assoc($result)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
@@ -182,7 +182,7 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	$query .= "GROUP BY imas_forums.courseid";
 	
-	$r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($r2)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
@@ -204,7 +204,7 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($line = mysql_fetch_assoc($result)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
@@ -235,7 +235,7 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "($postcidlist) AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	$query .= "GROUP BY courseid";*/
-	$r2 = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($r2)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
@@ -398,7 +398,7 @@ function printPostsGadget() {
 	$threaddata = array();
 	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
 	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($tline = mysql_fetch_assoc($result)) {
 		$threaddata[$tline['id']] = $tline;
 	}

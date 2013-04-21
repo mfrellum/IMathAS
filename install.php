@@ -100,7 +100,7 @@ $contents .= '
   /* Connecting, selecting database */
   if (!isset($dbsetup)) {
 	 $link = mysql_connect($dbserver,$dbusername, $dbpassword) 
-	  or die("<p>Could not connect : " . mysql_error() . "</p></div></body></html>");
+	  or die("<p>Could not connect : " . mysqli_error($GLOBALS['link']) . "</p></div></body></html>");
 	 mysql_select_db($dbname) 
 	  or die("<p>Could not select database</p></div></body></html>");
 	  

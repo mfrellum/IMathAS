@@ -6,14 +6,14 @@ if (empty($_GET['linkid'])) {
 	exit;
 }
 $query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $text = mysql_result($result, 0,0);
 $title = mysql_result($result,0,1);
 list($tool,$linkcustom) = explode('~~',substr($text,8));
 $tool = intval($tool);
 
 $query = "SELECT * from imas_external_tools WHERE id=$tool AND (courseid='$cid' OR (courseid=0 AND (groupid='$groupid' OR groupid=0)))";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	echo '<html><body>Invalid tool</body></html>';
 	exit;
@@ -45,7 +45,7 @@ if (trim($linkcustom)!='') {
 }
 
 $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 list($firstname,$lastname,$email) = mysql_fetch_row($result);
 $parms['user_id'] = $userid;
 if (($line['privacy']&1)==1) {

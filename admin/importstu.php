@@ -113,7 +113,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				continue;
 			}
 			$query = "SELECT id FROM imas_users WHERE SID='$arr[0]'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$id = mysql_result($result,0,0);
 				echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
@@ -136,8 +136,8 @@ if (!(isset($teacherid)) && $myrights<100) {
 					}
 				}
 				$query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$id = mysql_insert_id();
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+				$id = mysqli_insert_id($GLOBALS['link'])();
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
 				if ($isadmin) {
@@ -147,7 +147,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				}
 				$vals = "'$id','$ncid'";
 				$query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$ncid'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) {
 					echo "Username {$arr[0]} already enrolled in course.  Skipping<br/>";
 					continue;
@@ -164,7 +164,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				}
 				$query .= ") VALUES ($vals)";
 				
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			}
 			
 		}
@@ -225,7 +225,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			$query = "SELECT imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName FROM imas_courses,imas_users ";
 			$query .= "WHERE imas_users.id=imas_courses.ownerid ";
 			
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$i=0;
 			while ($row = mysql_fetch_row($result)) {
 				$page_adminUserSelectVals[$i] = $row[0];

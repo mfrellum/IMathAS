@@ -20,10 +20,10 @@ if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['fol
 
 if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the student's record
 	$query = "UPDATE imas_bookmarks SET value='{$_GET['recordbookmark']}' WHERE userid='$userid' AND courseid='$cid' AND name='TR{$_GET['folder']}'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_affected_rows()==0) {
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+	if (mysqli_affected_rows($GLOBALS['link'])()==0) {
 		$query = "INSERT INTO imas_bookmarks (userid,courseid,name,value) VALUES ('$userid','$cid','TR{$_GET['folder']}','{$_GET['recordbookmark']}')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 	return "OK";
 	exit;
@@ -31,7 +31,7 @@ if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the studen
 
 $cid = intval($_GET['cid']);
 $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc FROM imas_courses WHERE id=$cid";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $line = mysql_fetch_assoc($result);
 $items = unserialize($line['itemorder']);		
 
@@ -150,7 +150,7 @@ $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course
 require("../header.php");
 
 $query = "SELECT value FROM imas_bookmarks WHERE userid='$userid' AND courseid='$cid' AND name='TR{$_GET['folder']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	$openitem = '';
 } else {
@@ -163,7 +163,7 @@ $foundopenitem = '';
 $astatus = array();
 $query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 $query .= "WHERE ia.courseid='$cid' AND ias.userid='$userid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	if (strpos($row[1],'-1')===false) {
 		$astatus[$row[0]] = 2; //completed
@@ -204,7 +204,7 @@ function printlist($items) {
 			$out .=  '</ul></li>';
 		} else {
 			$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$item'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			$typeid = $line['typeid'];
 			$itemtype = $line['itemtype'];
@@ -218,7 +218,7 @@ function printlist($items) {
 			if ($line['itemtype']=='Assessment') {
 				//TODO check availability, timelimit, etc.
 				 $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit,displaymethod FROM imas_assessments WHERE id='$typeid'";
-				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				 $line = mysql_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
@@ -242,7 +242,7 @@ function printlist($items) {
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
 				 $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
-				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				 $line = mysql_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
@@ -254,7 +254,7 @@ function printlist($items) {
 			} /*else if ($line['itemtype']=='Forum') {
 				//TODO check availability, etc.
 				 $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
-				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				 $line = mysql_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid; $isopen = true;
@@ -266,7 +266,7 @@ function printlist($items) {
 			} else if ($line['itemtype']=='Wiki') {
 				//TODO check availability, etc.
 				 $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
-				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				 $line = mysql_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;

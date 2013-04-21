@@ -29,32 +29,32 @@ if (!(isset($teacherid))) {
 		$textid = $_GET['id'];
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='InlineText'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$itemid = mysql_result($result,0,0);
 		
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		$query = "DELETE FROM imas_inlinetext WHERE id='$textid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		$query = "SELECT filename FROM imas_instr_files WHERE itemid='$textid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 		while ($row = mysql_fetch_row($result)) {
 			$safefn = addslashes($row[0]);
 			$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($r2)==1) {
 				//unlink($uploaddir . $row[0]);
 				deletecoursefile($row[0]);
 			}
 		}
 		$query = "DELETE FROM imas_instr_files WHERE itemid='$textid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		
 		$blocktree = explode('-',$block);
@@ -66,13 +66,13 @@ if (!(isset($teacherid))) {
 		array_splice($sub,$key,1);
 		$itemorder = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;
 	} else {
 		$query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$itemname = mysql_result($result,0,0);
 	}
 } 

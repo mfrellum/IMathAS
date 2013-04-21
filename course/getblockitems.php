@@ -16,7 +16,7 @@
    $cid = $_GET['cid'];
    require("../filter/filter.php");
    $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
-   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
    $line = mysql_fetch_assoc($result);
    if ($line == null) {
 	   echo "Course does not exist.  <a href=\"../index.php\">Return to main page</a></body></html>\n";
@@ -45,7 +45,7 @@
 	   $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
 	  // $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 	   //$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	   while ($line = mysql_fetch_assoc($result)) {
 		   $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
 	   }
@@ -86,7 +86,7 @@
    //get latepasses
    if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	   $latepasses = mysql_result($result,0,0);
    } else {
 	   $latepasses = 0;
@@ -102,7 +102,7 @@
 	}
 	$query .= "GROUP BY imas_forum_threads.forumid";
 	
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$newpostcnts = array();
 	while ($row = mysql_fetch_row($result)) {
 		$newpostcnts[$row[0]] = $row[1];

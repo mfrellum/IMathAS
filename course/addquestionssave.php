@@ -8,7 +8,7 @@
 		echo "error: validation";
 	}
 	$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error()); 
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
 	$rawitemorder = mysql_result($result,0,0);
 	$viddata = mysql_result($result,0,1);
 	$itemorder = str_replace('~',',',$rawitemorder);
@@ -98,13 +98,13 @@
 	
 	//delete any removed questions
 	$query = "DELETE FROM imas_questions WHERE id IN ('".implode("','",$toremove)."')";
-	mysql_query($query) or die("Query failed : " . mysql_error()); 
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
 	
 	//store new itemorder
 	$query = "UPDATE imas_assessments SET itemorder='{$_GET['order']}',viddata='$viddata' WHERE id='$aid'";
-	mysql_query($query) or die("Query failed : " . mysql_error()); 
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
 	
-	if (mysql_affected_rows()>0) {
+	if (mysqli_affected_rows($GLOBALS['link'])()>0) {
 		echo "OK";
 	} else {
 		echo "error: not saved";

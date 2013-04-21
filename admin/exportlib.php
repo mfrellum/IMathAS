@@ -69,7 +69,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if ($nonpriv) {
 			$query .= " AND userights>0";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			if (!in_array($row[2],$rootlibs)) { //don't export children here
 				$libs[$row[0]] = $libcnt;
@@ -96,7 +96,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			if ($nonpriv) {
 				$query .= " AND userights>0";
 			}
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				while ($row = mysql_fetch_row($result)) {
 					if (!isset($libs[$row[0]])) { //in case someone clicked a parent and it's child
@@ -138,7 +138,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$qassoc = Array();
 		$libitems = Array();
 		$qcnt = 0;
@@ -166,7 +166,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND imas_questionset.userights>0";
 		}
 		$query .= " AND (imas_questionset.control LIKE '%includecodefrom%' OR imas_questionset.qtext LIKE '%includeqtextfrom%')";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$includedqs = array();
 		while ($line = mysql_fetch_assoc($result)) {
 			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
@@ -180,7 +180,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if (count($includedqs)>0) {
 			$includedlist = implode(',',$includedqs);
 			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
-			$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$includedbackref[$row[0]] = $row[1];		
 			}
@@ -191,7 +191,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		while ($line = mysql_fetch_assoc($result)) {
 			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
 			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
@@ -221,7 +221,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
 				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($r2)) {
 					echo $row[0].','.$row[1]. "\n";
 					$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row[1];

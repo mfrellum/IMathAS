@@ -45,7 +45,7 @@ switch($_GET['action']) {
 				echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
 				$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses JOIN imas_teachers ON ";
 				$query .= "imas_courses.id=imas_teachers.courseid WHERE imas_teachers.userid='{$CFG['GEN']['selfenrolluser']}' ORDER by imas_courses.name";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 				}
@@ -78,7 +78,7 @@ switch($_GET['action']) {
 		break;
 	case "chguserinfo":
 		$query = "SELECT * FROM imas_users WHERE id='$userid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($result);
 		echo '<script type="text/javascript">function togglechgpw(val) { if (val) {document.getElementById("pwinfo").style.display="";} else {document.getElementById("pwinfo").style.display="none";} } </script>';
 		
@@ -166,7 +166,7 @@ switch($_GET['action']) {
 				$lname = "Unassigned";
 			} else {
 				$query = "SELECT name FROM imas_libraries WHERE id='{$line['deflib']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$lname = mysql_result($result,0,0);
 			}
 			
@@ -211,7 +211,7 @@ switch($_GET['action']) {
 			echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
 			$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses JOIN imas_teachers ON ";
 			$query .= "imas_courses.id=imas_teachers.courseid WHERE imas_teachers.userid='{$CFG['GEN']['selfenrolluser']}' ORDER by imas_courses.name";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 			}
@@ -254,7 +254,7 @@ switch($_GET['action']) {
 		break;
 	case "googlegadget":
 		$query = "SELECT remoteaccess FROM imas_users WHERE id='$userid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$code = mysql_result($result,0,0);
 		if ($code=='' || isset($_GET['regen'])) {
 			$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -264,10 +264,10 @@ switch($_GET['action']) {
 					$pass .= substr($chars,rand(0,61),1);
 				}	
 				$query = "SELECT id FROM imas_users WHERE remoteaccess='$pass'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			} while (mysql_num_rows($result)>0);
 			$query = "UPDATE imas_users SET remoteaccess='$pass' WHERE id='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$code = $pass;
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Google Gadget Access Code</h2></div>';

@@ -95,7 +95,7 @@ $now = time();
 
 if ($itemtype==0) { //accessing single assessment
 	$query = "SELECT courseid,startdate,enddate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	$cid = $line['courseid'];
 	if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
@@ -104,7 +104,7 @@ if ($itemtype==0) { //accessing single assessment
 	$secret = $line['ltisecret'];
 } else if ($itemtype==1) { //accessing whole course
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	if (!($line['avail']==0 || $line['avail']==2)) {
 		returnstudentnotice("This course is not available");
@@ -124,7 +124,7 @@ if (abs($now-$created)>60) {
 }
 //check nonce unique 
 $query = "SELECT id FROM imas_ltinonces WHERE nonce='$nonce'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)>0) {
 	if (!$debugmode) {
 		reporterror("Duplicate nonce");
@@ -132,7 +132,7 @@ if (mysql_num_rows($result)>0) {
 } else {
 	//record nonce to prevent reruns - we'll hold for 15 min
 	$query = "INSERT INTO imas_ltinonces (nonce,time) VALUES ('$nonce','$now')";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }
 //check sec digest
 if (base64_encode(pack("H*", sha1($nonce.$created.$secret))) != $digest) {
@@ -141,15 +141,15 @@ if (base64_encode(pack("H*", sha1($nonce.$created.$secret))) != $digest) {
 
 //look if we know this student
 $query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result) > 0) { //yup, we know them
 	$userid = mysql_result($result,0,0);
 } else {
 	//echo "student not known?  id $ltiuserid, org $ltiorg";
 	
 	$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	$localltiuser = mysql_insert_id();
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+	$localltiuser = mysqli_insert_id($GLOBALS['link'])();
 	if (!empty($_REQUEST['user_email'])) {
 		$email = $_REQUEST['user_email'];
 	} else {
@@ -168,7 +168,7 @@ if (mysql_num_rows($result) > 0) { //yup, we know them
 	if (!empty($_REQUEST['user_eid'])) {
 		$sid = $_REQUEST['user_eid'];
 		$query = "SELECT userid FROM imas_users WHERE SID='$sid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) { //eid already used as username; oh well
 			$sid = "lti-".$localltiuser;
 		}
@@ -177,18 +177,18 @@ if (mysql_num_rows($result) > 0) { //yup, we know them
 	}
 	$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ";
 	$query .= "('$sid','none',10,'$firstname','$lastname','$email')";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	$userid = mysql_insert_id();	
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+	$userid = mysqli_insert_id($GLOBALS['link'])();	
 	$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }
 	
 //see if student is enrolled
 $query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result) == 0) { //nope, not enrolled
 	$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$cid')";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }
 
 //save info in access table
@@ -203,15 +203,15 @@ if ($itemtype==0) { //is aid
 } else if ($itemtype==1) { // is cid
 	$query .= "('$pass','$userid','$cid',1,$now)";
 }
-mysql_query($query) or die("Query failed : " . mysql_error());
-$accessid = mysql_insert_id();
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+$accessid = mysqli_insert_id($GLOBALS['link'])();
 
 //cleanup
 $old = $now - 900; //old stuff - 15 min
 $query = "DELETE FROM imas_ltinonces WHERE time<$old";
-mysql_query($query) or die("Query failed : " . mysql_error());
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $query = "DELETE FROM imas_ltiaccess WHERE created<$old";
-mysql_query($query) or die("Query failed : " . mysql_error());
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 
 //we're done!  send back the launchresponse
 $host = $_SERVER['HTTP_HOST'];

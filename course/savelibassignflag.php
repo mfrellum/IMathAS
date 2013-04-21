@@ -11,8 +11,8 @@ if (!isset($_GET['libitemid']) || $myrights<20) {
 $ischanged = false;
 
 $query = "UPDATE imas_library_items SET junkflag='{$_GET['flag']}' WHERE id='{$_GET['libitemid']}'";
-mysql_query($query) or die("Query failed : $query " . mysql_error());
-if (mysql_affected_rows()>0) {
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
+if (mysqli_affected_rows($GLOBALS['link'])()>0) {
 	$ischanged = true;
 }
 

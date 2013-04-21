@@ -20,7 +20,7 @@ $cid = intval($_GET['cid']);
 $daid = intval($_GET['daid']);
 
 $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	echo "Invalid drill assessment id";
 	exit;
@@ -44,7 +44,7 @@ $itemids = explode(',',$dadata['itemids']);
 $itemdescr = explode(',',$dadata['itemdescr']);
 
 $query = "SELECT * FROM imas_drillassess_sessions WHERE drillassessid='$daid' AND userid='$userid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	//new
 	$curitem = -1;
@@ -52,7 +52,7 @@ if (mysql_num_rows($result)==0) {
 	$scorerec = array();
 	$scorerecarr = serialize($scorerec);
 	$query = "INSERT INTO imas_drillassess_sessions (drillassessid,userid,scorerec) VALUES ('$daid','$userid','$scorerecarr')";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$starttime = 0;
 } else {
 	$sessdata = mysql_fetch_assoc($result);
@@ -85,7 +85,7 @@ if (isset($_GET['score'])) {
 	$curscores[] = getpts($score);
 	$scorelist = implode(',',$curscores);
 	$query = "UPDATE imas_drillassess_sessions SET curscores='$scorelist',seed='$seed' WHERE id='{$sessdata['id']}'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if ($mode=='cntdown') {
 		$page_scoreMsg .= "<p>Current: ".countcorrect($curscores)." question(s) correct</p>";
 	} else if ($stopattype=='a') {
@@ -109,7 +109,7 @@ if (isset($_GET['start'])) {
 	$scorelist = implode(',',$curscores);
 	$seed = rand(1,9999);
 	$query = "UPDATE imas_drillassess_sessions SET curscores='$scorelist',seed='$seed',starttime=$starttime,curitem=$curitem WHERE id='{$sessdata['id']}'";
-	mysql_query($query) or die("Query failed : " . mysql_error());	
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));	
 }
 
 //check on time
@@ -190,11 +190,11 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 	$scorerec[$curitem][] = $torecscore;
 	$scorerecarr = serialize($scorerec);
 	$query = "UPDATE imas_drillassess_sessions SET curitem=-1,scorerec='$scorerecarr' WHERE id='{$sessdata['id']}'";
-	mysql_query($query) or die("Query failed : " . mysql_error());	
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));	
 	if ($isnewclassbest) {
 		$bestarr = implode(',',$classbests);
 		$query = "UPDATE imas_drillassess SET classbests='$bestarr' WHERE id='$daid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());	
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));	
 	}
 }
 
@@ -458,7 +458,7 @@ function printscore($sc,$qsetid,$seed) {
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
 		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
 		$control = mysql_result($result,0,0);
 		$ptposs = getansweights($control,$seed);
 		$weightsum = array_sum($ptposs);

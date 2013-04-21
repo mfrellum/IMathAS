@@ -64,7 +64,7 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 }
 
 $query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid';";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $blockcnt = mysql_result($result,0,0);
 $items = unserialize(mysql_result($result,0,1));
 
@@ -74,7 +74,7 @@ copyrubrics();
 
 $itemorder = addslashes(serialize($items));
 $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-mysql_query($query) or die("Query failed : $query" . mysql_error());
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 
 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 ?>

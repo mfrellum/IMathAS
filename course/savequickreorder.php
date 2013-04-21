@@ -30,7 +30,7 @@
 		 $query = "UPDATE imas_wikis SET name='$val' WHERE id='$typeid'";
 	 } else if ($type=="B") {
 		 $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		 $itemsforblock = unserialize(mysql_result($result,0,0));
 		$blocktree = explode('-',$typeid);
 		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
@@ -44,11 +44,11 @@
 		$itemorder = addslashes(serialize($itemsforblock));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
 	 }
-	 mysql_query($query) or die("Query failed : " . mysql_error());
+	 mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
  }
  
  $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
- $result = mysql_query($query) or die("Query failed : " . mysql_error());
+ $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
  $items = unserialize(mysql_result($result,0,0));
  
  $newitems = array();
@@ -56,7 +56,7 @@
  $newitems = additems($order);
  $itemlist = addslashes(serialize($newitems));
  $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
- mysql_query($query) or die("Query failed : " . mysql_error());
+ mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
  
 
  

@@ -18,7 +18,7 @@
 		$gbmode = $_GET['gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbmode = mysql_result($result,0,0);
 	}
 	
@@ -27,7 +27,7 @@
 	echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; View Group Scores</div>";
 	
 	$query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = mysql_fetch_row($result);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
@@ -51,7 +51,7 @@
 	}
 		
 	$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-	$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$totalpossible = 0;
 	while ($r = mysql_fetch_row($result2)) {
 		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
@@ -74,7 +74,7 @@
 
 	$query = "SELECT ias.agroupid,ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM ";
 	$query .= "imas_assessment_sessions AS ias WHERE ias.assessmentid='$aid' GROUP BY ias.agroupid";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$scoredata = array();
 	while ($line = mysql_fetch_assoc($result)) {
 		$scoredata[$line['agroupid']] = $line;
@@ -89,7 +89,7 @@
 	$n = 0;
 	$tot = 0;
 	$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY id";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$grpnums = 1;
 	while ($row = mysql_fetch_row($result)) {
 		if ($row[1] == 'Unnamed group') { 
@@ -97,7 +97,7 @@
 			$grpnums++;
 			$query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
 			$query .= "ON iu.id=isgm.userid AND isgm.stugroupid='{$row[0]}' ORDER BY isgm.id LIMIT 1";
-			$r = mysql_query($query) or die("Query failed : " . mysql_error());
+			$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($r)>0) {
 				$row[1] .= ' ('.mysql_result($r,0,1).', '.mysql_result($r,0,0).' &isin;)';
 			}

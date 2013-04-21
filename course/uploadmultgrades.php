@@ -26,7 +26,7 @@ if (!(isset($teacherid))) {
 			exit;
 		}
 		$query = "SELECT imas_users.id,imas_users.SID FROM imas_users JOIN imas_students ON imas_students.userid=imas_users.id WHERE imas_students.courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$useridarr[$row[1]] = $row[0];
 		}
@@ -47,20 +47,20 @@ if (!(isset($teacherid))) {
 			if ($_POST["coloverwrite$col"]>0) {
 				//we're going to check that this id really belongs to this course.  Don't want cross-course hacking :)
 				$query = "SELECT id FROM imas_gbitems WHERE id='{$_POST["coloverwrite$col"]}' AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) { //if this fails, we'll end up creating a new item
 					$gbitemid[$col] = mysql_result($result,0,0);
 					//delete old grades
 					//$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]}";
-					//mysql_query($query) or die("Query failed : " . mysql_error());
+					//mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$gradestodel[$col] = array();
 					continue;
 				}
 			}
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
 			$query .= "('$cid','$name','$pts',$showdate,'$gbcat','$cnt',0) ";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$gbitemid[$col] = mysql_insert_id();
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+			$gbitemid[$col] = mysqli_insert_id($GLOBALS['link'])();
 		}
 		$adds = array();
 		if (count($gbitemid)>0) {
@@ -106,14 +106,14 @@ if (!(isset($teacherid))) {
 				if (count($stus)>0) {
 					$stulist = implode(',',$stus);
 					$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid={$gbitemid[$col]} AND userid IN ($stulist)";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			}
 			//now we load in the data!
 			if (count($adds)>0) {
 				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 				$query .= implode(',',$adds);
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				//echo $query;
 			}
 		}
@@ -177,7 +177,7 @@ if (!(isset($teacherid))) {
 				}
 				$namelist = "'".implode("','",$names)."'";
 				$query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$loc = array_search($row[1],$names);
 					if ($loc===false) {continue; } //shouldn't happen
@@ -236,7 +236,7 @@ if ($overwriteBody==1) {
 		<tbody>
 	<?php
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbcatoptions = '<option value="0" selected=1>Default</option>';
 		if (mysql_num_rows($result)>0) {
 			while ($row = mysql_fetch_row($result)) {

@@ -11,8 +11,8 @@ if (!isset($_GET['threadid'])) {
 $ischanged = false;
 
 $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto='$userid' AND id='{$_GET['threadid']}'";
-mysql_query($query) or die("Query failed : $query " . mysql_error());
-if (mysql_affected_rows()>0) {
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
+if (mysqli_affected_rows($GLOBALS['link'])()>0) {
 	$ischanged = true;
 }
 

@@ -34,7 +34,7 @@
 			$page_newaccounterror .= "$loginprompt is invalid. ";
 		} else {
 			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$page_newaccounterror .= "$loginprompt '{$_POST['SID']}' is already used. ";
 			} 
@@ -47,7 +47,7 @@
 		} 
 		
 		$query = "SELECT enrollkey FROM imas_courses WHERE id = '{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$enrollkey = mysql_result($result,0,0);
 		if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= "Please provide the enrollment key";
@@ -75,12 +75,12 @@
 			}
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
 			$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot);";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$newuserid = mysql_insert_id();
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+			$newuserid = mysqli_insert_id($GLOBALS['link'])();
 			$query = "INSERT INTO imas_students (userid,courseid,gbcomment) VALUES ('$newuserid','{$_GET['cid']}','$code');";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if ($emailconfirmation) {
-				$id = mysql_insert_id();
+				$id = mysqli_insert_id($GLOBALS['link'])();
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
@@ -111,7 +111,7 @@
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
 			$query = "SELECT name,enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			list($coursename,$enrollkey) = mysql_fetch_row($result);
 			$keylist = array_map('trim',explode(';',$enrollkey));
 			if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
@@ -120,7 +120,7 @@
 				} else {
 					$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_GET['cid']}');";
 				}
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
 				exit;
 			} else {
@@ -154,7 +154,7 @@
 		 }
 	 
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$coursename = mysql_result($result,0,0);
 		
 		$placeinhead = "<style type=\"text/css\">div#header {clear: both;height: 75px;background-color: #9C6;margin: 0px;padding: 0px;border-left: 10px solid #036;border-bottom: 5px solid #036;} \n.vcenter {font-family: sans-serif;font-size: 28px;margin: 0px;margin-left: 30px;padding-top: 25px;color: #fff;}</style>";
@@ -178,7 +178,7 @@
 		} 
 		
 		$query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$enrollkey = mysql_result($result,0,0);
 		
 ?>

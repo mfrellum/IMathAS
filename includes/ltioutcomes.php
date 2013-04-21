@@ -185,7 +185,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 	global $aidtotalpossible;
 	if (!isset($aidtotalpossible[$aid])) {
 		$query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
-		$res= mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$res= mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$aitems = explode(',',mysql_result($res,0,0));
 		$defpoints = mysql_result($res,0,1);
 		foreach ($aitems as $k=>$v) {
@@ -205,7 +205,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 		}
 		
 		$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		$totalpossible = 0;
 		while ($r = mysql_fetch_row($result2)) {
 			if (($k=array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
@@ -240,7 +240,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 					$secret = $testsettings['ltisecret'];
 				} else {
 					$qr = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
-					$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
+					$res= mysqli_query($GLOBALS['link'],$qr) or die("Query failed : $qr" . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($res)>0) {
 						$secret = mysql_result($res,0,0);
 						$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
@@ -255,7 +255,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				} else {
 					$qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
 				}
-				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
+				$res= mysqli_query($GLOBALS['link'],$qr) or die("Query failed : $qr" . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($res)>0) {
 					$secret = mysql_result($res,0,0);
 					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
@@ -265,7 +265,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				}
 			} else {
 				$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76)";
-				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
+				$res= mysqli_query($GLOBALS['link'],$qr) or die("Query failed : $qr" . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($res)>0) {
 					$secret = mysql_result($res,0,0);
 					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;

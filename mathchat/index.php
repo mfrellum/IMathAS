@@ -17,12 +17,12 @@ $editorloc = "$imasroot/editor";
 $now = time();
 //check for session
 //$query = "SELECT * FROM mc_sessions WHERE sessionid='$sessionid'";
-//$result = mysql_query($query) or die("Query failed : " . mysql_error());
+//$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 //if (mysql_num_rows($result)==0) {
 if (isset($_GET['isactive'])) { //request to see if room is being used
 	$on = $now - 15;
 	$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='{$_GET['isactive']}' AND lastping>$on";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	echo mysql_num_rows($result);
 	exit;
 }
@@ -41,8 +41,8 @@ if (!isset($_GET['userid'])) {
 	//$query .= "VALUES ('$sessionid','$uname','$room','$mathdisp','$graphdisp',$now)";
 	$query = "INSERT INTO mc_sessions (name,room,mathdisp,graphdisp,lastping) ";
 	$query .= "VALUES ('$uname','$room','$mathdisp','$graphdisp',$now)";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	$mcsession['userid'] = mysql_insert_id();
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+	$mcsession['userid'] = mysqli_insert_id($GLOBALS['link'])();
 	$mcsession['name'] = $uname;
 	$mcsession['room'] = $room;
 	$mcsession['mathdisp'] = $mathdisp;
@@ -51,21 +51,21 @@ if (!isset($_GET['userid'])) {
 	
 	$old = time() - 24*60*60; //1 day old
 	$query = "DELETE FROM mc_msgs WHERE time<$old";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$query = "DELETE FROM mc_sessions WHERE lastping<$old";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'].'?userid='.$mcsession['userid']);
 	//exit;
 } else {
 	/*if (!empty($_REQUEST['uname']) && !empty($_REQUEST['room'])) {
 		$query = "UPDATE mc_sessions SET name='{$_REQUEST['uname']}',room='{$_REQUEST['room']}' WHERE sessionid='$sessionid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$_SESSION['roomname'] = $_REQUEST['roomname'];
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
 		exit;
 	}*/
 	$query = "SELECT * FROM mc_sessions WHERE userid='{$_GET['userid']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$mcsession = mysql_fetch_assoc($result);	
 }
 $mcsession['useed'] = 1;
@@ -73,7 +73,7 @@ $mcsession['useed'] = 1;
 if (isset($_POST['addtxt'])) {
 	$query = "INSERT INTO mc_msgs (userid,msg,time) VALUES ";
 	$query .= "('{$mcsession['userid']}','{$_POST['addtxt']}',$now)";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }
 if (isset($_REQUEST['update'])) {
 	$query = "SELECT mc_sessions.name,mc_msgs.msg,mc_msgs.id FROM mc_sessions ";
@@ -86,7 +86,7 @@ if (isset($_REQUEST['update'])) {
 		$query .= "WHERE mc_sessions.room='{$mcsession['room']}' AND mc_msgs.id > $lastmsg ";
 	}
 	$query .= "ORDER BY mc_msgs.time";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	echo '{"msgs":[';
 	$i =0;
 	while ($row = mysql_fetch_row($result)) {
@@ -100,11 +100,11 @@ if (isset($_REQUEST['update'])) {
 	}
 	echo '],"users":[';
 	$query = "UPDATE mc_sessions SET lastping=$now WHERE userid='{$mcsession['userid']}'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$on = $now - 15;
 	//echo '<div id="userlist">';
 	$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='{$mcsession['room']}' AND lastping>$on ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$i =0;
 	while ($row = mysql_fetch_row($result)) {
 		//echo $row[0].'<br/>';

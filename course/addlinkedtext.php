@@ -172,13 +172,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$_POST['text'] = trim($_POST['text']);
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$text = trim(mysql_result($result,0,0));
 			if (substr($text,0,5)=='file:') { //has file
 				$safetext = addslashes($text);
 				if ($_POST['text']!=$safetext) { //if not same file, delete old if not used
 					$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($result)==1) { 
 						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 						$filename = substr($text,5);
@@ -192,23 +192,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (!$processingerror) {
 				$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}' ";
 				$query .= "WHERE id='{$_GET['id']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		} else if (!$processingerror) { //add new
 			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) VALUES ";
 			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$newtextid = mysql_insert_id();
+			$newtextid = mysqli_insert_id($GLOBALS['link'])();
 			
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','LinkedText','$newtextid');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$itemid = mysql_insert_id();
+			$itemid = mysqli_insert_id($GLOBALS['link'])();
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 				
@@ -225,7 +225,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$itemorder = addslashes(serialize($items));
 			
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		}
 		if ($uploaderror == true || $processingerror == true) {
@@ -253,7 +253,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$webaddr = '';
 		if (isset($_GET['id'])) {
 			$query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
@@ -309,7 +309,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$toollabels = array('Select a tool...');
 		$query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ";
 		$query .= "OR (courseid=0 AND (groupid='$groupid' OR groupid=0)) ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$toolvals[] = $row[0];
 			$toollabels[] = $row[1];

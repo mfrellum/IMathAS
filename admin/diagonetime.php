@@ -43,10 +43,10 @@ if ($myrights<60) {
 			$query .= "('$diag',$now,'$code',$goodfor)";
 			$code_list[] = $code;	
 		}
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$code_list = array();
 		$query = "SELECT code,goodfor FROM imas_diag_onetime WHERE time=$now";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			if ($row[1]==0) {
 				$row[1] = "One-time";
@@ -65,7 +65,7 @@ if ($myrights<60) {
 } else if (isset($_GET['delete'])) {
 	if ($_GET['delete']=='true') {
 		$query = "DELETE FROM imas_diag_onetime WHERE diag='$diag'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
 		exit;
 	}
@@ -73,10 +73,10 @@ if ($myrights<60) {
 	$old = time() - 365*24*60*60; //one year ago
 	$now = time();
 	$query = "DELETE FROM imas_diag_onetime WHERE time<$old OR (goodfor>1000000000 AND goodfor<$now)";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$code_list = array();
 	$query = "SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag='$diag' ORDER BY time";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$row[0] = tzdate("F j, Y",$row[0]);
 		if ($row[2]==0) {
@@ -99,7 +99,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	echo $curBreadcrumb;
 	echo '<div id="headerdiagonetime" class="pagetitle"><h2>Diagnostic One-time Passwords</h2></div>';
 	$query = "SELECT name FROM imas_diags WHERE id='$diag'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	echo '<h4>'.mysql_result($result,0,0).'</h4>';
 	if (isset($_GET['generate'])) {
 		if (isset($_POST['n'])) {

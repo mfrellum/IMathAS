@@ -63,8 +63,8 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$query .= "'{$item[$itemtoadd]['displaymethod']}','{$item[$itemtoadd]['defpoints']}','{$item[$itemtoadd]['defattempts']}',";
 		$query .= "'{$item[$itemtoadd]['deffeedback']}','{$item[$itemtoadd]['defpenalty']}','{$item[$itemtoadd]['shuffle']}','{$item[$itemtoadd]['password']}','{$item[$itemtoadd]['cntingb']}',";
 		*/
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+		$typeid = mysqli_insert_id($GLOBALS['link'])();
 					
 		//determine question to be added
 		//$qtoadd = explode(',',$item[$itemtoadd]['questions']);  //FIX!!! can be ~ separated as well
@@ -78,7 +78,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		foreach ($qtoadd as $qid) {
 			//add question or get system id. 
 			$query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}' AND deleted=0";
-			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 			$questionexists = (mysql_num_rows($result)>0);
 			
 			if ($questionexists && $_POST['merge']==1) {
@@ -97,16 +97,16 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$query .= "qtext='{$qset['qtext'][$n]}',answer='{$qset['answer'][$n]}',";
 					$query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now,hasimg=$hasimg ";
 					$query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>3)";
-					mysql_query($query) or die("error on: $query: " . mysql_error());
-					if (mysql_affected_rows()>0 && $hasimg==1) {
+					mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+					if (mysqli_affected_rows($GLOBALS['link'])()>0 && $hasimg==1) {
 						//not efficient, but sufficient :)
 						$query = "DELETE FROM imas_qimages WHERE qsetid='{$questions[$qid]['qsetid']}'";
-						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 						$qimgs = explode("\n",$qset['qimgs'][$n]);
 						foreach($qimgs as $qimg) {
 							$p = explode(',',$qimg);
 							$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ('{$questions[$qid]['qsetid']}','{$p[0]}','{$p[1]}')";
-							mysql_query($query) or die("Import failed on $query: " . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 						}
 					}
 				}
@@ -130,20 +130,20 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$query .= "'$userid','{$qset['author'][$n]}','$userights',";
 				$query .= "'{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}',";
 				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['extref'][$n]}',$hasimg)";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
-				$questions[$qid]['qsetid'] = mysql_insert_id();
+				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+				$questions[$qid]['qsetid'] = mysqli_insert_id($GLOBALS['link'])();
 				if ($hasimg==1) {
 					$qimgs = explode("\n",$qset['qimgs'][$n]);
 					foreach($qimgs as $qimg) {
 						$p = explode(',',$qimg);
 						$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
 							
-						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 					}
 				}
 				foreach ($newlibs as $lib) {
 					$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','{$questions[$qid]['qsetid']}','$userid')";
-					mysql_query($query) or die("error on: $query: " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 				}
 			}
 			$allqids[] = $questions[$qid]['qsetid'];
@@ -152,8 +152,8 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans)";
 			$query .= "VALUES ($typeid,'{$questions[$qid]['qsetid']}','{$questions[$qid]['points']}',";
 			$query .= "'{$questions[$qid]['attempts']}','{$questions[$qid]['penalty']}','{$questions[$qid]['category']}','{$questions[$qid]['regen']}','{$questions[$qid]['showans']}')";
-			mysql_query($query) or die("error on: $query: " . mysql_error());
-			$questions[$qid]['systemid'] = mysql_insert_id();
+			mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+			$questions[$qid]['systemid'] = mysqli_insert_id($GLOBALS['link'])();
 		}
 		
 		//resolve any includecodefrom links
@@ -161,7 +161,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$qidstocheck = implode(',',$allqids);
 		//look up any refs to UIDs
 		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
-		$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 		$includedqs = array();
 		while ($row = mysql_fetch_row($result)) {
 			$qidstoupdate[] = $row[0];
@@ -178,19 +178,19 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			if (count($includedqs)>0) {
 				$includedlist = implode(',',$includedqs);
 				$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
-				$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$includedbackref[$row[1]] = $row[0];		
 				}
 			}
 			$updatelist = implode(',',$qidstoupdate);
 			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
-			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
 				$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
 				$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 			}
 		}
 		
@@ -198,7 +198,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$item[$itemtoadd]['questions'] = preg_replace("/(\d+)/e",'$questions[\\1]["systemid"]',$item[$itemtoadd]['questions']);
 		//write itemorder to db
 		$query = "UPDATE imas_assessments SET itemorder='{$item[$itemtoadd]['questions']}' WHERE id=$typeid";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 	} else if ($item[$itemtoadd]['type'] == "Forum") {
 		$settings = explode("\n",$item[$itemtoadd]['settings']);
 		foreach ($settings as $set) {
@@ -209,14 +209,14 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$query .= "VALUES ('{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','$cid',";
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['postby']}','{$item[$itemtoadd]['replyby']}',";
 		$query .= "'{$item[$itemtoadd]['defdisplay']}','{$item[$itemtoadd]['points']}','{$item[$itemtoadd]['cntingb']}','{$item[$itemtoadd]['settings']}')";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+		$typeid = mysqli_insert_id($GLOBALS['link'])();
 	} else if ($item[$itemtoadd]['type'] == "InlineText") {
 		$query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag)";
 		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['text']}',";
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}')";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+		$typeid = mysqli_insert_id($GLOBALS['link'])();
 		if (isset($item[$itemtoadd]['instrfiles'])) {
 			$item[$itemtoadd]['instrfiles'] = explode("\n",$item[$itemtoadd]['instrfiles']);
 			$fileorder = array();
@@ -227,18 +227,18 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				list($filename,$filedescr) = explode(':::',addslashes($fileinfo));
 				$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ";
 				$query .= "('$filedescr','$filename',$typeid)";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
-				$fileorder[] = mysql_insert_id();
+				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+				$fileorder[] = mysqli_insert_id($GLOBALS['link'])();
 			}
 			$query = "UPDATE imas_inlinetext SET fileorder='".implode(',',$fileorder)."' WHERE id=$typeid";
-			mysql_query($query) or die("error on: $query: " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 		}
 	} else if ($item[$itemtoadd]['type'] == "LinkedText") {
 		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,avail,startdate,enddate,oncal,caltag,target)";
 		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['text']}',";
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}','{$item[$itemtoadd]['target']}')";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+		$typeid = mysqli_insert_id($GLOBALS['link'])();
 	} else {
 		return false;
 	}
@@ -246,8 +246,8 @@ function additem($itemtoadd,$item,$questions,$qset) {
 	//add item, set 
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','{$item[$itemtoadd]['type']}',$typeid)";
-	mysql_query($query) or die("error on: $query: " . mysql_error());
-	$item[$itemtoadd]['systemid'] = mysql_insert_id();
+	mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+	$item[$itemtoadd]['systemid'] = mysqli_insert_id($GLOBALS['link'])();
 	
 	return ($item[$itemtoadd]['systemid']);		
 }
@@ -454,7 +454,7 @@ if (!(isset($teacherid))) {
 		
 		$checked = $_POST['checked'];
 		$query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$blockcnt = mysql_result($result,0,0);
 		$ciditemorder = unserialize(mysql_result($result,0,1));
 		$items = unserialize($itemlist);
@@ -466,7 +466,7 @@ if (!(isset($teacherid))) {
 		array_splice($ciditemorder,count($ciditemorder),0,$newitems);
 		$itemorder = addslashes(serialize($ciditemorder));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {

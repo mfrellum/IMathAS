@@ -23,7 +23,7 @@ if (!(isset($teacherid))) {
 		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
 			$curscores = array();
 			$query = "SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$curscores[$row[0]] = $row[1];
 			}
@@ -62,7 +62,7 @@ if (!(isset($teacherid))) {
 				} else {
 					$query .= "0";
 				}
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if ($feedbackcol==-1) {
 					$feedback = '';
 				} else {
@@ -79,7 +79,7 @@ if (!(isset($teacherid))) {
 						$query .= "('offline','{$_GET['gbitem']}','$cuserid','$score','$feedback')";
 						$successes++;
 					}
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				} else {
 					$failures[] = $data[$usercol];
 				}

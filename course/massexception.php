@@ -10,7 +10,7 @@
 	if (isset($_POST['clears'])) {
 		$clearlist = "'".implode("','",$_POST['clears'])."'";
 		$query = "DELETE FROM imas_exceptions WHERE id IN ($clearlist)";
-		mysql_query($query) or die("Query failed :$query " . mysql_error());	
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	
 	}
 	if (isset($_POST['addexc'])) {
 		require_once("parsedatetime.php");
@@ -20,7 +20,7 @@
 		foreach(explode(',',$_POST['tolist']) as $stu) {
 			foreach($_POST['addexc'] as $aid) {
 				$query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$aid'";
-				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)==0) {
 					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ";
 					$query .= "('$stu','$aid',$startdate,$enddate)";
@@ -28,11 +28,11 @@
 					$eid = mysql_result($result,0,0);
 					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0 WHERE id=$eid";
 				}
-				mysql_query($query) or die("Query failed :$query " . mysql_error());	
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	
 				if (isset($_POST['forceregen'])) {
 					//this is not group-safe
 					$query = "SELECT id,questions,lastanswers FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
-					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($result)>0) {
 						$row = mysql_fetch_row($result);
 						$questions = explode(',',$row[1]);
@@ -64,13 +64,13 @@
 						$reattemptinglist = implode(',',$reattempting);
 						$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 						$query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";
-						mysql_query($query) or die("Query failed :$query " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 					}
 					
 				} else if (isset($_POST['forceclear'])) {
 					//this is not group-safe
 					$query = "DELETE FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
-					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				}
 					
 			}
@@ -79,7 +79,7 @@
 			$n = intval($_POST['latepassn']);
 			$tolist = implode("','",explode(',',$_POST['tolist']));
 			$query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid IN ('$tolist') AND courseid='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		}
 		if (isset($_POST['sendmsg'])) {
 			$_POST['submit'] = "Message";
@@ -149,7 +149,7 @@
 	
 	if (isset($_GET['uid']) || count($_POST['checked'])==1) {
 		$query = "SELECT LastName,FirstName FROM imas_users WHERE id=$tolist";
-		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		echo "<h2>{$row[0]}, {$row[1]}</h2>";
 	}
@@ -161,7 +161,7 @@
 	} else {
 		$query .= "ORDER BY iu.LastName,iu.FirstName,ia.name";
 	}
-	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		echo "<h4>Existing Exceptions</h4>";
 		echo "Select exceptions to clear";
@@ -214,7 +214,7 @@
 		echo "<p>No exceptions currently exist for the selected students.</p>";
 	}
 	$query = "SELECT latepass FROM imas_students WHERE courseid='$cid' AND userid IN ($tolist)";
-	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 	$row = mysql_fetch_row($result);
 	$lpmin = $row[0];
 	$lpmax = $row[0];
@@ -250,7 +250,7 @@
 	echo "<ul>";
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid'";
 	$query .= ' ORDER BY name';
-	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 	$assessarr = array();
 	while ($row = mysql_fetch_row($result)) {
 		$assessarr[$row[0]] = $row[1];
@@ -275,7 +275,7 @@
 	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
 		echo "<h4>Students Selected</h4>";
 		$query = "SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
-		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		echo "<ul>";
 		while ($row = mysql_fetch_row($result)) {
 			echo "<li>{$row[0]}, {$row[1]}</li>";

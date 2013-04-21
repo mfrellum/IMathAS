@@ -14,7 +14,7 @@ function getquestioninfo($qns,$testsettings) {
 	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,il.name,iqs.qtype,iqs.control ";
 	$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_libraries as il ";
 	$query .= "ON iq.category=il.id WHERE iq.id IN ($qnlist)";
-	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
 	while ($line = mysql_fetch_assoc($result)) {
 		if ($line['name']!=null && is_numeric($line['category'])) {
 			$line['category'] = $line['name'];
@@ -486,7 +486,7 @@ function recordtestdata($limit=false) {
 		$query .= "WHERE id='$testid' LIMIT 1";
 	}
 	
-	mysql_query($query) or die("Query failed : $query " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {

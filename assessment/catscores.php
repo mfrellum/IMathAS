@@ -5,7 +5,7 @@
 function catscores($quests,$scores,$defptsposs) {
 	$qlist = "'" . implode("','",$quests) . "'";
 	$query = "SELECT id,category,points FROM imas_questions WHERE id IN ($qlist)";
- 	$result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
+ 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query; " . mysqli_error($GLOBALS['link']));
 	$cat = array();
 	$pospts = array();
 	$tolookup = array();
@@ -26,7 +26,7 @@ function catscores($quests,$scores,$defptsposs) {
 	if (count($tolookup)>0) {
 		$lulist = "'".implode("','",$tolookup)."'";
 		$query = "SELECT id,name FROM imas_libraries WHERE id IN ($lulist)";
-		$result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query; " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$libnames[$row[0]] = $row[1];
 		}

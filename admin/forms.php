@@ -9,7 +9,7 @@ if (!isset($_GET['cid'])) {
 switch($_GET['action']) {
 	case "delete":
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$name = mysql_result($result,0,0);
 		echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
 		echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
@@ -45,7 +45,7 @@ switch($_GET['action']) {
 			$oldrights = 10;
 		} else {
 			$query = "SELECT FirstName,LastName,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			echo "<h2>{$line['FirstName']} {$line['LastName']}</h2>\n";
 			$oldgroup = $line['groupid'];
@@ -86,7 +86,7 @@ switch($_GET['action']) {
 			echo "<span class=formright><select name=\"group\" id=\"group\">";
 			echo "<option value=0>Default</option>\n";
 			$query = "SELECT id,name FROM imas_groups ORDER BY name";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				echo "<option value=\"{$row[0]}\" ";
 				if ($oldgroup==$row[0]) {
@@ -103,7 +103,7 @@ switch($_GET['action']) {
 	case "addcourse":
 		if ($_GET['action']=='modify') {
 			$query = "SELECT * FROM imas_courses WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			$courseid = $line['id'];
 			$name = $line['name'];
@@ -182,7 +182,7 @@ switch($_GET['action']) {
 			if ($lockaid==0) { echo 'selected="1"';}
 			echo '>No lock</option>';
 			$query = "SELECT id,name FROM imas_assessments WHERE courseid='{$_GET['id']}' ORDER BY name";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				echo "<option value=\"{$row[0]}\" ";
 				if ($lockaid==$row[0]) { echo 'selected="1"';}
@@ -424,7 +424,7 @@ switch($_GET['action']) {
 			echo '<span class="formright"><select name="usetemplate" onchange="templatepreviewupdate(this)">';
 			echo '<option value="0" selected="selected">Start with blank course</option>';
 			$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 			}
@@ -442,7 +442,7 @@ switch($_GET['action']) {
 		break;
 	case "chgteachers":
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($result);
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h2>{$line['name']}</h2>\n";
@@ -452,7 +452,7 @@ switch($_GET['action']) {
 		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid ";
 		$query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND ";
 		$query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$num = mysql_num_rows($result);
 		echo '<form method="post" action="actions.php?action=remteacher&cid='.$_GET['id'].'&tot='.$num.'">';
 		echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
@@ -481,7 +481,7 @@ switch($_GET['action']) {
 		} else if ($myrights==100) {
 			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND rights<>76 ORDER BY LastName;";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		echo '<form method="post" action="actions.php?action=addteacher&cid='.$_GET['id'].'">';
 		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
 		echo "<table cellpadding=5>\n";
@@ -538,7 +538,7 @@ switch($_GET['action']) {
 			$query .= " AND groupid='$groupid'";
 		}
 		$query .= " ORDER BY LastName";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			echo "<option value=\"$row[0]\">$row[2], $row[1]</option>\n";
 		}
@@ -565,7 +565,7 @@ switch($_GET['action']) {
 		echo '</div>';
 		echo "<table><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr>\n";
 		$query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			echo "<tr><td>{$row[1]}</td><td>{$row[2]}</td>";
 			if ($row[3]==76) {
@@ -598,7 +598,7 @@ switch($_GET['action']) {
 		echo "<h3>Modify LTI Domain Credentials</h3>\n";
 		echo '</div>';
 		$query = "SELECT id,email,SID,password,rights FROM imas_users WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		echo "<form method=post action=\"actions.php?action=modltidomaincred&id={$row[0]}\">\n";
 		echo "Modify LTI key/secret: <br/>";
@@ -620,7 +620,7 @@ switch($_GET['action']) {
 		echo '</div>';
 		echo "<table><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr>\n";
 		$query = "SELECT id,name FROM imas_groups ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			echo "<tr><td>{$row[1]}</td>";
 			echo "<td><a href=\"forms.php?action=modgroup&id={$row[0]}\">Modify</a></td>\n";
@@ -640,7 +640,7 @@ switch($_GET['action']) {
 	case "modgroup":
 		echo '<div id="headerforms" class="pagetitle"><h2>Rename Instructor Group</h2></div>';
 		$query = "SELECT name FROM imas_groups WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gpname = mysql_result($result,0,0);
 		echo "<form method=post action=\"actions.php?action=modgroup&id={$_GET['id']}\">\n";
 		echo "Group name: <input type=text size=50 name=gpname id=gpname value=\"$gpname\"><br/>\n";

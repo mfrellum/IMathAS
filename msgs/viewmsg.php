@@ -31,7 +31,7 @@
 	
 	$teacherof = array();
 	$query = "SELECT courseid FROM imas_teachers WHERE userid='$userid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$teacherof[$row[0]] = true;
 	}
@@ -39,7 +39,7 @@
 	if (isset($_GET['markunread'])) {
 		$msg = $_GET['msgid'];	
 		$query = "UPDATE imas_msgs SET isread=isread-1 WHERE id='$msg'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		if ($type=='new') {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
 		} else {
@@ -84,7 +84,7 @@
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto='$userid' OR imas_msgs.msgfrom='$userid')";
 	}
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo "Message not found";
 		require("../footer.php");
@@ -107,11 +107,11 @@
 		echo " <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\" target=\"_popoutgradebook\">gradebook</a>";
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$query = "SELECT id FROM imas_assessments WHERE name='{$matches[2]}' AND courseid='{$line['courseid']}'";
-			$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($res)>0) {
 				$aid = mysql_result($res,0,0);
 				$query = "SELECT id FROM imas_assessment_sessions WHERE assessmentid='$aid' AND userid='{$line['msgfrom']}'";
-				$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($res)>0) {
 					$asid = mysql_result($res,0,0);
 					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid\" target=\"_popoutgradebook\">assignment</a>";
@@ -132,7 +132,7 @@
 	if ($type!='sent' && $type!='allstu') {
 		if ($line['courseid']>0) {
 			$query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			$msgset = mysql_result($result,0,0);
 			$msgmonitor = floor($msgset/5);
 			$msgset = $msgset%5;
@@ -140,13 +140,13 @@
 				$cansendmsgs = true;
 				if ($msgset==1 && !$isteacher) { //check if sending to teacher 
 					$query = "SELECT id FROM imas_teachers WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($result)==0) {
 						$cansendmsgs = false;
 					}
 				} else if ($msgset==2 && !$isteacher) { //check if sending to stu
 					$query = "SELECT id FROM imas_students WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($result)==0) {
 						$cansendmsgs = false;
 					}
@@ -173,7 +173,7 @@
 	}
 	if ($type!='sent' && $type!='allstu' && ($line['isread']==0 || $line['isread']==4)) {
 		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id='$msgid'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	}
 	require("../footer.php");
 ?>

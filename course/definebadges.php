@@ -16,7 +16,7 @@ if (empty($_GET['badgeid'])) {
 	echo '<div id="headerbadgesettings" class="pagetitle"><h2>Badge Settings</h2></div>';
 
 	$query = "SELECT id,name FROM imas_badgesettings WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)!=0) {
 		echo '<ul>';
 		while ($row=mysql_fetch_row($result)) {
@@ -38,13 +38,13 @@ if (empty($_GET['badgeid'])) {
 		$badgeid = intval($_GET['badgeid']);
 		if ($badgeid==0) { echo 'Can not delete - invalid badgeid'; exit;}
 		$query = "SELECT courseid FROM imas_badgesettings WHERE id=$badgeid";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0) != $cid) { echo 'Can not delete - badgeid is for a different course'; exit;}
 		
 		$query = "DELETE FROM imas_badgesettings WHERE id=$badgeid";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$query = "DELETE FROM imas_badgerecords WHERE badgeid=$badgeid";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/definebadges.php?cid=$cid");
 		exit;
 	}
@@ -66,11 +66,11 @@ if (empty($_GET['badgeid'])) {
 		$req = addslashes(serialize($req));
 		if ($_GET['badgeid']=='new') {
 			$query = "INSERT INTO imas_badgesettings (name, badgetext, description, longdescription, courseid, requirements) VALUES ('$badgename','$badgetext','$descr','$longdescr','$cid','$req')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		} else {
 			$badgeid = intval($_GET['badgeid']);
 			$query = "UPDATE imas_badgesettings SET name='$badgename',badgetext='$badgetext',description='$descr', longdescription='$longdescr', requirements='$req' WHERE id='$badgeid' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/definebadges.php?cid=$cid");
 		exit;
@@ -87,14 +87,14 @@ if (empty($_GET['badgeid'])) {
 		} else {
 			$badgeid = intval($_GET['badgeid']);
 			$query = "SELECT name,badgetext,description,longdescription,requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)==0) { echo 'Invalid badge id for this course'; exit;}
 			
 			list($name, $badgetext, $descr, $longdescr, $req) = mysql_fetch_row($result);
 			$req = unserialize($req);
 		}
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbvals = array('-1');
 		$gblabels = array('Course total'); 
 		while ($row=mysql_fetch_row($result)) {

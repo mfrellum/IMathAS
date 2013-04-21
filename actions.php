@@ -30,7 +30,7 @@
 			exit;
 		}
 		$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			echo "<html><body>\n";
 			echo "$loginprompt '{$_POST['SID']}' is used.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
@@ -74,7 +74,7 @@
 		}
 		if (!isset($_GET['confirmed'])) {
 			$query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$nologo = true;
 				require("header.php");
@@ -102,10 +102,10 @@
 		}
 		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
 		$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$newuserid = mysql_insert_id();
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+		$newuserid = mysqli_insert_id($GLOBALS['link'])();
 		if ($emailconfirmation) {
-			$id = mysql_insert_id();
+			$id = mysqli_insert_id($GLOBALS['link'])();
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
@@ -135,7 +135,7 @@
 					$error = 'Invalid course id';
 				} else {
 					$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['courseid']}' AND available<4";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$line = mysql_fetch_assoc($result);
 					if ($line==null) {
 						$error = 'Course not found';
@@ -153,7 +153,7 @@
 							} else {
 								$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid','{$_POST['courseid']}');";
 							}
-							mysql_query($query) or die("Query failed : " . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 							echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
 						}
 					}
@@ -175,8 +175,8 @@
 	} else if ($_GET['action']=="confirm") {
 		require_once("config.php");
 		$query = "UPDATE imas_users SET rights=10 WHERE id='{$_GET['id']}' AND rights=0";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_affected_rows()>0) {
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+		if (mysqli_affected_rows($GLOBALS['link'])()>0) {
 			echo "<html><body>\n";
 			echo "Confirmed.  Please <a href=\"index.php\">Log In</a>\n";
 			echo "</html></body>\n";	
@@ -190,7 +190,7 @@
 		require_once("config.php");
 		if (isset($_POST['username'])) {
 			$query = "SELECT password,id,email FROM imas_users WHERE SID='{$_POST['username']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$code = mysql_result($result,0,0);
 				$id = mysql_result($result,0,1);
@@ -211,11 +211,11 @@
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 		} else if (isset($_GET['code'])) {
 			$query = "SELECT password FROM imas_users WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0 && $_GET['code']===mysql_result($result,0,0)) {
 				$newpw = md5("password");
 				$query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['id']}' LIMIT 1";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				echo "Password Reset.  ";
 				echo "<a href=\"index.php\">Login with password: password</a>";
 				echo "<p>After logging in, select Change User Info to change your password</p>";
@@ -225,7 +225,7 @@
 	} else if ($_GET['action']=="lookupusername") {
 		require_once("config.php");
 		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			echo mysql_num_rows($result);
 			echo " usernames match this email address and were emailed.  <a href=\"index.php\">Return to login page</a>";
@@ -256,7 +256,7 @@
 	if ($_GET['action']=="logout") {
 		$sessionid = session_id();
 		$query = "DELETE FROM imas_sessions WHERE sessionid='$sessionid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
 			setcookie(session_name(), '', time()-42000, '/');
@@ -264,12 +264,12 @@
 		session_destroy();
 	} else if ($_GET['action']=="chgpwd") {
 		$query = "SELECT password FROM imas_users WHERE id = '$userid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($result);
 		if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
 			$md5pw =md5($_POST['newpw1']);
 			$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error()); 
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
 		} else {
 			echo "<html><body>Password change failed.  <A HREF=\"forms.php?action=chgpwd$gb\">Try Again</a>\n";
 			echo "</body></html>\n";
@@ -292,7 +292,7 @@
 			exit;
 		}
 		$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($result);
 		if ($line == null) {
 			echo "<html><body>\n";
@@ -311,7 +311,7 @@
 			exit;
 		}  else {
 			$query = "SELECT * FROM imas_teachers WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				echo "<html><body>\n";
 				echo "You are a teacher for this course, and can't enroll as a student.  Use Student View to see ";
@@ -321,7 +321,7 @@
 				exit;
 			}
 			$query = "SELECT * FROM imas_tutors WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				echo "<html><body>\n";
 				echo "You are a tutor for this course, and can't enroll as a student. ";
@@ -330,7 +330,7 @@
 				exit;
 			}
 			$query = "SELECT * FROM imas_students WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				echo "<html><body>\n";
 				echo "You are already enrolled in the course.  Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
@@ -349,13 +349,13 @@
 					} else {
 						$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
 					}
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
 				}
 				
 				
 				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
-				//mysql_query($query) or die("Query failed : " . mysql_error());
+				//mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		}	
 	} else if ($_GET['action']=="unenroll") {
@@ -371,36 +371,36 @@
 		}
 		$cid = $_GET['cid'];
 		$query = "SELECT allowunenroll FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0)==1) {
 			$query = "DELETE FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			
 			$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid IN (SELECT id FROM imas_drillassess WHERE courseid='$cid') AND userid='$userid'";
-			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			
 			$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$row[0]}' AND userid='$userid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
-				$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$q2) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($rw2 = mysql_fetch_row($r2)) {
 					$query = "DELETE FROM imas_forum_views WHERE threadid='{$rw2[0]}' AND userid='$userid'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			}
 		}
@@ -467,16 +467,16 @@
 		}
 		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',listperpage='$perpage'$chguserimg ";
 		$query .= "WHERE id='$userid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		if (isset($_POST['dochgpw'])) {
 			$query = "SELECT password FROM imas_users WHERE id = '$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
 				$md5pw =md5($_POST['newpw1']);
 				$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
-				mysql_query($query) or die("Query failed : " . mysql_error()); 
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
 			} else {
 				echo "<html><body>Password change failed.  <A HREF=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
 				echo "</body></html>\n";
@@ -486,7 +486,7 @@
 	} else if ($_GET['action']=="googlegadget") {
 		if (isset($_GET['clear'])) {
 			$query = "UPDATE imas_users SET remoteaccess='' WHERE id='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 	}
 	if ($isgb) {

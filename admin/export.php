@@ -82,7 +82,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 	$now = time();
 	
 	$query = "SELECT id,description,qtype FROM imas_questionset WHERE id IN ($clist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$i=0;
 	$page_pChecked = array();
 	
@@ -100,7 +100,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$lnames[] = "Unassigned";
 	
 	$query = "SELECT name FROM imas_libraries WHERE id IN ($llist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$lnames[] = $row[0];
 	}
@@ -126,7 +126,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		
 		if (count($checked)>0) { $query .= "AND imas_questionset.id NOT IN ($clist);"; }
 		
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		
 		if (mysql_num_rows($result) != 0) {
 			$page_hasSearchResults = 1;		
@@ -157,7 +157,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		//first, lets pull any questions that have include__from so we can lookup backrefs
 		$query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
 		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$includedqs = array();
 		while ($line = mysql_fetch_assoc($result)) {
 			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
@@ -171,14 +171,14 @@ if (!(isset($teacherid)) && $myrights<75) {
 		if (count($includedqs)>0) {
 			$includedlist = implode(',',$includedqs);
 			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
-			$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$includedbackref[$row[0]] = $row[1];		
 			}
 		}
 		
 		$query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$qcnt = 0;
 		while ($line = mysql_fetch_assoc($result)) {
 			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
@@ -210,7 +210,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
 				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($r2)) {
 					echo $row[0].','.$row[1]. "\n";
 				}

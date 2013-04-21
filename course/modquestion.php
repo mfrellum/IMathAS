@@ -53,22 +53,22 @@ if (!(isset($teacherid))) {
 		if (isset($_GET['id'])) { //already have id - updating
 			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints ";
 			$query .= "WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$query = "SELECT questionsetid FROM imas_questions WHERE id='{$_GET['id']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$_GET['qsetid'] = mysql_result($result,0,0);
 			}
 		} 
 		if (isset($_GET['qsetid'])) { //new - adding
 			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$itemorder = mysql_result($result,0,0);
 			for ($i=0;$i<$_POST['copies'];$i++) {
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints) ";
 				$query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}',$rubric,$showhints)";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$qid = mysql_insert_id();
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+				$qid = mysqli_insert_id($GLOBALS['link'])();
 				
 				//add to itemorder
 				if (isset($_GET['id'])) { //am adding copies of existing  
@@ -85,7 +85,7 @@ if (!(isset($teacherid))) {
 				}
 			}
 			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
@@ -94,7 +94,7 @@ if (!(isset($teacherid))) {
 
 		if (isset($_GET['id'])) {
 			$query = "SELECT points,attempts,penalty,regen,showans,rubric,showhints FROM imas_questions WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			if ($line['penalty']{0}==='L') {
 				$line['penalty'] = substr($line['penalty'],1);
@@ -124,7 +124,7 @@ if (!(isset($teacherid))) {
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		$query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -132,7 +132,7 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 		$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result) > 0) {
 			$page_beenTakenMsg = "<h3>Warning</h3>\n";
 			$page_beenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";

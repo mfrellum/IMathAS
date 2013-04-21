@@ -37,7 +37,7 @@ function parseqs($file,$touse,$rights) {
 		$now = time();
 		$qd = array_map('addslashes_deep', $qd);
 		$query = "SELECT id,adddate,lastmoddate FROM imas_questionset WHERE uniqueid='{$qd['uqid']}'";
-		$result = mysql_query($query) or die("Error: $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Error: $query: " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			$qsetid = mysql_result($result,0,0);
 			$adddate = mysql_result($result,0,1);
@@ -60,7 +60,7 @@ function parseqs($file,$touse,$rights) {
 					//$query .= "imas_questionset.answer='{$qd['answer']}',imas_questionset.lastmoddate=$now,imas_questionset.adddate=$now WHERE imas_questionset.id='$qsetid'";
 					//$query .= " AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
 					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE WHERE imas_questionset.id='$qsetid' AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					if (mysql_num_rows($result)>0) {
 						$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
 						$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
@@ -76,18 +76,18 @@ function parseqs($file,$touse,$rights) {
 						$query .= " AND ownerid=$userid";
 					}
 				}
-				mysql_query($query) or die("error on: $query: " . mysql_error());
-				if (mysql_affected_rows()>0) {
+				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+				if (mysqli_affected_rows($GLOBALS['link'])()>0) {
 					$updateq++;
 					if (!empty($qd['qimgs'])) {
 						//not efficient, but sufficient :)
 						$query = "DELETE FROM imas_qimages WHERE qsetid='$qsetid'";
-						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 						$qimgs = explode("\n",$qd['qimgs']);
 						foreach($qimgs as $qimg) {
 							$p = explode(',',$qimg);
 							$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
-							mysql_query($query) or die("Import failed on $query: " . mysql_error());
+							mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 						}
 					}
 				}
@@ -108,15 +108,15 @@ function parseqs($file,$touse,$rights) {
 			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,extref,hasimg) VALUES ";
 			$query .= "('{$qd['uqid']}',$now,$now,'$userid','$rights','{$qd['description']}','{$qd['author']}','{$qd['qtype']}','{$qd['control']}','{$qd['qcontrol']}',";
 			$query .= "'{$qd['qtext']}','{$qd['answer']}','{$qd['extref']}',$hasimg)";
-			mysql_query($query) or die("Import failed on $query: " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 			$newq++;
-			$qsetid = mysql_insert_id();
+			$qsetid = mysqli_insert_id($GLOBALS['link'])();
 			if (!empty($qd['qimgs'])) {
 				$qimgs = explode("\n",$qd['qimgs']);
 				foreach($qimgs as $qimg) {
 					$p = explode(',',$qimg);
 					$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
-					mysql_query($query) or die("Import failed on $query: " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 				}
 			}
 			return $qsetid;
@@ -332,7 +332,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		//write libraries
 		$lookup = implode("','",$unique);
 		$query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ('$lookup')";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$exists[$row[1]] = $row[0];
 			$adddate[$row[0]] = $row[2];
@@ -362,8 +362,8 @@ if (!(isset($teacherid)) && $myrights<75) {
 					} else if (!$isadmin) {
 						$query .= " AND (ownerid='$userid' or userights>1)";
 					}
-					mysql_query($query) or die("error on: $query: " . mysql_error());
-					if (mysql_affected_rows()>0) {
+					mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+					if (mysqli_affected_rows($GLOBALS['link'])()>0) {
 						$updatel++;
 					}
 				} 
@@ -376,8 +376,8 @@ if (!(isset($teacherid)) && $myrights<75) {
 				}
 				$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				$query .= "('{$unique[$libid]}',$now,$now,'{$names[$libid]}','$userid','$librights','$parent','$groupid')";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
-				$libs[$libid] = mysql_insert_id();
+				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
+				$libs[$libid] = mysqli_insert_id($GLOBALS['link'])();
 				$newl++;
 			}
 			if (isset($libs[$libid])) {
@@ -393,7 +393,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$qidstoupdate = array();
 			//look up any refs to UIDs
 			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
-			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 			$includedqs = array();
 			while ($row = mysql_fetch_row($result)) {
 				$qidstoupdate[] = $row[0];
@@ -410,19 +410,19 @@ if (!(isset($teacherid)) && $myrights<75) {
 				if (count($includedqs)>0) {
 					$includedlist = implode(',',$includedqs);
 					$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
-					$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($result)) {
 						$includedbackref[$row[1]] = $row[0];		
 					}
 				}
 				$updatelist = implode(',',$qidstoupdate);
 				$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
-				$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
 					$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
 					$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
-					mysql_query($query) or die("error on: $query: " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 				}
 			}
 				
@@ -431,7 +431,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			foreach ($libstoadd as $libid) {
 				if (!isset($libs[$libid])) { $libs[$libid]=0;} //assign questions to unassigned if library is closed.  Shouldn't ever trigger
 				$query = "SELECT qsetid FROM imas_library_items WHERE libid={$libs[$libid]}";
-				$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 				$existingli = array();
 				while ($row = mysql_fetch_row($result)) { //don't add new LI if exists
 					$existingli[] = $row[0]; 	
@@ -440,7 +440,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				foreach ($qidlist as $qid) {
 					if (isset($qids[$qid]) && (array_search($qids[$qid],$existingli)===false)) {
 						$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('{$libs[$libid]}','{$qids[$qid]}','$userid')";
-						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 						$newli++;
 					}
 				}

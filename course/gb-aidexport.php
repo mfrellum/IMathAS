@@ -80,7 +80,7 @@ if (isset($_POST['options'])) {
 	
 	//get assessment info
 	$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$defpoints = mysql_result($result,0,0);
 	$assessname = mysql_result($result,0,1);
 	$itemorder = mysql_result($result,0,2);
@@ -105,7 +105,7 @@ if (isset($_POST['options'])) {
 	$qpts = array();
 	$qsetids = array();
 	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		if ($row[1]==9999) {
 			$qpts[$row[0]] = $defpoints;
@@ -124,7 +124,7 @@ if (isset($_POST['options'])) {
 		require("../assessment/macros.php");
 		$qsetidlist = implode(',',$qsetids);
 		$query = "SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			$qcontrols[$row[0]] = interpret('control',$row[1],$row[2]);
 			$qanswers[$row[0]] = interpret('answer',$row[1],$row[3]);
@@ -170,7 +170,7 @@ if (isset($_POST['options'])) {
 	$query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
 	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid' ";
 	$query .= "ORDER BY iu.LastName, iu.FirstName";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$r = 2;
 	$sturow = array();
 	while ($row = mysql_fetch_row($result)) {
@@ -183,7 +183,7 @@ if (isset($_POST['options'])) {
 	//pull assessment data
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 	while ($line=mysql_fetch_assoc($result)) {
 		$questions = explode(',',$line['questions']);
 		$scores = explode(',',$line['bestscores']);

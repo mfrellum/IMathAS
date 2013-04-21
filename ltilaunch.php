@@ -26,7 +26,7 @@ function reporterror($err) {
 
 if (isset($_GET['launch'])) {
 	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	list($enc,$userid) = mysql_fetch_row($result);
 	$sessiondata = unserialize(base64_decode($enc));
 	if ($_POST['access']==1) { //text-based
@@ -54,14 +54,14 @@ if (isset($_GET['launch'])) {
 	
 	$now = time();
 	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if ($sessiondata['ltiitemtype']==0) { //is aid
 		$aid = $sessiondata['ltiitemid'];
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$cid = mysql_result($result,0,0);
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
@@ -79,12 +79,12 @@ $code = $_GET['code'];
 $now = time();
 
 $query = "SELECT userid,itemid,itemtype,created FROM imas_ltiaccess WHERE id='$id' AND password='$code'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	//no entry. Either no/pw or rerun
 	//if rerun, check if session exists - might be cache-caused rerun
 	$query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
 		if (empty($sessiondata['ltiitemid'])) {
@@ -93,7 +93,7 @@ if (mysql_num_rows($result)==0) {
 		if ($sessiondata['ltiitemtype']==0) { //is aid
 			$aid = $sessiondata['ltiitemid'];
 			$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$cid = mysql_result($result,0,0);
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 		} else if ($sessiondata['ltiitemtype']==1) { //is cid
@@ -115,7 +115,7 @@ if (mysql_num_rows($result)==0) {
 	if ($itemtype==0) { //aid
 		$aid = $line['itemid'];
 		$query = "SELECT courseid,timelimit FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		list($cid,$timelimit) = mysql_fetch_row($result);
 		if ($timelimit>0) {
 			 if ($timelimit>3600) {
@@ -148,12 +148,12 @@ if (mysql_num_rows($result)==0) {
 }
 //prevent rerun
 $query = "DELETE FROM imas_ltiaccess WHERE id='$id' AND password='$code'";
-mysql_query($query) or die("Query failed : " . mysql_error());
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 
 //have we already established a session for this person?
 $promptforsettings = false;
 $query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)>0) {
 	//already have session.  Don't need to 	
 	$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
@@ -173,12 +173,12 @@ if ($createnewsession) {
 } else {
 	$query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
 }
-mysql_query($query) or die("Query failed : " . mysql_error());
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (!$promptforsettings && !$createnewsession && !($itemtype==0 && $tlwrds != '')) { 
 	//redirect now if already have session and no timelimit
 	$now = time();
 	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 	if ($sessiondata['ltiitemtype']==0) { //is aid
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");

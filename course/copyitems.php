@@ -31,17 +31,17 @@ if (!(isset($teacherid))) {
 	if (isset($_GET['action'])) {
 		$query = "SELECT imas_courses.id FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid";
 		$query .= " AND imas_teachers.userid='$userid' AND imas_courses.id='{$_POST['ctc']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)==0) {
 			$query = "SELECT enrollkey,copyrights FROM imas_courses WHERE id='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$copyrights = mysql_result($result,0,1)*1;
 			if ($copyrights<2) {
 				$oktocopy = 0;
 				if ($copyrights==1) {
 					$query = "SELECT imas_users.groupid FROM imas_courses,imas_users,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
 					$query .= "AND imas_teachers.userid=imas_users.id AND imas_courses.id='{$_POST['ctc']}'";
-					$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($r2)) {
 						if ($row[0]==$groupid) {
 							$oktocopy=1;
@@ -62,20 +62,20 @@ if (!(isset($teacherid))) {
 	if (isset($_GET['action']) && $_GET['action']=="copycalitems") {
 		if (isset($_POST['clearexisting'])) {
 			$query = "DELETE FROM imas_calitems WHERE courseid='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		}
 		if (isset($_POST['checked']) && count($_POST['checked'])>0) {
 			$checked = $_POST['checked'];
 			$chklist = "'".implode("','",$checked)."'";
 			$query = "SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			$insarr = array();
 			while ($row = mysql_fetch_row($result)) {
 				$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
 			}
 			$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ";
 			$query .= implode(',',$insarr);
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;	
@@ -84,7 +84,7 @@ if (!(isset($teacherid))) {
 			$tocopy = 'hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,available,theme';
 			
 			$query = "SELECT $tocopy FROM imas_courses WHERE id='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			$tocopyarr = explode(',',$tocopy);
 			$sets = '';
@@ -93,27 +93,27 @@ if (!(isset($teacherid))) {
 				$sets .= $tocopyarr[$i] . "='" . addslashes($row[$i])."'";
 			}
 			$query = "UPDATE imas_courses SET $sets WHERE id='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		}
 		if (isset($_POST['copygbsetup'])) {
 			$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}',colorize='{$row[5]}' WHERE courseid='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			
 			$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$query = "SELECT id FROM imas_gbcats WHERE courseid='$cid' AND name='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($r2)==0) {
 					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES ";
 					$frid = array_shift($row);
 					$irow = "'".implode("','",addslashes_deep($row))."'";
 					$query .= "('$cid',$irow)";
-					mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$gbcats[$frid] = mysql_insert_id();
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
+					$gbcats[$frid] = mysqli_insert_id($GLOBALS['link'])();
 				} else {
 					$rpid = mysql_result($r2,0,0);
 					$query = "UPDATE imas_gbcats SET scale='{$row[2]}',scaletype='{$row[3]}',chop='{$row[4]}',dropn='{$row[5]}',weight='{$row[6]}' ";
@@ -125,7 +125,7 @@ if (!(isset($teacherid))) {
 			$gbcats = array();
 			$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
 			$query .= "toc.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$gbcats[$row[0]] = $row[1];
 			}
@@ -133,11 +133,11 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['checked'])) {
 			$checked = $_POST['checked'];
 			$query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			$blockcnt = mysql_result($result,0,0);
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			$items = unserialize(mysql_result($result,0,0));
 			$newitems = array();
 			
@@ -151,7 +151,7 @@ if (!(isset($teacherid))) {
 			doaftercopy($_POST['ctc']);
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			$items = unserialize(mysql_result($result,0,0));
 			if ($_POST['addto']=="none") {
 				array_splice($items,count($items),0,$newitems);
@@ -166,13 +166,13 @@ if (!(isset($teacherid))) {
 			$itemorder = addslashes(serialize($items));
 			if ($itemorder!='') {
 				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			}
 		}	
 		$offlinerubrics = array();
 		if (isset($_POST['copyoffline'])) {
 			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			$insarr = array();
 			while ($row = mysql_fetch_row($result)) {
 				$rubric = array_pop($row);
@@ -183,9 +183,9 @@ if (!(isset($teacherid))) {
 				}
 				$ins = "('$cid','".implode("','",addslashes_deep($row))."')";
 				$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES $ins";
-				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				if ($rubric>0) {
-					$offlinerubrics[mysql_insert_id()] = $rubric;
+					$offlinerubrics[mysqli_insert_id($GLOBALS['link'])()] = $rubric;
 				}
 			}
 		}
@@ -196,7 +196,7 @@ if (!(isset($teacherid))) {
 			$_GET['action']='selectcalitems';
 			$calitems = array();
 			$query = "SELECT id,date,tag,title FROM imas_calitems WHERE courseid='{$_POST['ctc']}' ORDER BY date";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$calitems[] = $row;
 			}
@@ -208,7 +208,7 @@ if (!(isset($teacherid))) {
 	} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 	
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 		$items = unserialize(mysql_result($result,0,0));
 		$ids = array();
@@ -219,7 +219,7 @@ if (!(isset($teacherid))) {
 		getsubinfo($items,'0','');
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		$existblocks = array();
 	
@@ -236,7 +236,7 @@ if (!(isset($teacherid))) {
 		
 	} else if (isset($_GET['loadothers'])) {
 		$query = "SELECT id,name FROM imas_groups";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			$page_hasGroups=true;
 			$grpnames = array();
@@ -248,13 +248,13 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
 		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
-		$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$courseGroupResults = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		
 		
 	} else { //DATA MANIPULATION FOR DEFAULT LOAD
 	
 		$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
 		$page_mineList = array();
 		while ($row = mysql_fetch_row($result)) {
@@ -265,12 +265,12 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
 		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
-		$courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
+		$courseTreeResult = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$lastteacher = 0;
 		
 		
 		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' AND ic.available<4 ORDER BY ic.name";
-		$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
+		$courseTemplateResults = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 }
 /******* begin html output ********/

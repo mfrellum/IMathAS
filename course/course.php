@@ -26,7 +26,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		//deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
 		deleteasidfilesbyquery2('id',$sessiondata['sessiontestid'],null,1);
 		$query = "DELETE FROM imas_assessment_sessions WHERE id='{$sessiondata['sessiontestid']}' LIMIT 1";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());		
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));		
 	}
    
 	if (isset($teacherid) && isset($_GET['from']) && isset($_GET['to'])) {
@@ -34,7 +34,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$to = $_GET['to'];
 		$block = $_GET['block'];
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -79,12 +79,12 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		}
 		$itemlist = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error()); 
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	}
 		
 	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	if ($line == null) {
 		$overwriteBody = 1;
@@ -126,7 +126,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		}
 		$itemlist = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error()); 	   
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 	   
 	}
 	
 	//enable teacher guest access
@@ -166,7 +166,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
 		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		while ($line = mysql_fetch_assoc($result)) {
 			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
 		}
@@ -236,7 +236,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	
 	if ($msgset<4) {
 	   $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
-	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	   $msgcnt = mysql_result($result,0,0);
 	   if ($msgcnt>0) {
 		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">New ($msgcnt)</a>";
@@ -277,7 +277,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	*/
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$newpostcnts = array();
 	while ($row = mysql_fetch_row($result)) {
 		$newpostcnts[$row[0]] = $row[1];
@@ -309,7 +309,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 			//local mathchat
 			$on = time() - 15;
 			$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='$cid' AND lastping>$on";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$activechatters =  mysql_num_rows($result);
 		}
 	}
@@ -317,7 +317,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	//get latepasses
 	if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	   $latepasses = mysql_result($result,0,0);
 	} else {
 		$latepasses = 0;

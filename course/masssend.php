@@ -14,7 +14,7 @@
 			$limitaid = $_POST['aidselect'];
 			$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
 			$query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid='$limitaid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			while ($row = mysql_fetch_row($result)) {
 				$toignore[] = $row[0];
 			}
@@ -28,7 +28,7 @@
 			$tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
 			$query = "SELECT FirstName,LastName,id FROM imas_users WHERE id IN ($tolist)";
 			
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$emailaddys = array();
 			while ($row = mysql_fetch_row($result)) {
 				if (!in_array($row[2],$toignore)) {
@@ -51,7 +51,7 @@
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					$query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			}
 			
@@ -60,7 +60,7 @@
 				$tolist[] = $userid;
 			} else if ($_POST['self']=="allt") {
 				$query = "SELECT imas_users.id FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$tolist[] = $row[0];
 				}
@@ -71,7 +71,7 @@
 			foreach ($tolist as $msgto) {
 				$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 				$query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,0,'$cid')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			
 		} else {
@@ -81,7 +81,7 @@
 			$tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
 			$query = "SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)";
 			
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$emailaddys = array();
 			while ($row = mysql_fetch_row($result)) {
 				if (!in_array($row[3],$toignore)) {
@@ -105,7 +105,7 @@
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
 			$headers .= "From: $self\r\n";
@@ -124,7 +124,7 @@
 				$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 				$query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
 				$query .= "AND imas_users.id<>'$userid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while ($row = mysql_fetch_row($result)) {
 					$teacheraddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";	
 				}
@@ -192,7 +192,7 @@
 		echo "<select name=\"aidselect\" id=\"aidselect\">\n";
 		echo "<option value=\"0\">Don't limit - send to all</option>\n";
 		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($line=mysql_fetch_assoc($result)) {
 			echo "<option value=\"{$line['id']}\" ";
 			if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
@@ -205,7 +205,7 @@
 		echo "</form>\n";
 		$tolist = "'".implode("','",$_POST['checked'])."'";
 		$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		echo '<p>Unless limited, message will be sent to:<ul>';
 		while ($row = mysql_fetch_row($result)) {
 			echo "<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";

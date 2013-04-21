@@ -61,23 +61,23 @@ if (!(isset($teacherid))) {
 	if (isset($_POST['sdate'])) {
 		
 		$query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_POST['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$basedate = mysql_result($result,0,intval($_POST['base']));
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$_POST['sdate'],$dmatches);
 		$newstamp = mktime(date('G',$basedate),date('i',$basedate),0,$dmatches[1],$dmatches[2],$dmatches[3]);
 		$shift = $newstamp-$basedate;
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$items = unserialize(mysql_result($result,0,0));
 
 		shiftsub($items);
 		$itemorder = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		
 		$query = "SELECT itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		while ($row=mysql_fetch_row($result)) {
 			if ($row[0]=="InlineText") {
 				$table = "imas_inlinetext";
@@ -93,25 +93,25 @@ if (!(isset($teacherid))) {
 				$table = "imas_wikis";
 			}
 			$query = "UPDATE $table SET startdate=startdate+$shift WHERE id='{$row[1]}' AND startdate>0";
-			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			$query = "UPDATE $table SET enddate=enddate+$shift WHERE id='{$row[1]}' AND enddate<2000000000";
-			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			
 			if ($row[0]=="Wiki") {
 				$query = "UPDATE $table SET editbydate=editbydate+$shift WHERE id='{$row[1]}' AND editbydate>0 AND editbydate<2000000000";
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			} else if ($row[0]=="Forum") {
 				$query = "UPDATE $table SET replyby=replyby+$shift WHERE id='{$row[1]}' AND replyby>0 AND replyby<2000000000";
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 				
 				$query = "UPDATE $table SET postby=postby+$shift WHERE id='{$row[1]}' AND postby>0 AND postby<2000000000";
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			}
 		}
 		
 		//update Calendar items
 		$query = "UPDATE imas_calitems SET date=date+$shift WHERE courseid='$cid'";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 			
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 
@@ -123,7 +123,7 @@ if (!(isset($teacherid))) {
 		$sdate = tzdate("m/d/Y",time());
 	
 		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
 		while ($line=mysql_fetch_assoc($result)) {
 			$page_assessmentList['val'][$i] = $line['id'];

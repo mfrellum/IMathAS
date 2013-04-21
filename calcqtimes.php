@@ -12,7 +12,7 @@ $trim = .2;  //20%
 $qtimes = array();
 
 $query = "SELECT questions,timeontask FROM imas_assessment_sessions WHERE timeontask<>''";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$q = explode(',',$row[0]);
 	$t = explode(',',$row[1]);
@@ -27,7 +27,7 @@ while ($row = mysql_fetch_row($result)) {
 }
 $qstimes = array();
 $query = "SELECT id,questionsetid FROM imas_questions WHERE 1";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	if (isset($qtimes[$row[0]])) {
 		if (isset($qstimes[$row[1]])) {
@@ -47,7 +47,7 @@ foreach ($qstimes as $qsid=>$tv) {
 	
 	//would need to add this database field
 	$query = "UPDATE imas_questionset SET avgtime=$avg WHERE id=$qsid";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }
 echo "Done";
 ?>

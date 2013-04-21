@@ -30,7 +30,7 @@
 			if (count($keys)>0) {
 				$kl = implode(',',$keys);
 				$query = "SELECT refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid' AND refid IN ($kl)";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				while($row = mysql_fetch_row($result)) {
 					$_POST['score'][$row[0]] = $_POST['newscore'][$row[0]];
 					unset($_POST['newscore'][$row[0]]);
@@ -44,10 +44,10 @@
 				$sc = trim($sc);
 				if ($sc!='') {
 					$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				} else {
 					$query = "DELETE FROM imas_grades WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			}
 		}
@@ -57,7 +57,7 @@
 				if ($sc!='') {
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score,feedback) VALUES ";
 					$query .= "('forum','$forumid','$k','$uid','$sc','{$_POST['feedback'][$k]}')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			}
 		}
@@ -73,7 +73,7 @@
 	
 	$query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points FROM imas_users AS iu, imas_forums as i_f ";
 	$query .= "WHERE iu.id='$uid' AND i_f.id='$forumid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$row = mysql_fetch_row($result);
 	$possiblepoints = $row[3];
 	
@@ -83,7 +83,7 @@
 	
 	$scores = array();
 	$query = "SELECT score,feedback,refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$totalpts = 0;
 	while ($row = mysql_fetch_row($result)) {
 		$scores[$row[2]] = $row;
@@ -102,7 +102,7 @@
 	
 	echo '<table class="gb"><thead><tr><th>Post</th><th>Points</th><th>Private Feedback</th></tr></thead><tbody>';
 	$query = "SELECT id,threadid,subject FROM imas_forum_posts WHERE forumid='$forumid' AND userid='$uid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		echo "<tr><td><a href=\"$imasroot/forums/posts.php?cid=$cid&forum=$forumid&thread={$row[1]}\">{$row[2]}</a></td>";
 		if ($isteacher) {

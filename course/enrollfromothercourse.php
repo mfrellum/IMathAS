@@ -24,7 +24,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 		$todolist = implode(',',$todo);
 		$query = "SELECT userid FROM imas_students WHERE courseid='$cid' AND userid IN ($todolist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$dontdo = array();
 		while ($row = mysql_fetch_row($result)) {
 			$dontdo[] = $row[0];
@@ -45,7 +45,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$query .= ',section';
 			}
 			$query .= ') VALUES '.implode(',',$vals);
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 		exit;
@@ -54,11 +54,11 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		//know source course
 		$source = intval($_POST['sourcecourse']);
 		$query = "SELECT iu.FirstName,iu.LastName,iu.id FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$source' ORDER BY iu.LastName,iu.FirstName";
-		$resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
+		$resultStudentList = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 	} else {
 		$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers ON imas_teachers.courseid=ic.id WHERE imas_teachers.userid='$userid' ORDER BY ic.name";
-		$resultCourseList = mysql_query($query) or die("Query failed : " . mysql_error());
+		$resultCourseList = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 	
 } //END DATA MANIPULATION

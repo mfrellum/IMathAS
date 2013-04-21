@@ -36,20 +36,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		//check if exception already exists
 		$query = "SELECT id FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		if ($row != null) {
 			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0 WHERE id='{$row[0]}'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		} else {
 			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ";
 			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate)";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		}
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
 			$query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		}
 		
 		//force regen?
@@ -58,7 +58,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stu = $_GET['uid'];
 			$aid = $_GET['aid'];
 			$query = "SELECT id,questions,lastanswers FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$row = mysql_fetch_row($result);
 				$questions = explode(',',$row[1]);
@@ -90,7 +90,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$reattemptinglist = implode(',',$reattempting);
 				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 				$query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";
-				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 			}
 			
 		}
@@ -99,11 +99,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 	} else if (isset($_GET['clear'])) {
 		$query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
-		mysql_query($query) or die("Query failed :$query " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		$query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		$sdate = tzdate("m/d/Y",$row[0]);
 		$edate = tzdate("m/d/Y",$row[1]);
@@ -112,7 +112,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		//check if exception already exists
 		$query = "SELECT id,startdate,enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$erow = mysql_fetch_row($result);
 		$page_isExceptionMsg = "";
 		if ($erow != null) {
@@ -127,7 +127,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}&asid=$asid";
 
 	$query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$page_courseSelect = array();
 	$i=0;
 	while ($line=mysql_fetch_assoc($result)) {
@@ -139,7 +139,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 }
 
 $query = "SELECT latepass FROM imas_students WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $latepasses = mysql_result($result,0,0);
 
 /******* begin html output ********/

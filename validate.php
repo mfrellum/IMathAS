@@ -49,7 +49,7 @@
  }
  $sessiondata = array();
  $query = "SELECT userid,tzoffset,sessiondata,time FROM imas_sessions WHERE sessionid='$sessionid'";
- $result = mysql_query($query) or die("Query failed : " . mysql_error());
+ $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
  if (mysql_num_rows($result)>0) {
 	 $userid = mysql_result($result,0,0);
 	 $tzoffset = mysql_result($result,0,1);
@@ -59,7 +59,7 @@
 		 //delete own session if old and not posting
 		 if ((time()-mysql_result($result,0,3))>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
 			$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			unset($userid);
 		 }
 	 } else {
@@ -79,11 +79,11 @@
 			 }
 			 $enc = base64_encode(serialize($sessiondata));
 			 $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
-			 mysql_query($query) or die("Query failed : " . mysql_error());
+			 mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			 
 			// $now = time();
 			// $query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
-			// mysql_query($query) or die("Query failed : " . mysql_error());
+			// mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			 
 			 
 			 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
@@ -171,14 +171,14 @@ END;
 	 $now = time();
 	 $old = $now - 25*60*60;
 	 $query = "DELETE FROM imas_sessions WHERE time<$old";
-	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	 
 	 if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username']=='guest') { // create a temp account when someone logs in w/ username: guest
 	 	$query = 'SELECT ver FROM imas_dbschema WHERE id=2';
-	 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	 	$guestcnt = mysql_result($result,0,0);
 	 	$query = 'UPDATE imas_dbschema SET ver=ver+1 WHERE id=2';
-	 	mysql_query($query) or die("Query failed : " . mysql_error());
+	 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		if (isset($CFG['GEN']['homelayout'])) {
 			$homelayout = $CFG['GEN']['homelayout'];
@@ -187,15 +187,15 @@ END;
 		}
 	 	$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,homelayout) ";
 	 	$query .= "VALUES ('guestacct$guestcnt','',5,'Guest','Account','none@none.com',0,'$homelayout')";
-	 	mysql_query($query) or die("Query failed : " . mysql_error());
-	 	$userid = mysql_insert_id();
+	 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+	 	$userid = mysqli_insert_id($GLOBALS['link'])();
 	 	
 	 	if (is_array($CFG['GEN']['guesttempaccts']) && count($CFG['GEN']['guesttempaccts'])>0) {
 	 		$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
 			foreach ($CFG['GEN']['guesttempaccts'] as $i=>$encid) {
 				if ($i>0) { $query .= ',';}
 				$query .= "($userid,$encid)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		}
 	 	
@@ -207,7 +207,7 @@ END;
 	 	$_POST['usedetected'] = true;
 	 } else {
 		 $query = "SELECT id,password,rights,groupid FROM imas_users WHERE SID = '{$_POST['username']}'";
-		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		 $line = mysql_fetch_assoc($result);
 	 }
 	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
@@ -269,10 +269,10 @@ END;
 		 }
 		
 		 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
-		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		 
 		 $query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
-		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		 
 		 if (isset($_SERVER['QUERY_STRING'])) {
 			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
@@ -281,7 +281,7 @@ END;
 		 }
 		 //$now = time();
 		 //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
-		 //mysql_query($query) or die("Query failed : " . mysql_error());
+		 //mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			 
 		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);	 
 	 } else {
@@ -299,7 +299,7 @@ END;
 		 $err .= ','.addslashes($_SERVER['HTTP_USER_AGENT']);
 		 $query = "INSERT INTO imas_failures (SID,challenge,sent,type) VALUES ";
 		 $query .= "('{$_POST['username']}','{$_SESSION['challenge']}','{$_POST['password']}','$err')";
-		 mysql_query($query) or die("Query failed : " . mysql_error());
+		 mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		 */
 		 
 	 }
@@ -312,7 +312,7 @@ END;
 		//suggests sidejacking.  Delete session and require relogin
 		/*
 		$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
 		exit;
 		*/
@@ -323,7 +323,7 @@ END;
 		$query .= ',listperpage';
 	}
 	$query .= " FROM imas_users WHERE id='$userid'"; 
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
@@ -362,7 +362,7 @@ END;
 			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php'))) {
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$cid = mysql_result($result,0,0);
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
@@ -376,7 +376,7 @@ END;
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
 		$cid = $_GET['cid'];
 		$query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line = mysql_fetch_assoc($result);
 		if ($line != null) {
 			$studentid = $line['id'];
@@ -392,20 +392,20 @@ END;
 				$now = time();
 				if (!isset($sessiondata['lastaccess'.$cid])) {
 					$query = "UPDATE imas_students SET lastaccess='$now' WHERE id=$studentid";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$sessiondata['lastaccess'.$cid] = $now;
 					$query = "INSERT INTO imas_login_log (userid,courseid,logintime) VALUES ($userid,'$cid',$now)";
-					mysql_query($query) or die("Query failed : " . mysql_error());
-					$sessiondata['loginlog'.$cid] = mysql_insert_id();
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+					$sessiondata['loginlog'.$cid] = mysqli_insert_id($GLOBALS['link'])();
 					writesessiondata();
 				} else if (isset($CFG['GEN']['keeplastactionlog'])) {
 					$query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$cid];
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
 			}
 		} else {
 			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			if ($line != null) {
 				if ($myrights>19) {
@@ -432,7 +432,7 @@ END;
 			} else {
 				
 				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$line = mysql_fetch_assoc($result);
 				if ($line != null) {
 					$tutorid = $line['id'];
@@ -443,7 +443,7 @@ END;
 		}
 		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			$crow = mysql_fetch_row($result);
 			$coursename = $crow[0]; //mysql_result($result,0,0);
@@ -513,7 +513,7 @@ END;
 	  global $sessiondata,$sessionid;
 	  $enc = base64_encode(serialize($sessiondata));
 	  $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
-	  mysql_query($query) or die("Query failed : " . mysql_error());
+	  mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
   }
   function checkeditorok() {
 	  $ua = $_SERVER['HTTP_USER_AGENT'];

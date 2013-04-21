@@ -7,7 +7,7 @@ require("validate.php");
 if (isset($_GET['cid']) && $_GET['cid']>0) {
 	$cid = $_GET['cid'];
 	$query = "SELECT topbar FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$topbar = explode('|',mysql_result($result,0,0));
 	$topbar[0] = explode(',',$topbar[0]);
 	$topbar[1] = explode(',',$topbar[1]);
@@ -63,7 +63,7 @@ $query .= "UNION SELECT imas_courses.name,imas_courses.id FROM imas_students,ima
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ";
 $query .= "ORDER BY name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	echo "<li><a href=\"$imasroot/course/course.php?cid={$row[1]}\">{$row[0]}</a></li>";
 }

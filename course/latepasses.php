@@ -15,10 +15,10 @@
 	if (isset($_POST['latepass'])) {
 		foreach ($_POST['latepass'] as $uid=>$lp) {
 			$query = "UPDATE imas_students SET latepass='$lp' WHERE userid='$uid' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 		$query = "UPDATE imas_courses SET latepasshrs='{$_POST['hours']}' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 		exit;
 	}
@@ -103,7 +103,7 @@ function sendtoall(type) {
 <?php
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0)>0) {
 			$hassection = true;
 		} else {
@@ -112,7 +112,7 @@ function sendtoall(type) {
 		
 		if ($hassection) {
 			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysql_result($result,0,0)==0) {
 				$sortorder = "sec";
 			} else {
@@ -126,7 +126,7 @@ function sendtoall(type) {
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
 		$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$hours = mysql_result($result,0,0);
 		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"$hours\"/> hours</p>";
 		echo "<p>To all:  <input type=\"text\" value=\"1\" id=\"toall\"/> ";
@@ -146,7 +146,7 @@ function sendtoall(type) {
 		} else {
 			 $query .= " ORDER BY imas_users.LastName,imas_users.FirstName";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 		while ($row = mysql_fetch_row($result)) {
 			echo "<tr><td>{$row[1]}, {$row[2]}</td>";

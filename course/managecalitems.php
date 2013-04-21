@@ -22,7 +22,7 @@ if (isset($_POST['submit'])) {
 	if (isset($_POST['del']) && count($_POST['del'])>0) {
 		foreach ($_POST['del'] as $id=>$val) {
 			$query = "DELETE FROM imas_calitems WHERE id='$id' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 	}
 	
@@ -33,7 +33,7 @@ if (isset($_POST['submit'])) {
 			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
 			$date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
 			$query = "UPDATE imas_calitems SET date='$date',tag='$tag',title='{$_POST['txt'][$id]}' WHERE id='$id'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
 	}
 	
@@ -43,7 +43,7 @@ if (isset($_POST['submit'])) {
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
 		$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
 		$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ('$cid','$datenew','{$_POST['tagnew']}','{$_POST['txtnew']}')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
 	if ($_POST['submit']=='Save') {
 		if ($from=='cp') {
@@ -69,7 +69,7 @@ echo '<div id="headermanagecalitems" class="pagetitle"><h2>Manage Calendar Items
 echo "<p>This page allows you to add items only to the calendar.  Course items automatically place themselves on the calendar</p>";
 	
 $query = "SELECT id,date,title,tag FROM imas_calitems WHERE courseid='$cid' ORDER BY date";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 
 ?>
 <form method=post action="managecalitems.php?cid=<?php echo $cid.'&amp;from='.$from;?>">

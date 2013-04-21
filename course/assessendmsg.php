@@ -33,7 +33,7 @@ if (!isset($imasroot)) {
 			$aidlist = "'".implode("','",explode(',',$_POST['aidlist']))."'";
 			$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id IN ($aidlist)";
 		}
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 			
@@ -51,7 +51,7 @@ if (!isset($imasroot)) {
 	}
 	if (!isset($_POST['checked'])) {
 		$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$endmsg = mysql_result($result,0,0);
 	} else {
 		$endmsg = '';

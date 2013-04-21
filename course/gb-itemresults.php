@@ -24,7 +24,7 @@ $att = $_GET['att'];
 //pull questionset ids
 $qsids = array();
 $query = "SELECT id,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$qsids[$row[0]] = $row[1];
 }
@@ -32,7 +32,7 @@ while ($row = mysql_fetch_row($result)) {
 //pull question data
 $qsdata = array();
 $query = "SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$qsdata[$row[0]] = array($row[1],$row[2],$row[3]);
 }
@@ -47,7 +47,7 @@ while ($row = mysql_fetch_row($result)) {
 
 $query = "SELECT questions,seeds,lastanswers,scores FROM imas_assessment_sessions ";
 $query .= "WHERE assessmentid='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $sessioncnt = 0;
 $qdata = array();
 while ($row = mysql_fetch_row($result)) {
@@ -111,7 +111,7 @@ echo "&gt; Item Results</div>";
 echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Results: ';
 
 $query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $defpoints = mysql_result($result,0,0);
 echo mysql_result($result,0,1).'</h2></div>';
 $itemorder = mysql_result($result,0,2);

@@ -13,7 +13,7 @@
 	}
 	//look up user
 	$query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)==0) {
 		echo "Access key invalid";
 		exit;
@@ -62,7 +62,7 @@
 		//$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
 	
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		while ($line = mysql_fetch_assoc($result)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();
@@ -92,7 +92,7 @@
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
 	
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		while ($line = mysql_fetch_assoc($result)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();
@@ -117,7 +117,7 @@
 	$coursenames = array();
 	$cidlist = implode(',',array_keys($courseforums));
 	$query = "SELECT id,name FROM imas_courses WHERE id IN ($cidlist)";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		$coursenames[$row[0]] = $row[1];
 	}
@@ -126,7 +126,7 @@
 		$threadids = implode(',',array_keys($lastpost));
 		$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
 		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadids) ORDER BY imas_forum_posts.postdate DESC";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$lastforum = '';
 		$lastcourse = '';
 		$forumcontent = array();
@@ -167,7 +167,7 @@
 	$query = "SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_users.FirstName,imas_users.LastName ";
 	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgto='$userid' AND imas_msgs.msgfrom=imas_users.id ";
 	$query .= "AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ORDER BY imas_msgs.senddate DESC";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	if (mysql_num_rows($result)>0) {
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; '>New Messages</div>";
 		echo '<table border=0 cellspacing=2>';

@@ -47,7 +47,7 @@ $tolib = $_POST['libs'];
 
 $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid FROM imas_questions,imas_assessments,imas_questionset WHERE imas_questions.assessmentid=imas_assessments.id AND ";
 $query .= "imas_questionset.id=imas_questions.questionsetid AND imas_assessments.courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysql_num_rows($result)==0) {
 	echo "no Q found";
 	exit;
@@ -62,7 +62,7 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$query .= "('$tolib','{$row[0]}','{$row[1]}')";
 }
-mysql_query($query) or die("Query failed : " . mysql_error());
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 echo "Done.  <a href=\"course.php?cid=$cid\">Return to course page</a>";
 exit;
 

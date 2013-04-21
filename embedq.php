@@ -131,7 +131,7 @@ function printscore($sc,$qsetid,$seed) {
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
 		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
 		$control = mysql_result($result,0,0);
 		$ptposs = getansweights($control,$seed);
 		for ($i=0; $i<count($ptposs)-1; $i++) {

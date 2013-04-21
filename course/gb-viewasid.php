@@ -17,7 +17,7 @@
 			$gbmode =  $sessiondata[$cid.'gbmode'];
 		} else {
 			$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$gbmode = mysql_result($result,0,0);
 		}
 		if (isset($_GET['stu']) && $_GET['stu']!='') {
@@ -47,12 +47,12 @@
 		$aid = $_GET['aid'];
 		//student could have started, so better check to make sure it still doesn't exist
 		$query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$_GET['uid']}' AND assessmentid='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)>0) {
 			$_GET['asid'] = mysql_result($result,0,0);
 		} else {
 			$query = "SELECT * FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$adata = mysql_fetch_assoc($result);
 			
 			$stugroupmem = array();
@@ -60,11 +60,11 @@
 			if ($adata['isgroup']>0) { //if is group assessment, and groups already exist, create asid for all in group
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid='{$_GET['uid']}' AND i_sg.groupsetid={$adata['groupsetid']}";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysql_num_rows($result)>0) { //group exists
 					$agroupid = mysql_result($result,0,0);
 					$query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid=$agroupid AND userid<>'{$_GET['uid']}'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					while ($row = mysql_fetch_row($result)) {
 						$stugroupmem[] = $row[0];
 					}
@@ -78,8 +78,8 @@
 			foreach ($stugroupmem as $uid) {
 				$query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
 				$query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',0,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$asid = mysql_insert_id();
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+				$asid = mysqli_insert_id($GLOBALS['link'])();
 			}												
 			$_GET['asid'] = $asid;
 		}
@@ -90,7 +90,7 @@
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
 			$query = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			$aid = mysql_result($result,0,0);
 			$ltisourcedid = mysql_result($result,0,1);
 			if (strlen($ltisourcedid)>1) {
@@ -105,7 +105,7 @@
 			$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
 			$query .= " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			//$query .= getasidquery($_GET['asid']);
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
 			if ($from=='isolate') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
@@ -136,7 +136,7 @@
 		if ($_GET['breakfromgroup']=="confirmed") {
 			include("../includes/stugroups.php");
 			$query = "SELECT userid,agroupid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$row = mysql_fetch_row($result);
 			removegroupmember($row[1],$row[0]);
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
@@ -157,7 +157,7 @@
 			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
 			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			$query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions $whereqry";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$seeds = explode(',',mysql_result($result,0,0));
 			$ltisourcedid = mysql_result($result,0,1);
 			if (strlen($ltisourcedid)>1) {
@@ -180,7 +180,7 @@
 			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
 			$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
 			$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			//unset($_GET['asid']);
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
@@ -205,7 +205,7 @@
 			//$whereqry = getasidquery($_GET['asid']);
 			
 			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
 			
 			$scores = explode(",",$line['scores']);
@@ -241,7 +241,7 @@
 				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
 				$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist',reattempting='$reattemptinglist' ";
 				$query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				
 				if (strlen($line['lti_sourcedid'])>1) {
 					require_once("../includes/ltioutcomes.php");
@@ -315,7 +315,7 @@
 					$query .= "WHERE id='{$_GET['asid']}'";
 				}
 				$q2 = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$res = mysql_query($q2) or die("Query failed : $q2 " . mysql_error());
+				$res = mysqli_query($GLOBALS['link'],$q2) or die("Query failed : $q2 " . mysqli_error($GLOBALS['link']));
 				$row = mysql_fetch_row($res);
 				$aid = $row[0];
 				if (strlen($row[1])>1) {
@@ -327,7 +327,7 @@
 				echo "No authority to change scores.";
 				exit;
 			}
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if ($from=='isolate') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='gisolate') {
@@ -355,7 +355,7 @@
 			//$query .= getasidquery($_GET['asid']);
 			$qp = getasidquery($_GET['asid']);
 			$query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		}
 		
 		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,";
@@ -365,7 +365,7 @@
 		if (!$isteacher && !$istutor) {
 			$query .= " AND imas_assessment_sessions.userid='$userid'";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($result)==0) {
 			echo "uh oh.  Bad assessment id";
 			exit;
@@ -394,14 +394,14 @@
 		echo "Detail</div>";
 		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
 		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		
 		if ($isteacher) {
 			$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
 			$query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$line['assessmentid']} AND rubric>0)";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysql_num_rows($result)>0) {
 				$rubrics = array();
 				while ($row = mysql_fetch_row($result)) {
@@ -439,7 +439,7 @@
 			if ($line['agroupid']>0) {
 				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
 				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$line['agroupid']}' ORDER BY LastName,FirstName";
-				$result = mysql_query($q2) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$q2) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				echo "<p>Group members: <ul>";
 				while ($row = mysql_fetch_row($result)) {
 					echo "<li>{$row[0]}, {$row[1]}</li>";
@@ -467,7 +467,7 @@
 		$saenddate = $line['enddate'];
 		unset($exped);
 		$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}'";
-		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysql_num_rows($r2)>0) {
 			$exped = mysql_result($r2,0,0);
 			if ($exped>$saenddate) {
@@ -554,7 +554,7 @@
 		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric,iq.showhints,iqs.extref ";
 		$query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
 		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		$totalpossible = 0;
 		$pts = array();
 		$withdrawn = array();
@@ -807,7 +807,7 @@
 			if ($line['agroupid']>0) {
 				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
 				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.agroupid='{$line['agroupid']}'";
-				$result = mysql_query($q2) or die("Query failed : " . mysql_error());
+				$result = mysqli_query($GLOBALS['link'],$q2) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				echo "Group members: <ul>";
 				while ($row = mysql_fetch_row($result)) {
 					echo "<li>{$row[0]}, {$row[1]}</li>";
@@ -825,7 +825,7 @@
 		}
 		
 		$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
-		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
 			catscores($questions,$scores,$line['defpoints']);
@@ -841,14 +841,14 @@
 		echo "&gt; Detail</div>";
 		echo "<h2>Grade Book Detail</h2>\n";
 		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		
 		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$line=mysql_fetch_assoc($result);
 		
 		echo "<h4>{$line['name']}</h4>\n";
@@ -861,7 +861,7 @@
 		
 		
 		$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
-		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
 			catscores(explode(',',$line['questions']),explode(',',$line['bestscores']),$line['defpoints']);
@@ -877,7 +877,7 @@
 		echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
 		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ({$line['questions']})";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=1;
 		$totpt = 0;
 		$totposs = 0;
@@ -931,7 +931,7 @@ function getpts($sc) {
 }
 function getasidquery($asid) {
 	$query = "SELECT agroupid,assessmentid FROM imas_assessment_sessions WHERE id='$asid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$agroupid = mysql_result($result,0,0);
 	$aid= mysql_result($result,0,1);
 	if ($agroupid>0) {
@@ -944,7 +944,7 @@ function getasidquery($asid) {
 }
 function isasidgroup($asid) {
 	$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$asid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	return (mysql_result($result,0,0)>0);
 }
 function printscore($sc) {
@@ -997,7 +997,7 @@ function getconfirmheader($group=false) {
 		$out = '<h3>Whole Group</h3>';
 	} else {
 		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$row = mysql_fetch_row($result);
 		$out = "<h3>{$row[1]}, {$row[0]}</h3>\n";
 	}
@@ -1006,7 +1006,7 @@ function getconfirmheader($group=false) {
 	if (!$isteacher && !$istutor) {
 		$query .= " AND imas_assessment_sessions.userid='$userid'";
 	}
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$out .= "<h4>".mysql_result($result,0,0)."</h4>";
 	return $out;
 }
@@ -1019,7 +1019,7 @@ function isoktorec() {
 	} else if ($istutor) {
 		$query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 		$query .= "WHERE ias.id='{$_GET['asid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		if (mysql_result($result,0,0)==1) {
 			$oktorec = true;
 		}

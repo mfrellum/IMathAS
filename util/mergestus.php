@@ -11,7 +11,7 @@ $to = $_GET['to'];
 
 $ids = array();
 $query = "SELECT assessmentid FROM imas_assessment_sessions WHERE userid='$to'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$ids[] = $row[0];
 }
@@ -22,13 +22,13 @@ $query .= "assessmentid IN (SELECT id FROM imas_assessments WHERE courseid='$cid
 if (count($ids)>0) {
 	$query .= "AND assessmentid NOT IN ($idlist)";
 }
-mysql_query($query) or die("Query failed : " . mysql_error());
-echo mysql_affected_rows().' assessment sessions moved<br/><br/>';
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+echo mysqli_affected_rows($GLOBALS['link'])().' assessment sessions moved<br/><br/>';
 
 
 $ids = array();
 $query = "SELECT gradetypeid FROM imas_grades WHERE userid='$to' AND gradetype='offline' AND score IS NOT NULL";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 while ($row = mysql_fetch_row($result)) {
 	$ids[] = $row[0];
 }
@@ -39,8 +39,8 @@ $query .= "gradetype='offline' AND gradetypeid IN (SELECT id FROM imas_gbitems W
 if (count($ids)>0) {
 	$query .= "AND gradetypeid NOT IN ($idlist)";
 }
-mysql_query($query) or die("Query failed : " . mysql_error());
-echo mysql_affected_rows().' offline grades moved<br/><br/>';
+mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+echo mysqli_affected_rows($GLOBALS['link'])().' offline grades moved<br/><br/>';
 
 ?>
 

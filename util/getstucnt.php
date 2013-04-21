@@ -6,7 +6,7 @@
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	echo "<p>Student count: ".mysql_result($result,0,0);
 
 	$date = $now - 60*60*24*7;  
@@ -14,19 +14,19 @@
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	echo "<p>Student count: ".mysql_result($result,0,0);
 	
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_users.id=imas_teachers.userid AND imas_users.lastaccess>$date";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	echo "</p><p>Teacher count: ".mysql_result($result,0,0)."</p>";
 
 	echo "<p>Active student association</p>";
 	$query = "SELECT g.name,u.LastName,COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_teachers AS t ";
 	$query .= "ON s.courseid=t.courseid AND s.lastaccess>$date  JOIN imas_users as u  ";
 	$query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id ORDER BY g.name";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$lastgroup = '';
 	while ($row = mysql_fetch_row($result)) {
 		if ($row[0] != $lastgroup) {
@@ -42,14 +42,14 @@
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	echo mysql_result($result,0,0)."</p>";
 	
 	
 	
 	if (isset($_GET['emails']) && $myrights>75) {
 		$query = "SELECT email FROM imas_users WHERE rights>20";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		echo "<p>";
 		while ($row = mysql_fetch_row($result)) {
 			echo $row[0]."; ";

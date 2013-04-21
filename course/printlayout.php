@@ -51,7 +51,7 @@ if ($overwriteBody==1) {
 	$isfinal = isset($_GET['final']);
 	
 	$query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$line = mysql_fetch_assoc($result);
 	
 	$ioquestions = explode(",",$line['itemorder']);
@@ -91,7 +91,7 @@ if ($overwriteBody==1) {
 	$qn = array();
 	$qlist = "'".implode("','",$questions)."'";
 	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	while ($row = mysql_fetch_row($result)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
@@ -267,13 +267,13 @@ if ($overwriteBody==1) {
 		}
 		if (isset($_POST['cname'])) {
 			$query = "SELECT name FROM imas_courses WHERE id=$cid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$headerleft .= mysql_result($result,0,0);
 			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
 		}
 		if (isset($_POST['iname'])) {
 			$query = "SELECT LastName FROM imas_users WHERE id=$userid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$headerleft .= mysql_result($result,0,0);
 		}
 		$headerright = '';
@@ -393,12 +393,12 @@ function printq($qn,$qsetid,$seed,$pts) {
 	srand($seed);
 
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$qdata = mysql_fetch_assoc($result);
 	
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		while ($row = mysql_fetch_row($result)) {
 			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
 		}

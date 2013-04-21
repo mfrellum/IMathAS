@@ -79,7 +79,7 @@ switch($_GET['action']) {
 	case "chguserinfo":
 		$query = "SELECT * FROM imas_users WHERE id='$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		echo '<script type="text/javascript">function togglechgpw(val) { if (val) {document.getElementById("pwinfo").style.display="";} else {document.getElementById("pwinfo").style.display="none";} } </script>';
 		
 		echo '<div id="headerforms" class="pagetitle"><h2>User Info</h2></div>';
@@ -167,7 +167,7 @@ switch($_GET['action']) {
 			} else {
 				$query = "SELECT name FROM imas_libraries WHERE id='{$line['deflib']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$lname = mysql_fetch_first($result);
+				$lname = mysqli_fetch_first($result);
 			}
 			
 			echo "<script type=\"text/javascript\">";
@@ -255,7 +255,7 @@ switch($_GET['action']) {
 	case "googlegadget":
 		$query = "SELECT remoteaccess FROM imas_users WHERE id='$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$code = mysql_fetch_first($result);
+		$code = mysqli_fetch_first($result);
 		if ($code=='' || isset($_GET['regen'])) {
 			$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 			do {

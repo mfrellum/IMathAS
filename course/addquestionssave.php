@@ -104,7 +104,7 @@
 	$query = "UPDATE imas_assessments SET itemorder='{$_GET['order']}',viddata='$viddata' WHERE id='$aid'";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
 	
-	if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+	if (mysqli_affected_rows($GLOBALS['link'])>0) {
 		echo "OK";
 	} else {
 		echo "error: not saved";

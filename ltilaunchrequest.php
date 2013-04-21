@@ -96,7 +96,7 @@ $now = time();
 if ($itemtype==0) { //accessing single assessment
 	$query = "SELECT courseid,startdate,enddate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	$cid = $line['courseid'];
 	if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
 		returnstudentnotice("This assessment is closed");
@@ -105,7 +105,7 @@ if ($itemtype==0) { //accessing single assessment
 } else if ($itemtype==1) { //accessing whole course
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	if (!($line['avail']==0 || $line['avail']==2)) {
 		returnstudentnotice("This course is not available");
 	}
@@ -143,13 +143,13 @@ if (base64_encode(pack("H*", sha1($nonce.$created.$secret))) != $digest) {
 $query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysqli_num_rows($result) > 0) { //yup, we know them
-	$userid = mysql_fetch_first($result);
+	$userid = mysqli_fetch_first($result);
 } else {
 	//echo "student not known?  id $ltiuserid, org $ltiorg";
 	
 	$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$localltiuser = mysqli_insert_id($GLOBALS['link'])();
+	$localltiuser = mysqli_insert_id($GLOBALS['link']);
 	if (!empty($_REQUEST['user_email'])) {
 		$email = $_REQUEST['user_email'];
 	} else {
@@ -178,7 +178,7 @@ if (mysqli_num_rows($result) > 0) { //yup, we know them
 	$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ";
 	$query .= "('$sid','none',10,'$firstname','$lastname','$email')";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$userid = mysqli_insert_id($GLOBALS['link'])();	
+	$userid = mysqli_insert_id($GLOBALS['link']);	
 	$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }
@@ -204,7 +204,7 @@ if ($itemtype==0) { //is aid
 	$query .= "('$pass','$userid','$cid',1,$now)";
 }
 mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-$accessid = mysqli_insert_id($GLOBALS['link'])();
+$accessid = mysqli_insert_id($GLOBALS['link']);
 
 //cleanup
 $old = $now - 900; //old stuff - 15 min

@@ -82,17 +82,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$revisedate,'{$_POST['avail']}',$settings,'{$_POST['groupsetid']}');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$newwikiid = mysqli_insert_id($GLOBALS['link'])();
+			$newwikiid = mysqli_insert_id($GLOBALS['link']);
 			
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','Wiki','$newwikiid');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$itemid = mysqli_insert_id($GLOBALS['link'])();
+			$itemid = mysqli_insert_id($GLOBALS['link']);
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 				
 			$blocktree = explode('-',$block);
@@ -128,7 +128,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) { //MODIFY MODE
 			$query = "SELECT * FROM imas_wikis WHERE id='{$_GET['id']}';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 			$revisedate = $line['editbydate'];

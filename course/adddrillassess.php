@@ -28,7 +28,7 @@ if (mysqli_num_rows($result)==0) {
 	$itemdescr = array();
 	$daid = 0;
 } else {
-	$dadata = mysql_fetch_assoc($result);
+	$dadata = mysqli_fetch_assoc($result);
 	$n = $dadata['n'];
 	$showtype = $dadata['showtype'];
 	$scoretype = $dadata['scoretype'];
@@ -117,7 +117,7 @@ if (isset($_GET['record'])) {
 		$query = "INSERT INTO imas_drillassess (courseid,itemdescr,itemids,scoretype,showtype,n,classbests,showtostu) VALUES ";
 		$query .= "($cid,'$descrlist','$itemlist','$scoretype',$showtype,$n,'$bestlist',$showtostu)";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$daid = mysqli_insert_id($GLOBALS['link'])();
+		$daid = mysqli_insert_id($GLOBALS['link']);
 	} else {
 		if ($beentaken) {
 			$query = "UPDATE imas_drillassess SET itemdescr='$descrlist',showtostu=$showtostu";
@@ -291,7 +291,7 @@ if (!$beentaken) {
 			$page_libqids = array();
 			$page_useavgtimes = false;
 			
-			while ($line = mysql_fetch_assoc($result)) {
+			while ($line = mysqli_fetch_assoc($result)) {
 				if ($newonly && in_array($line['id'],$itemids)) {
 					continue;
 				}
@@ -366,7 +366,7 @@ if (!$beentaken) {
 				
 				/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 				$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$times = mysql_fetch_first($result2);
+				$times = mysqli_fetch_first($result2);
 				$page_questionTable[$i]['times'] = $times;
 				*/
 				$page_questionTable[$i]['times'] = 0;

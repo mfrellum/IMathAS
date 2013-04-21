@@ -30,7 +30,7 @@ function delitembyid($itemid) {
 	} else if ($itemtype == "LinkedText") {
 		$query = "SELECT text FROM imas_linkedtext WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$text = mysql_fetch_first($result);
+		$text = mysqli_fetch_first($result);
 		if (substr($text,0,5)=='file:') { //delete file if not used
 			$safetext = addslashes($text);
 			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?

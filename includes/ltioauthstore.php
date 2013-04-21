@@ -51,7 +51,7 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
         $query = "SELECT id FROM imas_ltinonces WHERE nonce='$nonce'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysqli_num_rows($result)>0) {
-		return mysql_fetch_first($result);
+		return mysqli_fetch_first($result);
 	} else {
 		return NULL;
 	}

@@ -24,7 +24,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_POST['chgcnt'])) {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		
 		$cnt = $_POST['chgcnt'];
 		$blockchg = 0;
@@ -250,7 +250,7 @@ if ($overwriteBody==1) {
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$itemorder = unserialize(mysql_fetch_first($result));
+		$itemorder = unserialize(mysqli_fetch_first($result));
 		$itemsimporder = array();
 		function flattenitems($items,&$addto,$parent) {
 			global $itemsimporder,$itemsassoc;
@@ -351,7 +351,7 @@ if ($overwriteBody==1) {
 	if ($filter=='all' || $filter=='blocks') {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		
 		function getblockinfo($items,$parent) {
 			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby;

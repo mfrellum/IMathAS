@@ -39,7 +39,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref FROM imas_questionset WHERE id='$qidx'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$qdata = mysql_fetch_assoc($result);
+	$qdata = mysqli_fetch_assoc($result);
 	
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
@@ -373,7 +373,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	$GLOBALS['inquestiondisplay'] = false;	
 	$query = "SELECT qtype,control,answer FROM imas_questionset WHERE id='$qidx'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$qdata = mysql_fetch_assoc($result);
+	$qdata = mysqli_fetch_assoc($result);
 
 	if (isset($GLOBALS['lastanswers'])) {
 		foreach ($GLOBALS['lastanswers'] as $i=>$ar) {

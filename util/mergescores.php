@@ -36,7 +36,7 @@ if (isset($_POST['assess'])) {
     } else {
         $query = "SELECT itemorder FROM imas_assessments WHERE id='$dest'";
         $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-        $sourceitemord = mysql_fetch_first($result);
+        $sourceitemord = mysqli_fetch_first($result);
         $query = "SELECT itemorder,name FROM imas_assessments WHERE id IN (".implode(',',$source).")";
         $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
         while ($row = mysqli_fetch_row($result)) {

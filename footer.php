@@ -31,7 +31,7 @@ if (isset($placeinfooter)) {
 </html>
 <?php
 if (isset($link)) {
-	mysql_close($link);
+	mysqli_close($link);
 }
 /*
 $end_time = microtime(true);

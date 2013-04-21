@@ -27,7 +27,7 @@
 	$forumname = array();
 	$forumids = array();
 	$lastpost = array();
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$forumname[$line['threadid']] = $line['name'];
 		$forumids[$line['threadid']] = $line['id'];
 		$lastpost[$line['threadid']] = tzdate("F j, Y, g:i a",$line['lastposttime']);
@@ -91,7 +91,7 @@
 		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_posts.forumid";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if ($forumname[$line['threadid']]!=$lastforum) {
 				if ($lastforum!='') { echo '</tbody></table>';}
 				echo "<h4>Forum: <a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></h4><table class="forum"><thead><th>Topic</th><th>Last Post Date</th></thead><tbody>';

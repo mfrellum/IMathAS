@@ -168,7 +168,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$query .= " AND (imas_questionset.control LIKE '%includecodefrom%' OR imas_questionset.qtext LIKE '%includeqtextfrom%')";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$includedqs = array();
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
 			}
@@ -192,7 +192,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND imas_questionset.userights>0";
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
 			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
 			echo "\nSTART QUESTION\n";

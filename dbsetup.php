@@ -12,10 +12,8 @@
 }*/
 $dbsetup = true;
 include("config.php");
-$link = mysql_connect($dbserver,$dbusername, $dbpassword) 
+$link = mysqli_connect($dbserver,$dbusername, $dbpassword, $dbname) 
   or die("Could not connect : " . mysqli_error($GLOBALS['link']));
-mysql_select_db($dbname) 
-  or die("Could not select database");
   
 $query = "SELECT ver FROM imas_dbschema WHERE id=1";
 $result = mysqli_query($GLOBALS['link'],$query);

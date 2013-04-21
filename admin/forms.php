@@ -46,7 +46,7 @@ switch($_GET['action']) {
 		} else {
 			$query = "SELECT FirstName,LastName,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			echo "<h2>{$line['FirstName']} {$line['LastName']}</h2>\n";
 			$oldgroup = $line['groupid'];
 			$oldrights = $line['rights'];
@@ -104,7 +104,7 @@ switch($_GET['action']) {
 		if ($_GET['action']=='modify') {
 			$query = "SELECT * FROM imas_courses WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$courseid = $line['id'];
 			$name = $line['name'];
 			$ekey = $line['enrollkey'];
@@ -443,7 +443,7 @@ switch($_GET['action']) {
 	case "chgteachers":
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h2>{$line['name']}</h2>\n";
 		echo '</div>';
@@ -458,7 +458,7 @@ switch($_GET['action']) {
 		echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		$onlyone = ($num==1);
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if ($onlyone) {
 				echo '<tr><td></td>';
 			} else {
@@ -485,7 +485,7 @@ switch($_GET['action']) {
 		echo '<form method="post" action="actions.php?action=addteacher&cid='.$_GET['id'].'">';
 		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
 		echo "<table cellpadding=5>\n";
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if ($used[$line['id']]!=true) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
 				echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';

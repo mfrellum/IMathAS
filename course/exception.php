@@ -130,7 +130,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$page_courseSelect = array();
 	$i=0;
-	while ($line=mysql_fetch_assoc($result)) {
+	while ($line=mysqli_fetch_assoc($result)) {
 		$page_courseSelect['val'][$i] = $line['id'];
 		$page_courseSelect['label'][$i] = $line['name'];
 		$i++;
@@ -140,7 +140,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 $query = "SELECT latepass FROM imas_students WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-$latepasses = mysql_fetch_first($result);
+$latepasses = mysqli_fetch_first($result);
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";

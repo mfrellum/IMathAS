@@ -59,14 +59,14 @@
 		require("../footer.php");
 		exit;
 	}
-	$baseid = mysql_fetch_first($result);
+	$baseid = mysqli_fetch_first($result);
 	if ($baseid==0) {
 		$baseid=$msgid;
 	}
 	$query = "SELECT imas_msgs.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_msgs,imas_users ";
 	$query .= "WHERE imas_msgs.msgfrom=imas_users.id AND (imas_msgs.id='$baseid' OR imas_msgs.baseid='$baseid') ORDER BY imas_msgs.id";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($line =  mysql_fetch_assoc($result)) {
+	while ($line =  mysqli_fetch_assoc($result)) {
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['senddate'];
 		$n = 0;
@@ -96,7 +96,7 @@
 	if ($line['courseid']>0) {
 		$query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$msgset = mysql_fetch_first($result);
+		$msgset = mysqli_fetch_first($result);
 		$msgmonitor = floor($msgset/5);
 		$msgset = $msgset%5;
 		if ($msgset<3 || $isteacher) {

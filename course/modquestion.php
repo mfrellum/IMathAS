@@ -57,18 +57,18 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$query = "SELECT questionsetid FROM imas_questions WHERE id='{$_GET['id']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$_GET['qsetid'] = mysql_fetch_first($result);
+				$_GET['qsetid'] = mysqli_fetch_first($result);
 			}
 		} 
 		if (isset($_GET['qsetid'])) { //new - adding
 			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$itemorder = mysql_fetch_first($result);
+			$itemorder = mysqli_fetch_first($result);
 			for ($i=0;$i<$_POST['copies'];$i++) {
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints) ";
 				$query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}',$rubric,$showhints)";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$qid = mysqli_insert_id($GLOBALS['link'])();
+				$qid = mysqli_insert_id($GLOBALS['link']);
 				
 				//add to itemorder
 				if (isset($_GET['id'])) { //am adding copies of existing  
@@ -95,7 +95,7 @@ if (!(isset($teacherid))) {
 		if (isset($_GET['id'])) {
 			$query = "SELECT points,attempts,penalty,regen,showans,rubric,showhints FROM imas_questions WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			if ($line['penalty']{0}==='L') {
 				$line['penalty'] = substr($line['penalty'],1);
 				$skippenalty==10;

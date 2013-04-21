@@ -90,7 +90,7 @@
 			$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysqli_num_rows($result)>0) {
-				$groupid = mysql_fetch_first($result);
+				$groupid = mysqli_fetch_first($result);
 			} else {
 				$groupid=0;
 			}
@@ -216,7 +216,7 @@
 			$query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysqli_num_rows($r2)>0) {
-				$r2id = mysql_fetch_first($r2);
+				$r2id = mysqli_fetch_first($r2);
 				$query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			} else{
@@ -293,7 +293,7 @@
 		}
 	
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
+		$numpages = ceil(mysqli_fetch_first($result)/$threadsperpage);
 		
 		if ($numpages > 1) {
 			$prevnext .= "Page: ";
@@ -488,7 +488,7 @@
 	if (mysqli_num_rows($result)==0) {
 		echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 	}
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		if (isset($postcount[$line['id']])) {
 			$posts = $postcount[$line['id']];
 			$lastpost = tzdate("F j, Y, g:i a",$maxdate[$line['id']]);

@@ -581,7 +581,7 @@ function tokenize($str,$anstype,$countcnt) {
 					return array(array('',9));
 				} else {
 					list($control,$questype) = mysqli_result($result);
-					//$inside = interpretline(mysql_fetch_first($result),$anstype);
+					//$inside = interpretline(mysqli_fetch_first($result),$anstype);
 					$inside = interpret('control',$anstype,$control,$countcnt+1);
 					if ($questype!=$anstype) {
 						//echo 'Imported code question type does not match current question answer type';

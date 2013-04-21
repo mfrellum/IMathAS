@@ -80,7 +80,7 @@
 				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupset'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				if (mysqli_num_rows($result)>0) {
-					$groupid = mysql_fetch_first($result);
+					$groupid = mysqli_fetch_first($result);
 				} else {
 					$groupid=0;
 				}
@@ -135,7 +135,7 @@
 	if (!$isteacher) {
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		if ((mysql_fetch_first($result)%5)==0) {
+		if ((mysqli_fetch_first($result)%5)==0) {
 			$allowmsg = true;
 		} 
 	}
@@ -151,7 +151,7 @@
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array();
-	while ($line =  mysql_fetch_assoc($result)) {
+	while ($line =  mysqli_fetch_assoc($result)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
 				$allowreply = ($isteacher || (time()<$line['replyby']));
@@ -264,7 +264,7 @@
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$prevth = '';
 	if (mysqli_num_rows($result)>0) {
-		$prevth = mysql_fetch_first($result);
+		$prevth = mysqli_fetch_first($result);
 		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$prevth&grp=$groupid\">Prev</a> ";
 	} else {
 		echo "Prev ";
@@ -277,7 +277,7 @@
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$nextth = '';
 	if (mysqli_num_rows($result)>0) {
-		$nextth = mysql_fetch_first($result);
+		$nextth = mysqli_fetch_first($result);
 		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=$groupid\">Next</a>";
 	} else {
 		echo "Next";

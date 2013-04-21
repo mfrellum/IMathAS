@@ -35,7 +35,7 @@
 		
 		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name FROM imas_assessments WHERE id='$aid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-		$adata = mysql_fetch_assoc($result);
+		$adata = mysqli_fetch_assoc($result);
 		$now = time();
 		$assessmentclosed = false;
 		
@@ -132,7 +132,7 @@
 		
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		
 		if ($line == null) { //starting test
 			//get question set
@@ -172,7 +172,7 @@
 					}
 					$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$stugroupid = mysqli_insert_id($GLOBALS['link'])();
+					$stugroupid = mysqli_insert_id($GLOBALS['link']);
 					//if ($adata['isgroup']==3) {
 					//	$sessiondata['groupid'] = $stugroupid;
 					//} else {
@@ -192,7 +192,7 @@
 			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid) ";
 			$query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext','$ltisourcedid');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sessiondata['sessiontestid'] = mysqli_insert_id($GLOBALS['link'])();
+			$sessiondata['sessiontestid'] = mysqli_insert_id($GLOBALS['link']);
 			
 			if ($stugroupid==0) {
 				$sessiondata['groupid'] = 0;
@@ -277,7 +277,7 @@
 				//already has asid, but broken from group
 				$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$stugroupid = mysqli_insert_id($GLOBALS['link'])();
+				$stugroupid = mysqli_insert_id($GLOBALS['link']);
 				if ($adata['isgroup']==3) {
 					$sessiondata['groupid'] = $stugroupid;
 				} else {
@@ -333,7 +333,7 @@
 	}
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	$questions = explode(",",$line['questions']);
 
 	$seeds = explode(",",$line['seeds']);
@@ -367,7 +367,7 @@
 	
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-	$testsettings = mysql_fetch_assoc($result);
+	$testsettings = mysqli_fetch_assoc($result);
 	if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
 		$testsettings['displaymethod']= 'Embed';
 	}
@@ -2447,7 +2447,7 @@ if (!isset($_POST['embedpostback'])) {
 			global $userid;
 			$query = "SELECT * from imas_users WHERE id='$userid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$userinfo = mysql_fetch_assoc($result);
+			$userinfo = mysqli_fetch_assoc($result);
 			echo "<h3>{$userinfo['LastName']}, {$userinfo['FirstName']}: ";
 			echo substr($userinfo['SID'],0,strpos($userinfo['SID'],'~'));
 			echo "</h3>\n";

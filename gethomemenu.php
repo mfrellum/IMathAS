@@ -8,7 +8,7 @@ if (isset($_GET['cid']) && $_GET['cid']>0) {
 	$cid = $_GET['cid'];
 	$query = "SELECT topbar FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$topbar = explode('|',mysql_fetch_first($result));
+	$topbar = explode('|',mysqli_fetch_first($result));
 	$topbar[0] = explode(',',$topbar[0]);
 	$topbar[1] = explode(',',$topbar[1]);
 	if (!isset($topbar[2])) {$topbar[2] = 0;}

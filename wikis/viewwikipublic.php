@@ -52,7 +52,7 @@
 	
 	$query = "SELECT id FROM imas_items WHERE itemtype='Wiki' AND typeid='$id'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$itemid = mysql_fetch_first($result);
+	$itemid = mysqli_fetch_first($result);
 	
 	$query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));

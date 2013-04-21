@@ -71,7 +71,7 @@ if ($overwriteBody==1) {
 
 	$query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	
 	$ioquestions = explode(",",$line['itemorder']);
 	$aname = $line['name'];
@@ -285,7 +285,7 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$qdata = mysql_fetch_assoc($result);
+	$qdata = mysqli_fetch_assoc($result);
 	
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";

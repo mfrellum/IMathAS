@@ -29,7 +29,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$forumid' AND itemtype='Forum'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemid = mysql_fetch_first($result);
+		$itemid = mysqli_fetch_first($result);
 		
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -40,7 +40,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -77,7 +77,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 	} else {
 		$query = "SELECT name FROM imas_forums WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemname = mysql_fetch_first($result);
+		$itemname = mysqli_fetch_first($result);
 	}	
 }
 

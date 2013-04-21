@@ -16,7 +16,7 @@ if (isset($teacherid)) {
 		$userid = $_GET['userid'];
 		$query = "SELECT SID FROM imas_users WHERE id='$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$username = mysql_fetch_first($result);
+		$username = mysqli_fetch_first($result);
 	}
 } else if (!isset($studentid) && !isset($teacherid)) {
 	echo 'Must be a student in this class to claim a badge';

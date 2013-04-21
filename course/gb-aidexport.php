@@ -182,7 +182,7 @@ if (isset($_POST['options'])) {
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
-	while ($line=mysql_fetch_assoc($result)) {
+	while ($line=mysqli_fetch_assoc($result)) {
 		$questions = explode(',',$line['questions']);
 		$scores = explode(',',$line['bestscores']);
 		$seeds = explode(',',$line['bestseeds']);

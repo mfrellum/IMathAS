@@ -33,7 +33,7 @@ if (!(isset($teacherid))) {
 			
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$items = unserialize(mysql_fetch_first($result));
+	$items = unserialize(mysqli_fetch_first($result));
 	
 	$blocktree = explode('-',$block);
 	$sub =& $items;
@@ -53,10 +53,10 @@ if (!(isset($teacherid))) {
 	$query .= "('$cid','Calendar');";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
-	$itemid = mysqli_insert_id($GLOBALS['link'])();
+	$itemid = mysqli_insert_id($GLOBALS['link']);
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	$items = unserialize($line['itemorder']);
 	
 	$blocktree = explode('-',$block);

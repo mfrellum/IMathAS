@@ -76,14 +76,14 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$now = time();
 			$query .= "('{$_POST['subject']}','{$_POST['message']}','{$_POST['to']}','$userid',$now,0,'{$_POST['courseid']}')";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$msgid = mysqli_insert_id($GLOBALS['link'])();
+			$msgid = mysqli_insert_id($GLOBALS['link']);
 			
 			if ($_GET['replyto']>0) {
 				$query = "UPDATE imas_msgs SET replied=1 WHERE id='{$_GET['replyto']}'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				$query = "SELECT baseid FROM imas_msgs WHERE id='{$_GET['replyto']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$baseid = mysql_fetch_first($result);
+				$baseid = mysqli_fetch_first($result);
 				if ($baseid==0) {
 					$baseid = $_GET['replyto'];
 				}
@@ -92,7 +92,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} 
 			$query = "SELECT name FROM imas_courses WHERE id='{$_POST['courseid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$cname = mysql_fetch_first($result);
+			$cname = mysqli_fetch_first($result);
 			
 			$query = "SELECT msgnotify,email FROM imas_users WHERE id='{$_POST['to']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
@@ -161,7 +161,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($cid>0) {
 				$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$msgset = mysql_fetch_first($result);
+				$msgset = mysqli_fetch_first($result);
 				$msgmonitor = (floor($msgset/5)&1);
 				$msgset = $msgset%5;
 			}
@@ -187,7 +187,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				if (isset($parts[3])) {  //sending to instructor
 					$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_fetch_first($result));
+					$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysqli_fetch_first($result));
 					if ($_GET['to']=='instr') {
 						unset($_GET['to']);
 						$msgset = 1; //force instructor only list
@@ -357,7 +357,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$query .= " AND (isread&8)=8";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
+	$numpages = ceil(mysqli_fetch_first($result)/$threadsperpage);
 	if ($numpages==0 && $filteruid>0) {
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
@@ -370,7 +370,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$query .= " AND (isread&8)=8";
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
+		$numpages = ceil(mysqli_fetch_first($result)/$threadsperpage);
 	}
 	$prevnext = '';
 	if ($numpages > 1 && !$limittotagged) {
@@ -419,7 +419,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	if ($myrights > 5 && $cid>0) {
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$msgset = mysql_fetch_first($result);
+		$msgset = mysqli_fetch_first($result);
 		$msgmonitor = (floor($msgset/5)&1);
 		$msgset = $msgset%5;
 		if ($msgset<3 || $isteacher) {
@@ -519,7 +519,7 @@ function chgfilter() {
 	if (mysqli_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';
 		}

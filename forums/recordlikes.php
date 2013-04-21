@@ -22,7 +22,7 @@ $like = intval($_GET['like']);
 if ($like==0) {
 	$query = "DELETE FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";	
 	$result = mysqli_query($GLOBALS['link'],$query);
-	$aff =  mysqli_affected_rows($GLOBALS['link'])();
+	$aff =  mysqli_affected_rows($GLOBALS['link']);
 } else {
 	$query = "SELECT id FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query);
@@ -32,7 +32,7 @@ if ($like==0) {
 		$query = "SELECT threadid FROM imas_forum_posts WHERE id=$postid";
 		$result = mysqli_query($GLOBALS['link'],$query);
 		if (mysqli_num_rows($result)==0) {echo "fail";exit;}
-		$threadid = mysql_fetch_first($result);
+		$threadid = mysqli_fetch_first($result);
 		
 		$query = "INSERT INTO imas_forum_likes (userid,threadid,postid,type) VALUES ";
 		$query .= "('$userid',$threadid,$postid,$isteacher)";

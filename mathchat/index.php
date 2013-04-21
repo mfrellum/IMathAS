@@ -42,7 +42,7 @@ if (!isset($_GET['userid'])) {
 	$query = "INSERT INTO mc_sessions (name,room,mathdisp,graphdisp,lastping) ";
 	$query .= "VALUES ('$uname','$room','$mathdisp','$graphdisp',$now)";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$mcsession['userid'] = mysqli_insert_id($GLOBALS['link'])();
+	$mcsession['userid'] = mysqli_insert_id($GLOBALS['link']);
 	$mcsession['name'] = $uname;
 	$mcsession['room'] = $room;
 	$mcsession['mathdisp'] = $mathdisp;
@@ -66,7 +66,7 @@ if (!isset($_GET['userid'])) {
 	}*/
 	$query = "SELECT * FROM mc_sessions WHERE userid='{$_GET['userid']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$mcsession = mysql_fetch_assoc($result);	
+	$mcsession = mysqli_fetch_assoc($result);	
 }
 $mcsession['useed'] = 1;
 

@@ -40,7 +40,7 @@ END;
 	
 	$query = "SELECT * from imas_diags WHERE id='$diagid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	$pcid = $line['cid'];
 	$diagid = $line['id'];
 	if ($line['term']=='*mo*') {
@@ -190,7 +190,7 @@ if (isset($_POST['SID'])) {
 			if ($passwordnotfound) {
 				$query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysqli_num_rows($result)>0 && strtoupper(mysql_fetch_first($result))==strtoupper($_POST['passwd'])) {
+				if (mysqli_num_rows($result)>0 && strtoupper(mysqli_fetch_first($result))==strtoupper($_POST['passwd'])) {
 					
 				} else {
 					echo "<html><body>Error, password incorrect or expired.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
@@ -205,7 +205,7 @@ if (isset($_POST['SID'])) {
 	$query = "SELECT id FROM imas_users WHERE SID='$diagSID'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysqli_num_rows($result)>0) {
-		$userid = mysql_fetch_first($result);
+		$userid = mysqli_fetch_first($result);
 		$allowreentry = ($line['public']&4);
 		if (!in_array(strtolower($_POST['passwd']),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
 			$aids = explode(',',$line['aidlist']);
@@ -261,7 +261,7 @@ if (isset($_POST['SID'])) {
 	$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
 	$query .= "VALUES ('$diagSID','{$_POST['passwd']}',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$userid = mysqli_insert_id($GLOBALS['link'])();
+	$userid = mysqli_insert_id($GLOBALS['link']);
 	$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$pcid','{$_POST['teachers']}');";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	

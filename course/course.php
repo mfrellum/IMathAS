@@ -35,7 +35,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$block = $_GET['block'];
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		$blocktree = explode('-',$block);
 		$sub =& $items;
 		for ($i=1;$i<count($blocktree)-1;$i++) {
@@ -85,7 +85,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		
 	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	if ($line == null) {
 		$overwriteBody = 1;
 		$body = "Course does not exist.  <a hre=\"../index.php\">Return to main page</a></body></html>\n";
@@ -167,7 +167,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
 		}
 	}
@@ -237,7 +237,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if ($msgset<4) {
 	   $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	   $msgcnt = mysql_fetch_first($result);
+	   $msgcnt = mysqli_fetch_first($result);
 	   if ($msgcnt>0) {
 		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">New ($msgcnt)</a>";
 	   } else {
@@ -318,7 +318,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   $latepasses = mysql_fetch_first($result);
+	   $latepasses = mysqli_fetch_first($result);
 	} else {
 		$latepasses = 0;
 	}

@@ -12,7 +12,7 @@ $ischanged = false;
 
 $query = "UPDATE imas_questionset SET broken='{$_GET['flag']}' WHERE id='{$_GET['qsetid']}'";
 mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+if (mysqli_affected_rows($GLOBALS['link'])>0) {
 	$ischanged = true;
 }
 

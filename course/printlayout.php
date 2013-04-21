@@ -52,7 +52,7 @@ if ($overwriteBody==1) {
 	
 	$query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	
 	$ioquestions = explode(",",$line['itemorder']);
 	$questions = array();
@@ -268,13 +268,13 @@ if ($overwriteBody==1) {
 		if (isset($_POST['cname'])) {
 			$query = "SELECT name FROM imas_courses WHERE id=$cid";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$headerleft .= mysql_fetch_first($result);
+			$headerleft .= mysqli_fetch_first($result);
 			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
 		}
 		if (isset($_POST['iname'])) {
 			$query = "SELECT LastName FROM imas_users WHERE id=$userid";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$headerleft .= mysql_fetch_first($result);
+			$headerleft .= mysqli_fetch_first($result);
 		}
 		$headerright = '';
 		if (isset($_POST['sname'])) {
@@ -394,7 +394,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$qdata = mysql_fetch_assoc($result);
+	$qdata = mysqli_fetch_assoc($result);
 	
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";

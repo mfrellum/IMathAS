@@ -90,7 +90,7 @@
 		require("../footer.php");
 		exit;
 	}
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($line['hasuserimg']==1) {
@@ -109,11 +109,11 @@
 			$query = "SELECT id FROM imas_assessments WHERE name='{$matches[2]}' AND courseid='{$line['courseid']}'";
 			$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysqli_num_rows($res)>0) {
-				$aid = mysql_fetch_first($res);
+				$aid = mysqli_fetch_first($res);
 				$query = "SELECT id FROM imas_assessment_sessions WHERE assessmentid='$aid' AND userid='{$line['msgfrom']}'";
 				$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				if (mysqli_num_rows($res)>0) {
-					$asid = mysql_fetch_first($res);
+					$asid = mysqli_fetch_first($res);
 					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid\" target=\"_popoutgradebook\">assignment</a>";
 				}
 			}
@@ -133,7 +133,7 @@
 		if ($line['courseid']>0) {
 			$query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$msgset = mysql_fetch_first($result);
+			$msgset = mysqli_fetch_first($result);
 			$msgmonitor = floor($msgset/5);
 			$msgset = $msgset%5;
 			if ($msgset<3 || $isteacher) {

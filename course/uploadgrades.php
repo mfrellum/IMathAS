@@ -70,7 +70,7 @@ if (!(isset($teacherid))) {
 				}
 				$score = addslashes($data[$scorecol]);
 				if (mysqli_num_rows($result)>0) {
-					$cuserid=mysql_fetch_first($result);
+					$cuserid=mysqli_fetch_first($result);
 					if (isset($curscores[$cuserid])) {
 						$query = "UPDATE imas_grades SET score='$score',feedback='$feedback' WHERE userid='$cuserid' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 						$successes++;

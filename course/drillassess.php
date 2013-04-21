@@ -25,7 +25,7 @@ if (mysqli_num_rows($result)==0) {
 	echo "Invalid drill assessment id";
 	exit;
 }
-$dadata = mysql_fetch_assoc($result);
+$dadata = mysqli_fetch_assoc($result);
 $n = $dadata['n'];
 $sa = $dadata['showtype'];
 $showscore = ($sa==0 || $sa==1 || $sa==4);
@@ -55,7 +55,7 @@ if (mysqli_num_rows($result)==0) {
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$starttime = 0;
 } else {
-	$sessdata = mysql_fetch_assoc($result);
+	$sessdata = mysqli_fetch_assoc($result);
 	$curitem = $sessdata['curitem'];
 	$curitemid = $itemids[$curitem];
 	$seed = $sessdata['seed'];
@@ -459,7 +459,7 @@ function printscore($sc,$qsetid,$seed) {
 	} else {
 		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
-		$control = mysql_fetch_first($result);
+		$control = mysqli_fetch_first($result);
 		$ptposs = getansweights($control,$seed);
 		$weightsum = array_sum($ptposs);
 		if ($weightsum>1.1) {

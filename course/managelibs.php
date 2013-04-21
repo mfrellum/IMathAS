@@ -124,7 +124,7 @@ if ($myrights<20) {
 				for ($i=0; $i<count($_POST['nchecked']); $i++) {
 					$query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_POST['nchecked'][$i]}'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$libcnt= mysql_fetch_first($result);
+					$libcnt= mysqli_fetch_first($result);
 					if ($libcnt == 0) {
 						$oktorem[] = $_POST['nchecked'][$i];
 					}
@@ -189,7 +189,7 @@ if ($myrights<20) {
 				//added for mysql 3.23 compatibility
 				$query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$newgpid = mysql_fetch_first($result);
+				$newgpid = mysqli_fetch_first($result);
 				$query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
 				
 				if (!$isadmin) {
@@ -273,7 +273,7 @@ if ($myrights<20) {
 				$query .= " AND ownerid='$userid'";
 			}
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysqli_affected_rows($GLOBALS['link'])()>0 && count($qidstocheck)>0) {
+			if (mysqli_affected_rows($GLOBALS['link'])>0 && count($qidstocheck)>0) {
 				$query = "DELETE FROM imas_library_items WHERE libid='{$_GET['remove']}'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$qids = implode(",",$qidstocheck);
@@ -306,7 +306,7 @@ if ($myrights<20) {
 		} else {
 			$query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_GET['remove']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$libcnt= mysql_fetch_first($result);
+			$libcnt= mysqli_fetch_first($result);
 			$pagetitle = ($libcnt>0) ? "Error" : "Remove Library";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
 		}
@@ -316,7 +316,7 @@ if ($myrights<20) {
 			//added for mysql 3.23 compatibility
 			$query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$newgpid = mysql_fetch_first($result);
+			$newgpid = mysqli_fetch_first($result);
 				
 			//$query = "UPDATE imas_libraries,imas_users SET imas_libraries.ownerid='{$_POST['newowner']}'";
 			//$query .= ",imas_libraries.groupid=imas_users.groupid WHERE imas_libraries.ownerid=imas_users.id AND ";
@@ -423,7 +423,7 @@ if ($myrights<20) {
 			} else {
 				$query = "SELECT name FROM imas_libraries WHERE id='$parent'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$lnames = mysql_fetch_first($result);
+				$lnames = mysqli_fetch_first($result);
 			}
 		}
 		
@@ -464,7 +464,7 @@ if ($myrights<20) {
 		$rights = array();
 		$sortorder = array();
 		
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			$id = $line['id'];
 			$name = $line['name'];
 			$parent = $line['parent'];

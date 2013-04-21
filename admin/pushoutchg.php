@@ -18,7 +18,7 @@ if ($myrights==100) {
    	   	   $qset = array();
    	   	   $toset = explode(',','points,attempts');
    	   	   $nq = 0;
-   	   	   while ($line = mysql_fetch_assoc($result)) {
+   	   	   while ($line = mysqli_fetch_assoc($result)) {
    	   	   	   $sets = array();
    	   	   	   foreach ($toset as $it) {
    	   	   	   	   $sets[] = $it."='".addslashes($line[$it])."'";
@@ -26,7 +26,7 @@ if ($myrights==100) {
    	   	   	   $setst = implode(',',$sets);
    	   	   	   $query = "UPDATE imas_questions SET $setst WHERE questionsetid={$line['questionsetid']} AND points=9999 AND attempts=9999";
    	   	   	   mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-   	   	   	   $n += mysqli_affected_rows($GLOBALS['link'])();
+   	   	   	   $n += mysqli_affected_rows($GLOBALS['link']);
    	   	   	   $nq++;
    	   	   }
    	   	   echo "<p>Pushed out Question settings for $nq questions.  $n total changes made.</p>";
@@ -36,10 +36,10 @@ if ($myrights==100) {
    	   	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
    	   	   $n = 0;
    	   	   $na = 0;
-   	   	   while ($row = mysql_fetch_assoc($result)) {
+   	   	   while ($row = mysqli_fetch_assoc($result)) {
    	   	   	   $query = "UPDATE imas_assessments SET intro='".addslashes($row[1])."' WHERE name='{$row[0]}'";
    	   	   	   mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-   	   	   	   $n += mysqli_affected_rows($GLOBALS['link'])();
+   	   	   	   $n += mysqli_affected_rows($GLOBALS['link']);
    	   	   	   $na++;
    	   	   }
    	   	   echo "<p>Pushed out Intro/Instructions for $na assessments.  $n total changes made.</p>";
@@ -49,10 +49,10 @@ if ($myrights==100) {
    	   	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
    	   	   $n = 0;
    	   	   $na = 0;
-   	   	   while ($row = mysql_fetch_assoc($result)) {
+   	   	   while ($row = mysqli_fetch_assoc($result)) {
    	   	   	   $query = "UPDATE imas_assessments SET caltag='".addslashes($row[1])."',calrtag='".addslashes($row[2])."' WHERE name='{$row[0]}'";
    	   	   	   mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-   	   	   	   $n += mysqli_affected_rows($GLOBALS['link'])();
+   	   	   	   $n += mysqli_affected_rows($GLOBALS['link']);
    	   	   	   $na++;
    	   	   }
    	   	   echo "<p>Pushed out Calendar Tags for $na assessments.  $n total changes made.</p>";
@@ -65,7 +65,7 @@ if ($myrights==100) {
    	   echo '<p>Select the course to push out from: <select name="cid">';
    	   $query = "SELECT ic.id,ic.name FROM imas_courses as ic JOIN imas_teachers ON imas_teachers.courseid=ic.id WHERE imas_teachers.userid='$userid' ORDER BY ic.name";
    	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-   	   while ($row = mysql_fetch_assoc($result)) {
+   	   while ($row = mysqli_fetch_assoc($result)) {
    	   	   echo '<option value="'.$row[0].'">'.$row[1].'</option>';
    	   }
    	   echo '</select></p>';

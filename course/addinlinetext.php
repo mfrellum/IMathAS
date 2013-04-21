@@ -124,17 +124,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','$caltag');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$newtextid = mysqli_insert_id($GLOBALS['link'])();
+			$newtextid = mysqli_insert_id($GLOBALS['link']);
 			
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','InlineText','$newtextid');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$itemid = mysqli_insert_id($GLOBALS['link'])();
+			$itemid = mysqli_insert_id($GLOBALS['link']);
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 			
 			$blocktree = explode('-',$block);
@@ -177,7 +177,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 					$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ('{$_POST['newfiledescr']}','$filename','$newtextid')";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-					$addedfile = mysqli_insert_id($GLOBALS['link'])();
+					$addedfile = mysqli_insert_id($GLOBALS['link']);
 					$_GET['id'] = $newtextid;
 					
 					*/
@@ -187,7 +187,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 					$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ('{$_POST['newfiledescr']}','$filename','$newtextid')";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-					$addedfile = mysqli_insert_id($GLOBALS['link'])();
+					$addedfile = mysqli_insert_id($GLOBALS['link']);
 					$_GET['id'] = $newtextid;
 				} else {
 					$overwriteBody = 1;
@@ -200,7 +200,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($addedfile) || count($filestoremove)>0 || isset($_GET['movefile'])) {
 		$query = "SELECT fileorder FROM imas_inlinetext WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$fileorder = explode(',',mysql_fetch_first($result));
+		$fileorder = explode(',',mysqli_fetch_first($result));
 		if ($fileorder[0]=='') {
 			$fileorder = array();
 		}
@@ -234,7 +234,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_GET['id'])) {
 		$query = "SELECT * FROM imas_inlinetext WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		if ($line['title']=='##hidden##') {
 			$hidetitle = true;
 			$line['title']='';

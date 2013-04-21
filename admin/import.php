@@ -199,7 +199,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 						}
 					}
 					mysqli_query($GLOBALS['link'],$query) or die("Import failed on {$qdata['description']}: $query: " . mysqli_error($GLOBALS['link']));
-					if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+					if (mysqli_affected_rows($GLOBALS['link'])>0) {
 						$updateq++;
 						if (!empty($qdata[$qn]['qimgs'])) {
 							//not efficient, but sufficient :)
@@ -226,7 +226,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				$query .= "('{$qdata[$qn]['uqid']}',$now,$now,'$userid','$rights','{$qdata[$qn]['description']}','{$qdata[$qn]['author']}','{$qdata[$qn]['qtype']}','{$qdata[$qn]['control']}','{$qdata[$qn]['qcontrol']}',";
 				$query .= "'{$qdata[$qn]['qtext']}','{$qdata[$qn]['answer']}','{$qdata[$qn]['extref']}',$hasimg)";
 				mysqli_query($GLOBALS['link'],$query) or die("Import failed on {$qdata[$qn]['description']}: $query:" . mysqli_error($GLOBALS['link']));
-				$qsetid = mysqli_insert_id($GLOBALS['link'])();
+				$qsetid = mysqli_insert_id($GLOBALS['link']);
 				if (!empty($qdata[$qn]['qimgs'])) {
 					$qimgs = explode("\n",$qdata[$qn]['qimgs']);
 					foreach($qimgs as $qimg) {

@@ -151,7 +151,7 @@ if ($myrights<60) {
 		$query .= "('$userid','{$_POST['diagname']}','{$_POST['cid']}','{$_POST['term']}','{$_POST['public']}','{$_POST['iplist']}',";
 		$query .= "'{$_POST['pwlist']}','{$_POST['idprompt']}','{$_POST['sel1name']}','{$_POST['sel1list']}','$aidlist','{$_POST['sel2name']}','$sel2list','{$_POST['entryformat']}','$forceregen','{$_POST['reentrytime']}')";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$id = mysqli_insert_id($GLOBALS['link'])();
+		$id = mysqli_insert_id($GLOBALS['link']);
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
 	}
 	$page_diagLink = "<p>Direct link to diagnostic:  <b>http://{$_SERVER['HTTP_HOST']}$imasroot/diag/index.php?id=$id</b></p>";
@@ -161,7 +161,7 @@ if ($myrights<60) {
 	if (isset($_GET['id'])) { 
 		$query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		$diagname = $line['name'];
 		$cid = $line['cid'];
 		$public = $line['public'];

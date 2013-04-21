@@ -132,7 +132,7 @@ function printscore($sc,$qsetid,$seed) {
 	} else {
 		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
-		$control = mysql_fetch_first($result);
+		$control = mysqli_fetch_first($result);
 		$ptposs = getansweights($control,$seed);
 		for ($i=0; $i<count($ptposs)-1; $i++) {
 			$ptposs[$i] = round($ptposs[$i]*$poss,2);

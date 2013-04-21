@@ -243,7 +243,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 					$qr = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
 					$res= mysqli_query($GLOBALS['link'],$qr) or die("Query failed : $qr" . mysqli_error($GLOBALS['link']));
 					if (mysqli_num_rows($res)>0) {
-						$secret = mysql_fetch_first($res);
+						$secret = mysqli_fetch_first($res);
 						$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
 						writesessiondata();
 					} else {
@@ -258,7 +258,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				}
 				$res= mysqli_query($GLOBALS['link'],$qr) or die("Query failed : $qr" . mysqli_error($GLOBALS['link']));
 				if (mysqli_num_rows($res)>0) {
-					$secret = mysql_fetch_first($res);
+					$secret = mysqli_fetch_first($res);
 					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
 					writesessiondata();
 				} else {
@@ -268,7 +268,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76)";
 				$res= mysqli_query($GLOBALS['link'],$qr) or die("Query failed : $qr" . mysqli_error($GLOBALS['link']));
 				if (mysqli_num_rows($res)>0) {
-					$secret = mysql_fetch_first($res);
+					$secret = mysqli_fetch_first($res);
 					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
 					writesessiondata();
 				} else {

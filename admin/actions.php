@@ -38,7 +38,7 @@ switch($_GET['action']) {
 		$query = "DELETE FROM imas_users WHERE id='{$_GET['id']}'";
 		if ($myrights < 100) { $query .= " AND groupid='$groupid' AND rights<100"; }
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysqli_affected_rows($GLOBALS['link'])()==0) { break;}
+		if (mysqli_affected_rows($GLOBALS['link'])==0) { break;}
 		$query = "DELETE FROM imas_students WHERE userid='{$_GET['id']}'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$query = "DELETE FROM imas_teachers WHERE userid='{$_GET['id']}'";
@@ -65,7 +65,7 @@ switch($_GET['action']) {
 	case "chgpwd":
 		$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 	
 		if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2'])) {
 			$md5pw =md5($_POST['newpw1']);
@@ -224,7 +224,7 @@ switch($_GET['action']) {
 			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
 			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$toolset,$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$cid = mysqli_insert_id($GLOBALS['link'])();
+			$cid = mysqli_insert_id($GLOBALS['link']);
 			//if ($myrights==40) {
 				$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -254,7 +254,7 @@ switch($_GET['action']) {
 					$irow = "'".implode("','",addslashes_deep($row))."'";
 					$query .= "('$cid',$irow)";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-					$gbcats[$frid] = mysqli_insert_id($GLOBALS['link'])();
+					$gbcats[$frid] = mysqli_insert_id($GLOBALS['link']);
 				}
 				$copystickyposts = true;
 				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
@@ -309,7 +309,7 @@ switch($_GET['action']) {
 				}
 			}
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysqli_affected_rows($GLOBALS['link'])()==0) { break;}
+			if (mysqli_affected_rows($GLOBALS['link'])==0) { break;}
 			
 			$query = "SELECT id FROM imas_assessments WHERE courseid='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -661,7 +661,7 @@ switch($_GET['action']) {
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$exec = true;
 		}
-		if ($exec && mysqli_affected_rows($GLOBALS['link'])()>0) {
+		if ($exec && mysqli_affected_rows($GLOBALS['link'])>0) {
 			$query = "SELECT id FROM imas_teachers WHERE courseid='{$_GET['id']}' AND userid='{$_POST['newowner']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysqli_num_rows($result)==0) {

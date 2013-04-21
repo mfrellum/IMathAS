@@ -33,7 +33,7 @@ if (mysqli_num_rows($result)==0) {
 	echo 'Invalid drill id.';
 	exit;
 }
-$dadata = mysql_fetch_assoc($result);
+$dadata = mysqli_fetch_assoc($result);
 $n = $dadata['n'];
 $showtype = $dadata['showtype'];
 $scoretype = $dadata['scoretype'];

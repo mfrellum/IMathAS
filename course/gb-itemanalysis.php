@@ -14,7 +14,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_fetch_first($result);
+		$gbmode = mysqli_fetch_first($result);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];
@@ -106,7 +106,7 @@
 		$query .= " AND imas_students.section='$secfilter' ";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
-	$totstucnt = mysql_fetch_first($result);
+	$totstucnt = mysqli_fetch_first($result);
 	
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
@@ -114,7 +114,7 @@
 		$query .= " AND imas_students.section='$secfilter' ";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
-	while ($line=mysql_fetch_assoc($result)) {
+	while ($line=mysqli_fetch_assoc($result)) {
 		$questions = explode(',',$line['questions']);
 		$scores = explode(',',$line['bestscores']);
 		$attp = explode(',',$line['bestattempts']);
@@ -284,7 +284,7 @@
 	
 	$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
-	if (mysql_fetch_first($result)>0) {
+	if (mysqli_fetch_first($result)>0) {
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints);
 	}

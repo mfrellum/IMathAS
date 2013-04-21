@@ -68,7 +68,7 @@
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$forumdata = array();
 	$anyforumsgroup = false;
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$forumdata[$line['id']] = $line;
 		if ($line['groupsetid']>0) {
 			$anyforumsgroup = true;
@@ -77,7 +77,7 @@
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	$itemorder = unserialize(mysql_fetch_first($result));
+	$itemorder = unserialize(mysqli_fetch_first($result));
 	$itemsimporder = array();
 	function flattenitems($items,&$addto) {
 		global $itemsimporder;
@@ -211,7 +211,7 @@ if ($searchtype == 'thread') {
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$threaddata = array();
 	$threadids = array();
-	while ($line =  mysql_fetch_assoc($result)) {
+	while ($line =  mysqli_fetch_assoc($result)) {
 		$threaddata[$line['id']] = $line;
 		$threadids[] = $line['id'];
 	}
@@ -323,7 +323,7 @@ if ($searchtype == 'thread') {
 	
 	$query .= " ORDER BY imas_forum_posts.postdate DESC";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($line =  mysql_fetch_assoc($result)) {
+	while ($line =  mysqli_fetch_assoc($result)) {
 		echo "<div class=block>";
 		echo "<b>{$line['subject']}</b>";
 		echo ' (in '.$line['name'].')';
@@ -417,13 +417,13 @@ if ($searchtype == 'thread') {
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$forumdata = array();
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$forumdata[$line['id']] = $line;
 	}
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	$itemorder = unserialize(mysql_fetch_first($result));
+	$itemorder = unserialize(mysqli_fetch_first($result));
 	$itemsimporder = array();
 	function flattenitems($items,&$addto) {
 		global $itemsimporder;

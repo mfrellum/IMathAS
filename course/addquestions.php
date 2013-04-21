@@ -59,7 +59,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
 				$query .= "VALUES ('$aid',9999,9999,9999,'$qsetid');";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$qids[] = mysqli_insert_id($GLOBALS['link'])();
+				$qids[] = mysqli_insert_id($GLOBALS['link']);
 			}
 			//add to itemorder
 			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
@@ -124,7 +124,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1; 
 			$query = "SELECT name FROM imas_assessments WHERE id={$_GET['aid']}";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$assessmentname = mysql_fetch_first($result);
+			$assessmentname = mysqli_fetch_first($result);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h3>$assessmentname</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
@@ -139,7 +139,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "SELECT id,questions,scores,attempts,lastanswers,bestscores,bestattempts,bestlastanswers ";
 				$query .= "FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($line = mysql_fetch_assoc($result)) {
+				while ($line = mysqli_fetch_assoc($result)) {
 					$questions = explode(',',$line['questions']);
 					$qloc = array_search($clearid,$questions);
 					if ($qloc!==false) {
@@ -361,7 +361,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints FROM imas_questions,imas_questionset,imas_users ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$existingq[] = $line['questionsetid'];
 			if ($j>0) {
 				$jsarr .= ',';
@@ -564,7 +564,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_libqids = array();
 					$page_useavgtimes = false;
 					
-					while ($line = mysql_fetch_assoc($result)) {
+					while ($line = mysqli_fetch_assoc($result)) {
 						if ($newonly && in_array($line['id'],$existingq)) {
 							continue;
 						}
@@ -639,7 +639,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-						$times = mysql_fetch_first($result2);
+						$times = mysqli_fetch_first($result2);
 						$page_questionTable[$i]['times'] = $times;
 						*/
 						$page_questionTable[$i]['times'] = 0;
@@ -741,7 +741,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$qgroupid[$row[0]] = $row[7];
 					$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$row[1]}'";
 					$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$times[$row[0]] = mysql_fetch_first($result2);
+					$times[$row[0]] = mysqli_fetch_first($result2);
 					
 				}
 				
@@ -794,7 +794,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$i=0;
 			$page_assessmentList = array();
-			while ($line = mysql_fetch_assoc($result)) {
+			while ($line = mysqli_fetch_assoc($result)) {
 				$page_assessmentList[$i]['id'] = $line['id'];
 				$page_assessmentList[$i]['name'] = $line['name'];
 				$line['summary'] = strip_tags($line['summary']);

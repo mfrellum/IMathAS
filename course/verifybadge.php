@@ -13,7 +13,7 @@ if (!empty($_GET['userid'])) {
 	$query = "SELECT SID FROM imas_users WHERE id='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysqli_num_rows($result)>0) {
-		$s = mysql_fetch_first($result);
+		$s = mysqli_fetch_first($result);
 		if (empty($_GET['v']) || $_GET['v'] != hash('sha256', $s . $userid)) {
 			$userid = 0;
 		}
@@ -49,7 +49,7 @@ if (mysqli_num_rows($result)==0) {
 			if (mysqli_fetch_row($result)==0) {  //no records.  Uh oh!
 				exit;
 			} else {
-				$data = unserialize(mysql_fetch_first($result));
+				$data = unserialize(mysqli_fetch_first($result));
 				//if ($_GET['format']=='json') {
 					print_assertation($cid, $badgetext, $name, $descr, $userid, $data[5]);
 				//} else {
@@ -270,7 +270,7 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 			$data = addslashes(serialize($data));
 			$query = "UPDATE imas_badgerecords SET data='$data' WHERE badgeid='$badgeid' AND userid='$userid'";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysqli_affected_rows($GLOBALS['link'])()==0) {//no existing record
+			if (mysqli_affected_rows($GLOBALS['link'])==0) {//no existing record
 				$query = "INSERT INTO imas_badgerecords (badgeid,userid,data) VALUES ('$badgeid','$userid','$data')";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}

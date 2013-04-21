@@ -225,12 +225,12 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sets[] = "intro='".addslashes(mysql_fetch_first($result))."'";
+			$sets[] = "intro='".addslashes(mysqli_fetch_first($result))."'";
 		}
 		if (isset($_POST['chgsummary'])) {
 			$query = "SELECT summary FROM imas_assessments WHERE id='{$_POST['summary']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sets[] = "summary='".addslashes(mysql_fetch_first($result))."'";
+			$sets[] = "summary='".addslashes(mysqli_fetch_first($result))."'";
 		}
 		if (isset($_POST['chgdates'])) {
 			$query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['dates']}'";
@@ -240,7 +240,7 @@ if (!(isset($teacherid))) {
 		} if (isset($_POST['chgcopyendmsg'])) {
 			$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_POST['copyendmsg']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sets[] = "endmsg='".addslashes(mysql_fetch_first($result))."'";
+			$sets[] = "endmsg='".addslashes(mysqli_fetch_first($result))."'";
 		}
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
@@ -292,7 +292,7 @@ if (!(isset($teacherid))) {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		$gitypeids = array();
 		$ids = array();
 		$types = array();

@@ -39,7 +39,7 @@ if (empty($_GET['badgeid'])) {
 		if ($badgeid==0) { echo 'Can not delete - invalid badgeid'; exit;}
 		$query = "SELECT courseid FROM imas_badgesettings WHERE id=$badgeid";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_fetch_first($result) != $cid) { echo 'Can not delete - badgeid is for a different course'; exit;}
+		if (mysqli_fetch_first($result) != $cid) { echo 'Can not delete - badgeid is for a different course'; exit;}
 		
 		$query = "DELETE FROM imas_badgesettings WHERE id=$badgeid";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));

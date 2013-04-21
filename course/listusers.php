@@ -86,7 +86,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$body = "Error, username doesn't exist. <a href=\"listusers.php?cid=$cid&enroll=student\">Try again</a>\n";
 				$body .= "or <a href=\"listusers.php?cid=$cid&newstu=new\">create and enroll a new student</a>";
 			} else {
-				$id = mysql_fetch_first($result);
+				$id = mysqli_fetch_first($result);
 				if ($id==$userid) {
 					echo "Instructors can't enroll themselves as students.  Use Student View.";
 					exit;
@@ -129,7 +129,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
 				$query .= "VALUES ('{$_POST['SID']}','$md5pw',10,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',0);";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$newuserid = mysqli_insert_id($GLOBALS['link'])();
+				$newuserid = mysqli_insert_id($GLOBALS['link']);
 				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ($newuserid,'$cid')";
 				$vals = "$newuserid,'$cid'";
 				$query = "INSERT INTO imas_students (userid,courseid";
@@ -255,7 +255,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$lineStudent = mysql_fetch_assoc($result);
+			$lineStudent = mysqli_fetch_assoc($result);
 			
 		}
 		
@@ -310,7 +310,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 		$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_fetch_first($result)>0) {
+		if (mysqli_fetch_first($result)>0) {
 			$hascode = true;
 		} else {
 			$hascode = false;
@@ -380,7 +380,7 @@ if ($overwriteBody==1) {
 			</thead>
 			<tbody>
 <?php	
-		while ($line=mysql_fetch_assoc($resultStudentList)) {
+		while ($line=mysqli_fetch_assoc($resultStudentList)) {
 ?>
 			<tr>
 				<td><?php echo $line['LastName'] . ", " . $line['FirstName'] ?></td>
@@ -560,7 +560,7 @@ if ($overwriteBody==1) {
 <?php		
 		$alt = 0;
 		$numstu = 0;
-		while ($line=mysql_fetch_assoc($resultDefaultUserList)) {
+		while ($line=mysqli_fetch_assoc($resultDefaultUserList)) {
 			if ($line['section']==null) {
 				$line['section'] = '';
 			}

@@ -9,7 +9,7 @@
    require("../filter/filter.php");
    $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id='$cid'";
    $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-   $line = mysql_fetch_assoc($result);
+   $line = mysqli_fetch_assoc($result);
    if ($line == null) {
 	   echo "Course does not exist. \n";
 	   exit;

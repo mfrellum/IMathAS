@@ -173,7 +173,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_GET['id'])) { //teacher modifying existing block, load form with block data
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 			
 		$blocktree = explode('-',$_GET['id']);
 		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
@@ -235,7 +235,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$grouplimit = array();
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 	}
 
 	//set some default data for use with either the add or modify form

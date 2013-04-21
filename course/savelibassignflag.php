@@ -12,7 +12,7 @@ $ischanged = false;
 
 $query = "UPDATE imas_library_items SET junkflag='{$_GET['flag']}' WHERE id='{$_GET['libitemid']}'";
 mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+if (mysqli_affected_rows($GLOBALS['link'])>0) {
 	$ischanged = true;
 }
 

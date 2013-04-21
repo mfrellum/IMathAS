@@ -14,7 +14,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_fetch_first($result);
+		$gbmode = mysqli_fetch_first($result);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];
@@ -156,7 +156,7 @@
 			if ($_GET['emailgb']=="me") {
 				$query = "SELECT email FROM imas_users WHERE id='$userid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$_GET['emailgb'] = mysql_fetch_first($result);
+				$_GET['emailgb'] = mysqli_fetch_first($result);
 			}
 			if ($_GET['emailgb']!='') {
 				mail($_GET['emailgb'], "Gradebook for $coursename", $message, $headers);

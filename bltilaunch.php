@@ -264,7 +264,7 @@ if (isset($_GET['launch'])) {
 		if ($infoerr=='') { // no error, so create!
 			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$localltiuser = mysqli_insert_id($GLOBALS['link'])();	
+			$localltiuser = mysqli_insert_id($GLOBALS['link']);	
 			if (!isset($userid) && $allow_acctcreation) {	
 				if ($name_only) {
 					//make up a username/password for them
@@ -283,7 +283,7 @@ if (isset($_GET['launch'])) {
 				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 				$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$userid = mysqli_insert_id($GLOBALS['link'])();	
+				$userid = mysqli_insert_id($GLOBALS['link']);	
 			}
 			$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));	
@@ -550,7 +550,7 @@ if (isset($_GET['launch'])) {
 			
 			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$localltiuser = mysqli_insert_id($GLOBALS['link'])();	
+			$localltiuser = mysqli_insert_id($GLOBALS['link']);	
 			if (!isset($userid)) {	
 				//make up a username/password for them
 				$_POST['SID'] = 'lti-'.$localltiuser;
@@ -567,7 +567,7 @@ if (isset($_GET['launch'])) {
 				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 				$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$userid = mysqli_insert_id($GLOBALS['link'])();	
+				$userid = mysqli_insert_id($GLOBALS['link']);	
 			}
 			$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -665,7 +665,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
 						$query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
 						mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-						$destcid  = mysqli_insert_id($GLOBALS['link'])();
+						$destcid  = mysqli_insert_id($GLOBALS['link']);
 						$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
 						mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 						
@@ -741,7 +741,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 	$cid = intval($keyparts[1]);
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	if ($_SESSION['ltirole']!='instructor') {
 		if (!($line['avail']==0 || $line['avail']==2)) {
 			reporterror("This course is not available");
@@ -751,7 +751,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 	$aid = intval($keyparts[1]);
 	$query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	$cid = $line['courseid'];
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {

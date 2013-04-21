@@ -31,7 +31,7 @@ if ($isteacher) {
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmodet = mysql_fetch_first($result);
+		$gbmodet = mysqli_fetch_first($result);
 		$gbmode = 2;
 		if (($gbmodet&8)==8) { $gbmode += 1000;}
 		if (($gbmodet&16)==16) {$gbmode += 20;}

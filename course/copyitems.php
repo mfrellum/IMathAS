@@ -113,9 +113,9 @@ if (!(isset($teacherid))) {
 					$irow = "'".implode("','",addslashes_deep($row))."'";
 					$query .= "('$cid',$irow)";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-					$gbcats[$frid] = mysqli_insert_id($GLOBALS['link'])();
+					$gbcats[$frid] = mysqli_insert_id($GLOBALS['link']);
 				} else {
-					$rpid = mysql_fetch_first($r2);
+					$rpid = mysqli_fetch_first($r2);
 					$query = "UPDATE imas_gbcats SET scale='{$row[2]}',scaletype='{$row[3]}',chop='{$row[4]}',dropn='{$row[5]}',weight='{$row[6]}' ";
 					$query .= "WHERE id='$rpid'";
 					$gbcats[$row[0]] = $rpid;
@@ -134,11 +134,11 @@ if (!(isset($teacherid))) {
 			$checked = $_POST['checked'];
 			$query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-			$blockcnt = mysql_fetch_first($result);
+			$blockcnt = mysqli_fetch_first($result);
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-			$items = unserialize(mysql_fetch_first($result));
+			$items = unserialize(mysqli_fetch_first($result));
 			$newitems = array();
 			
 			if (isset($_POST['copystickyposts'])) {
@@ -152,7 +152,7 @@ if (!(isset($teacherid))) {
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-			$items = unserialize(mysql_fetch_first($result));
+			$items = unserialize(mysqli_fetch_first($result));
 			if ($_POST['addto']=="none") {
 				array_splice($items,count($items),0,$newitems);
 			} else {
@@ -185,7 +185,7 @@ if (!(isset($teacherid))) {
 				$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES $ins";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				if ($rubric>0) {
-					$offlinerubrics[mysqli_insert_id($GLOBALS['link'])()] = $rubric;
+					$offlinerubrics[mysqli_insert_id($GLOBALS['link'])] = $rubric;
 				}
 			}
 		}
@@ -210,7 +210,7 @@ if (!(isset($teacherid))) {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		$ids = array();
 		$types = array();
 		$names = array();
@@ -220,7 +220,7 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		$existblocks = array();
 	
 		buildexistblocks($items,'0');
@@ -414,7 +414,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	 if ($page_hasGroups) {
 				$lastteacher = 0;
 				$lastgroup = -1;
-				while ($line = mysql_fetch_assoc($courseGroupResults)) {
+				while ($line = mysqli_fetch_assoc($courseGroupResults)) {
 					if ($line['groupid']!=$lastgroup) {
 						if ($lastgroup!=-1) {
 							echo "				</ul>\n			</li>\n";
@@ -534,7 +534,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 //group's courses
 		if (mysqli_num_rows($courseTreeResult)>0) {
-			while ($line = mysql_fetch_assoc($courseTreeResult)) {
+			while ($line = mysqli_fetch_assoc($courseTreeResult)) {
 				if ($line['userid']!=$lastteacher) {
 					if ($lastteacher!=0) {
 						echo "				</ul>\n			</li>\n";

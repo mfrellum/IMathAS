@@ -75,7 +75,7 @@ if ($myrights<20) {
 		
 		$query = "SELECT count(qsetid) FROM imas_library_items WHERE libid='$lib'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$cnt = mysql_fetch_first($result);
+		$cnt = mysqli_fetch_first($result);
 		if ($cnt==0) {
 			$overwriteBody = 1;
 			$body = "Library empty";
@@ -83,7 +83,7 @@ if ($myrights<20) {
 		
 		$query = "SELECT qsetid FROM imas_library_items WHERE libid='$lib' LIMIT $offset,1";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$qsetid = mysql_fetch_first($result);
+		$qsetid = mysqli_fetch_first($result);
 		
 		
 		if (isset($_POST['remove']) || isset($_POST['delete'])) {
@@ -107,7 +107,7 @@ if ($myrights<20) {
 							//$query = "DELETE FROM imas_questionset WHERE id='$qsetid'";
 							$query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qsetid'";
 							$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-							if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+							if (mysqli_affected_rows($GLOBALS['link'])>0) {
 								$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid'";
 								$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 								//delqimgs($qsetid);
@@ -121,7 +121,7 @@ if ($myrights<20) {
 							$query .= " AND ownerid='$userid'";
 						}
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-						if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+						if (mysqli_affected_rows($GLOBALS['link'])>0) {
 							$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid'";
 							$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 							//delqimgs($qsetid);
@@ -144,7 +144,7 @@ if ($myrights<20) {
 						if (mysqli_num_rows($result)>0) {
 							$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid='$lib'";
 							$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-							if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+							if (mysqli_affected_rows($GLOBALS['link'])>0) {
 								$madechange = true;
 							}
 						}
@@ -155,7 +155,7 @@ if ($myrights<20) {
 							$query .= " AND ownerid='$userid'";
 						}
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-						if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+						if (mysqli_affected_rows($GLOBALS['link'])>0) {
 							$madechange = true;
 						}
 					}
@@ -181,7 +181,7 @@ if ($myrights<20) {
 				}
 				$query = "SELECT qsetid FROM imas_library_items WHERE libid='$lib' LIMIT $offset,1";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$qsetid = mysql_fetch_first($result);
+				$qsetid = mysqli_fetch_first($result);
 			}
 		} elseif (isset($_POST['update'])) {
 			$_POST['qtext'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['qtext']);
@@ -244,7 +244,7 @@ if ($myrights<20) {
 		$query = "SELECT imas_questionset.*,imas_users.groupid FROM imas_questionset,imas_users WHERE ";
 		$query .= "imas_questionset.ownerid=imas_users.id AND imas_questionset.id='$qsetid'";	
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$lineQSet = mysql_fetch_assoc($result);
+		$lineQSet = mysqli_fetch_assoc($result);
 		$myq = (intval($lineQSet['ownerid'])==$userid);
 		if ($isadmin || ($isgrpadmin && intval($lineQSet['groupid'])==$groupid) || $lineQSet['userights']==4) {
 			$myq = true;

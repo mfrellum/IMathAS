@@ -57,7 +57,7 @@
 		$query .= " AND msgto='$filterstu'";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
+	$numpages = ceil(mysqli_fetch_first($result)/$threadsperpage);
 	
 	$prevnext = '';
 	if ($numpages > 1) {
@@ -163,7 +163,7 @@ function chgfilter() {
 	if (mysqli_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';
 		}

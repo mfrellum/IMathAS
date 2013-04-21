@@ -21,7 +21,7 @@ if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['fol
 if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the student's record
 	$query = "UPDATE imas_bookmarks SET value='{$_GET['recordbookmark']}' WHERE userid='$userid' AND courseid='$cid' AND name='TR{$_GET['folder']}'";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysqli_affected_rows($GLOBALS['link'])()==0) {
+	if (mysqli_affected_rows($GLOBALS['link'])==0) {
 		$query = "INSERT INTO imas_bookmarks (userid,courseid,name,value) VALUES ('$userid','$cid','TR{$_GET['folder']}','{$_GET['recordbookmark']}')";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	}
@@ -32,7 +32,7 @@ if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the studen
 $cid = intval($_GET['cid']);
 $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc FROM imas_courses WHERE id=$cid";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-$line = mysql_fetch_assoc($result);
+$line = mysqli_fetch_assoc($result);
 $items = unserialize($line['itemorder']);		
 
 if ($_GET['folder']!='0') {
@@ -154,7 +154,7 @@ $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysql
 if (mysqli_num_rows($result)==0) {
 	$openitem = '';
 } else {
-	$openitem = mysql_fetch_first($result);
+	$openitem = mysqli_fetch_first($result);
 }
 
 $foundfirstitem = '';
@@ -205,7 +205,7 @@ function printlist($items) {
 		} else {
 			$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$item'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$typeid = $line['typeid'];
 			$itemtype = $line['itemtype'];
 			/*if ($line['itemtype']=="Calendar") {
@@ -219,7 +219,7 @@ function printlist($items) {
 				//TODO check availability, timelimit, etc.
 				 $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit,displaymethod FROM imas_assessments WHERE id='$typeid'";
 				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				 $line = mysql_fetch_assoc($result);
+				 $line = mysqli_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 				 }
@@ -243,7 +243,7 @@ function printlist($items) {
 				//TODO check availability, etc.
 				 $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
 				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				 $line = mysql_fetch_assoc($result);
+				 $line = mysqli_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 				 }
@@ -255,7 +255,7 @@ function printlist($items) {
 				//TODO check availability, etc.
 				 $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
 				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				 $line = mysql_fetch_assoc($result);
+				 $line = mysqli_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid; $isopen = true;
 				 }
@@ -267,7 +267,7 @@ function printlist($items) {
 				//TODO check availability, etc.
 				 $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 				 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				 $line = mysql_fetch_assoc($result);
+				 $line = mysqli_fetch_assoc($result);
 				 if ($openitem=='' && $foundfirstitem=='') {
 				 	 $foundfirstitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 				 }

@@ -60,13 +60,13 @@ ini_set("max_execution_time", "600");
 				//if not, convert to selected type
 				$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (count($_POST['checked']) < mysql_fetch_first($result)) {
+				if (count($_POST['checked']) < mysqli_fetch_first($result)) {
 					$_GET['uid'] = 'selected';
 				}
 			}*/
 			$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (count($_POST['checked']) == mysql_fetch_first($result)) {
+			if (count($_POST['checked']) == mysqli_fetch_first($result)) {
 				$_GET['uid'] = 'all';
 			} else {
 				$_GET['uid'] = 'selected';
@@ -83,7 +83,7 @@ ini_set("max_execution_time", "600");
 				$resultUserList = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (count($_POST['checked']) > floor(mysql_fetch_first($result)/2)) {
+				if (count($_POST['checked']) > floor(mysqli_fetch_first($result)/2)) {
 					$delForumMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
 					$delWikiMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> wiki revisions: ";
 					$delWikiMsg .= '<input type="radio" name="delwikirev" value="0" checked="checked" />No,  ';

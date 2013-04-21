@@ -43,7 +43,7 @@ if ($cid==0) {
 				$groupid = intval($_GET['grp']);
 				$query = "SELECT name FROM imas_stugroups WHERE id='$groupid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$groupname = mysql_fetch_first($result);
+				$groupname = mysqli_fetch_first($result);
 			} else {
 				$groupsetid = $row[5];
 				$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';

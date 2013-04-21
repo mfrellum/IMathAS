@@ -173,7 +173,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$text = trim(mysql_fetch_first($result));
+			$text = trim(mysqli_fetch_first($result));
 			if (substr($text,0,5)=='file:') { //has file
 				$safetext = addslashes($text);
 				if ($_POST['text']!=$safetext) { //if not same file, delete old if not used
@@ -199,17 +199,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$newtextid = mysqli_insert_id($GLOBALS['link'])();
+			$newtextid = mysqli_insert_id($GLOBALS['link']);
 			
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','LinkedText','$newtextid');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$itemid = mysqli_insert_id($GLOBALS['link'])();
+			$itemid = mysqli_insert_id($GLOBALS['link']);
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 				
 			$blocktree = explode('-',$block);
@@ -254,7 +254,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) {
 			$query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 			if ($line['avail']==2 && $startdate>0) {

@@ -9,7 +9,7 @@
 	//look up user
 	$query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$userid = mysql_fetch_first($result);
+	$userid = mysqli_fetch_first($result);
 	$tzoffset = $_GET['tzoffset'];
 	
 	function tzdate($string,$time) {
@@ -45,7 +45,7 @@
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
 	
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();
 			}
@@ -76,7 +76,7 @@
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
 	
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();
 			}
@@ -113,7 +113,7 @@
 		$lastforum = '';
 		$lastcourse = '';
 		$forumcontent = array();
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (!isset($forumcontent[$line['forumid']])) {
 				$forumcontent[$line['forumid']] = '';
 			}
@@ -149,7 +149,7 @@
 	$query .= "AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ORDER BY imas_msgs.senddate DESC";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	echo '<msglist>';
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$n = 0;
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';

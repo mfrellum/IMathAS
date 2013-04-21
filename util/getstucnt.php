@@ -7,7 +7,7 @@
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	echo "<p>Student count: ".mysql_fetch_first($result);
+	echo "<p>Student count: ".mysqli_fetch_first($result);
 
 	$date = $now - 60*60*24*7;  
 	echo "<p>Active users in 7 Days</p>";
@@ -15,12 +15,12 @@
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	echo "<p>Student count: ".mysql_fetch_first($result);
+	echo "<p>Student count: ".mysqli_fetch_first($result);
 	
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_users.id=imas_teachers.userid AND imas_users.lastaccess>$date";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	echo "</p><p>Teacher count: ".mysql_fetch_first($result)."</p>";
+	echo "</p><p>Teacher count: ".mysqli_fetch_first($result)."</p>";
 
 	echo "<p>Active student association</p>";
 	$query = "SELECT g.name,u.LastName,COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_teachers AS t ";
@@ -43,7 +43,7 @@
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	echo mysql_fetch_first($result)."</p>";
+	echo mysqli_fetch_first($result)."</p>";
 	
 	
 	

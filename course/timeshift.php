@@ -71,7 +71,7 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 
 		shiftsub($items);
 		$itemorder = addslashes(serialize($items));
@@ -127,7 +127,7 @@ if (!(isset($teacherid))) {
 		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
-		while ($line=mysql_fetch_assoc($result)) {
+		while ($line=mysqli_fetch_assoc($result)) {
 			$page_assessmentList['val'][$i] = $line['id'];
 			$page_assessmentList['label'][$i] = $line['name'];
 			$i++;

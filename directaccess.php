@@ -48,7 +48,7 @@
 		
 		$query = "SELECT enrollkey FROM imas_courses WHERE id = '{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$enrollkey = mysql_fetch_first($result);
+		$enrollkey = mysqli_fetch_first($result);
 		if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= "Please provide the enrollment key";
 		} else if (strlen($enrollkey)>0) {
@@ -76,11 +76,11 @@
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
 			$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot);";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$newuserid = mysqli_insert_id($GLOBALS['link'])();
+			$newuserid = mysqli_insert_id($GLOBALS['link']);
 			$query = "INSERT INTO imas_students (userid,courseid,gbcomment) VALUES ('$newuserid','{$_GET['cid']}','$code');";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if ($emailconfirmation) {
-				$id = mysqli_insert_id($GLOBALS['link'])();
+				$id = mysqli_insert_id($GLOBALS['link']);
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
@@ -155,7 +155,7 @@
 	 
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$coursename = mysql_fetch_first($result);
+		$coursename = mysqli_fetch_first($result);
 		
 		$placeinhead = "<style type=\"text/css\">div#header {clear: both;height: 75px;background-color: #9C6;margin: 0px;padding: 0px;border-left: 10px solid #036;border-bottom: 5px solid #036;} \n.vcenter {font-family: sans-serif;font-size: 28px;margin: 0px;margin-left: 30px;padding-top: 25px;color: #fff;}</style>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/md5.js\" ></script>";
@@ -179,7 +179,7 @@
 		
 		$query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$enrollkey = mysql_fetch_first($result);
+		$enrollkey = mysqli_fetch_first($result);
 		
 ?>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>" onsubmit="hashpw()">

@@ -71,7 +71,7 @@
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		$cnt = 0;
-		while($line=mysql_fetch_assoc($result)) {
+		while($line=mysqli_fetch_assoc($result)) {
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
 				$scores = explode(",",$line['bestscores']);
 				if ($onepergroup) {
@@ -344,7 +344,7 @@
 	require_once("../includes/filehandler.php");
 	if (mysqli_num_rows($result)>0) {
 		
-	while($line=mysql_fetch_assoc($result)) {
+	while($line=mysqli_fetch_assoc($result)) {
 		if ($page != -1) {
 			echo '<input type="hidden" name="userid" value="'.$line['userid'].'"/>';
 		}

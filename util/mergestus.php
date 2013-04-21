@@ -23,7 +23,7 @@ if (count($ids)>0) {
 	$query .= "AND assessmentid NOT IN ($idlist)";
 }
 mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-echo mysqli_affected_rows($GLOBALS['link'])().' assessment sessions moved<br/><br/>';
+echo mysqli_affected_rows($GLOBALS['link']).' assessment sessions moved<br/><br/>';
 
 
 $ids = array();
@@ -40,7 +40,7 @@ if (count($ids)>0) {
 	$query .= "AND gradetypeid NOT IN ($idlist)";
 }
 mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-echo mysqli_affected_rows($GLOBALS['link'])().' offline grades moved<br/><br/>';
+echo mysqli_affected_rows($GLOBALS['link']).' offline grades moved<br/><br/>';
 
 ?>
 

@@ -55,7 +55,7 @@
 	
 	$query = "SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid='{$_GET['id']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$itemid = mysql_fetch_first($result);
+	$itemid = mysqli_fetch_first($result);
 	
 	$query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -81,8 +81,7 @@
 	}
 	$query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$text = mysql_fetch_first($result);
-	$title = mysql_result($result,0,1);
+	list($text, $title) = mysqli_fetch_row($result);
 	$titlesimp = strip_tags($title);
 
 	require("../header.php");

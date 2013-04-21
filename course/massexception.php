@@ -25,7 +25,7 @@
 					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ";
 					$query .= "('$stu','$aid',$startdate,$enddate)";
 				} else {
-					$eid = mysql_fetch_first($result);
+					$eid = mysqli_fetch_first($result);
 					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0 WHERE id=$eid";
 				}
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));	

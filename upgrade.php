@@ -35,7 +35,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			fclose($handle);
 		}
 	} else {
-		$last = mysql_fetch_first($result);
+		$last = mysqli_fetch_first($result);
 	}
 	
 	if ($last==$latest) {
@@ -142,7 +142,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 						if (mysqli_num_rows($result)==0) {
 							echo "Orphaned Diags: ".implode(',',$owners[$ogrp]).'<br/>';
 						} else if (mysqli_num_rows($result)==1) {
-							$uid = mysql_fetch_first($result);
+							$uid = mysqli_fetch_first($result);
 							$query = "UPDATE imas_diags SET ownerid=$uid WHERE id IN (".implode(',',$owners[$ogrp]).")";
 							mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 						} else {
@@ -504,7 +504,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			while ($row = mysqli_fetch_row($result)) {
 				$query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('{$row[0]}','Group set for {$row[2]}')";
 				$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
-				$assessgrpset[$row[1]] = mysqli_insert_id($GLOBALS['link'])();
+				$assessgrpset[$row[1]] = mysqli_insert_id($GLOBALS['link']);
 				$query = "UPDATE imas_assessments SET groupsetid={$assessgrpset[$row[1]]} WHERE id={$row[1]}";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 			}
@@ -532,7 +532,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			foreach($agroups as $agroup) {
 				$query = "INSERT INTO imas_stugroups (groupsetid,name) VALUES (".$assessgrpset[$agroupaids[$agroup]].",'Unnamed group')";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
-				$stugrp = mysqli_insert_id($GLOBALS['link'])();
+				$stugrp = mysqli_insert_id($GLOBALS['link']);
 				if (count($agroupusers[$agroup])>0) {
 					foreach ($agroupusers[$agroup] as $k=>$v) {
 						$agroupusers[$agroup][$k] = "($stugrp,$v)";
@@ -1117,7 +1117,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 $haslist = implode(',',$hasimg);
 			 	 $query = "UPDATE imas_users SET hasuserimg=1 WHERE id IN ($haslist)";
 			 	 mysqli_query($GLOBALS['link'],$query);
-			 	 $n = mysqli_affected_rows($GLOBALS['link'])();
+			 	 $n = mysqli_affected_rows($GLOBALS['link']);
 			 }
 			 echo "hasuserimg field added, $n user images identified<br/>";
 		}

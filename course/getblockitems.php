@@ -17,7 +17,7 @@
    require("../filter/filter.php");
    $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
    $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-   $line = mysql_fetch_assoc($result);
+   $line = mysqli_fetch_assoc($result);
    if ($line == null) {
 	   echo "Course does not exist.  <a href=\"../index.php\">Return to main page</a></body></html>\n";
 	   exit;
@@ -46,7 +46,7 @@
 	  // $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 	   //$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   while ($line = mysql_fetch_assoc($result)) {
+	   while ($line = mysqli_fetch_assoc($result)) {
 		   $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
 	   }
    }
@@ -87,7 +87,7 @@
    if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   $latepasses = mysql_fetch_first($result);
+	   $latepasses = mysqli_fetch_first($result);
    } else {
 	   $latepasses = 0;
    }

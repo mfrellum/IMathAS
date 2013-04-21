@@ -61,7 +61,7 @@ if ($myrights < 40) {
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link'])); 
 	$page_courseList = array();
 	$i=0;
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$page_courseList[$i]['id'] = $line['id']; 
 		$page_courseList[$i]['name'] = $line['name']; 
 		$page_courseList[$i]['LastName'] = $line['LastName']; 
@@ -132,7 +132,7 @@ if ($myrights < 40) {
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
 	$i=0;
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$page_userDataId[$i] = $line['id'];
 		$page_userDataSid[$i] = $line['SID'];
 		$page_userDataEmail[$i] = $line['email'];

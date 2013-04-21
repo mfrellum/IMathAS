@@ -49,7 +49,7 @@ if (!(isset($teacherid))) {
 				$query = "SELECT id FROM imas_gbitems WHERE id='{$_POST["coloverwrite$col"]}' AND courseid='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				if (mysqli_num_rows($result)>0) { //if this fails, we'll end up creating a new item
-					$gbitemid[$col] = mysql_fetch_first($result);
+					$gbitemid[$col] = mysqli_fetch_first($result);
 					//delete old grades
 					//$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]}";
 					//mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -60,7 +60,7 @@ if (!(isset($teacherid))) {
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
 			$query .= "('$cid','$name','$pts',$showdate,'$gbcat','$cnt',0) ";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$gbitemid[$col] = mysqli_insert_id($GLOBALS['link'])();
+			$gbitemid[$col] = mysqli_insert_id($GLOBALS['link']);
 		}
 		$adds = array();
 		if (count($gbitemid)>0) {

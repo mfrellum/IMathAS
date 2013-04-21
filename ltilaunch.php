@@ -62,7 +62,7 @@ if (isset($_GET['launch'])) {
 		$aid = $sessiondata['ltiitemid'];
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$cid = mysql_fetch_first($result);
+		$cid = mysqli_fetch_first($result);
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
 		$cid = $sessiondata['ltiitemid'];
@@ -86,7 +86,7 @@ if (mysqli_num_rows($result)==0) {
 	$query = "SELECT sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysqli_num_rows($result)>0) {
-		$sessiondata = unserialize(base64_decode(mysql_fetch_first($result)));
+		$sessiondata = unserialize(base64_decode(mysqli_fetch_first($result)));
 		if (empty($sessiondata['ltiitemid'])) {
 			reporterror("Bad id or code");
 		}
@@ -94,7 +94,7 @@ if (mysqli_num_rows($result)==0) {
 			$aid = $sessiondata['ltiitemid'];
 			$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$cid = mysql_fetch_first($result);
+			$cid = mysqli_fetch_first($result);
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 		} else if ($sessiondata['ltiitemtype']==1) { //is cid
 			$cid = $sessiondata['ltiitemid'];
@@ -106,7 +106,7 @@ if (mysqli_num_rows($result)==0) {
 		reporterror("Bad id or code, or being rerun");
 	}
 } else {
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	if (abs($line['created'] - $now)>900) {
 		reporterror("Access has expired - please refresh and try again");
 	}
@@ -156,7 +156,7 @@ $query = "SELECT sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 if (mysqli_num_rows($result)>0) {
 	//already have session.  Don't need to 	
-	$sessiondata = unserialize(base64_decode(mysql_fetch_first($result)));
+	$sessiondata = unserialize(base64_decode(mysqli_fetch_first($result)));
 	if (!isset($sessiondata['mathdisp'])) {
 		$promptforsettings = true;
 	}

@@ -70,7 +70,7 @@
 		echo "<p>No new messages</p>";
 	} else {
 		$lastcourse = '';
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if ($line['name']!=$lastcourse) {
 				if($lastcourse!='') {
 					echo '</tbody></table>';

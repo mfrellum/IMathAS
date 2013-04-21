@@ -109,7 +109,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$oldgroupsetid = mysql_fetch_first($result);
+			$oldgroupsetid = mysqli_fetch_first($result);
 			if ($oldgroupsetid!=$_POST['groupsetid']) {
 				//change of groupset; zero out stugroupid 
 				$query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid='{$_GET['id']}';";
@@ -126,17 +126,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric);";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$newforumid = mysqli_insert_id($GLOBALS['link'])();
+			$newforumid = mysqli_insert_id($GLOBALS['link']);
 			
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','Forum','$newforumid');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$itemid = mysqli_insert_id($GLOBALS['link'])();
+			$itemid = mysqli_insert_id($GLOBALS['link']);
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 				
 			$blocktree = explode('-',$block);
@@ -178,7 +178,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$query = "SELECT * FROM imas_forums WHERE id='{$_GET['id']}';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 			$allowanon = (($line['settings']&1)==1);

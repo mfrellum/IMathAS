@@ -19,7 +19,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_fetch_first($result);
+		$gbmode = mysqli_fetch_first($result);
 	}
 	
 	require("../header.php");
@@ -76,7 +76,7 @@
 	$query .= "imas_assessment_sessions AS ias WHERE ias.assessmentid='$aid' GROUP BY ias.agroupid";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$scoredata = array();
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$scoredata[$line['agroupid']] = $line;
 	}
 	

@@ -174,7 +174,7 @@ END;
 	 if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username']=='guest') { // create a temp account when someone logs in w/ username: guest
 	 	$query = 'SELECT ver FROM imas_dbschema WHERE id=2';
 	 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	 	$guestcnt = mysql_fetch_first($result);
+	 	$guestcnt = mysqli_fetch_first($result);
 	 	$query = 'UPDATE imas_dbschema SET ver=ver+1 WHERE id=2';
 	 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
@@ -186,7 +186,7 @@ END;
 	 	$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,homelayout) ";
 	 	$query .= "VALUES ('guestacct$guestcnt','',5,'Guest','Account','none@none.com',0,'$homelayout')";
 	 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	 	$userid = mysqli_insert_id($GLOBALS['link'])();
+	 	$userid = mysqli_insert_id($GLOBALS['link']);
 	 	
 	 	if (is_array($CFG['GEN']['guesttempaccts']) && count($CFG['GEN']['guesttempaccts'])>0) {
 	 		$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
@@ -206,7 +206,7 @@ END;
 	 } else {
 		 $query = "SELECT id,password,rights,groupid FROM imas_users WHERE SID = '{$_POST['username']}'";
 		 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		 $line = mysql_fetch_assoc($result);
+		 $line = mysqli_fetch_assoc($result);
 	 }
 	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
 	 if (($line != null) && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password'])) )) {
@@ -322,7 +322,7 @@ END;
 	}
 	$query .= " FROM imas_users WHERE id='$userid'"; 
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
 	$groupid = $line['groupid'];
@@ -361,7 +361,7 @@ END;
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$cid = mysql_fetch_first($result);
+				$cid = mysqli_fetch_first($result);
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
@@ -375,7 +375,7 @@ END;
 		$cid = $_GET['cid'];
 		$query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		if ($line != null) {
 			$studentid = $line['id'];
 			$studentinfo['timelimitmult'] = $line['timelimitmult'];
@@ -394,7 +394,7 @@ END;
 					$sessiondata['lastaccess'.$cid] = $now;
 					$query = "INSERT INTO imas_login_log (userid,courseid,logintime) VALUES ($userid,'$cid',$now)";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$sessiondata['loginlog'.$cid] = mysqli_insert_id($GLOBALS['link'])();
+					$sessiondata['loginlog'.$cid] = mysqli_insert_id($GLOBALS['link']);
 					writesessiondata();
 				} else if (isset($CFG['GEN']['keeplastactionlog'])) {
 					$query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$cid];
@@ -404,7 +404,7 @@ END;
 		} else {
 			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			if ($line != null) {
 				if ($myrights>19) {
 					$teacherid = $line['id'];
@@ -431,7 +431,7 @@ END;
 				
 				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$line = mysql_fetch_assoc($result);
+				$line = mysqli_fetch_assoc($result);
 				if ($line != null) {
 					$tutorid = $line['id'];
 					$tutorsection = trim($line['section']);

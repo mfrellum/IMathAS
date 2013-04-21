@@ -22,7 +22,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_fetch_first($result);
+		$gbmode = mysqli_fetch_first($result);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	
@@ -35,7 +35,7 @@
 	$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 	$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	if (mysql_fetch_first($result)>0) {
+	if (mysqli_fetch_first($result)>0) {
 		$hassection = true;
 	} else {
 		$hassection = false;
@@ -44,7 +44,7 @@
 	if ($hassection) {
 		$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		if (mysql_fetch_first($result)==0) {
+		if (mysqli_fetch_first($result)==0) {
 			$sortorder = "sec";
 		} else {
 			$sortorder = "name";
@@ -137,7 +137,7 @@
 	$ntime = 0;
 	$tot = 0;
 	$tottime = 0;
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		if ($lc%2!=0) {
 			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">"; 
 		} else {

@@ -193,7 +193,7 @@
 		echo "<option value=\"0\">Don't limit - send to all</option>\n";
 		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($line=mysql_fetch_assoc($result)) {
+		while ($line=mysqli_fetch_assoc($result)) {
 			echo "<option value=\"{$line['id']}\" ";
 			if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
 			echo ">{$line['name']}</option>\n";

@@ -65,7 +65,7 @@
 					}
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					if (mysqli_num_rows($result)>0) {
-						$cuserid=mysql_fetch_first($result);
+						$cuserid=mysqli_fetch_first($result);
 						if ($comtype=='stu') {
 							$query = "UPDATE imas_students SET gbcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
 						} else if ($comtype=='instr') {

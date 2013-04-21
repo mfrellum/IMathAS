@@ -75,7 +75,7 @@ function parseqs($file,$touse,$rights) {
 					}
 				}
 				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-				if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+				if (mysqli_affected_rows($GLOBALS['link'])>0) {
 					$updateq++;
 					if (!empty($qd['qimgs'])) {
 						//not efficient, but sufficient :)
@@ -108,7 +108,7 @@ function parseqs($file,$touse,$rights) {
 			$query .= "'{$qd['qtext']}','{$qd['answer']}','{$qd['extref']}',$hasimg)";
 			mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
 			$newq++;
-			$qsetid = mysqli_insert_id($GLOBALS['link'])();
+			$qsetid = mysqli_insert_id($GLOBALS['link']);
 			if (!empty($qd['qimgs'])) {
 				$qimgs = explode("\n",$qd['qimgs']);
 				foreach($qimgs as $qimg) {
@@ -361,7 +361,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 						$query .= " AND (ownerid='$userid' or userights>1)";
 					}
 					mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-					if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+					if (mysqli_affected_rows($GLOBALS['link'])>0) {
 						$updatel++;
 					}
 				} 
@@ -375,7 +375,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				$query .= "('{$unique[$libid]}',$now,$now,'{$names[$libid]}','$userid','$librights','$parent','$groupid')";
 				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-				$libs[$libid] = mysqli_insert_id($GLOBALS['link'])();
+				$libs[$libid] = mysqli_insert_id($GLOBALS['link']);
 				$newl++;
 			}
 			if (isset($libs[$libid])) {

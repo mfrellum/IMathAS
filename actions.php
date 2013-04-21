@@ -103,9 +103,9 @@
 		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
 		$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$newuserid = mysqli_insert_id($GLOBALS['link'])();
+		$newuserid = mysqli_insert_id($GLOBALS['link']);
 		if ($emailconfirmation) {
-			$id = mysqli_insert_id($GLOBALS['link'])();
+			$id = mysqli_insert_id($GLOBALS['link']);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
@@ -136,7 +136,7 @@
 				} else {
 					$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['courseid']}' AND available<4";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$line = mysql_fetch_assoc($result);
+					$line = mysqli_fetch_assoc($result);
 					if ($line==null) {
 						$error = 'Course not found';
 					} else if (($line['allowunenroll']&2)==2) {
@@ -176,7 +176,7 @@
 		require_once("config.php");
 		$query = "UPDATE imas_users SET rights=10 WHERE id='{$_GET['id']}' AND rights=0";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysqli_affected_rows($GLOBALS['link'])()>0) {
+		if (mysqli_affected_rows($GLOBALS['link'])>0) {
 			echo "<html><body>\n";
 			echo "Confirmed.  Please <a href=\"index.php\">Log In</a>\n";
 			echo "</html></body>\n";	
@@ -267,7 +267,7 @@
 	} else if ($_GET['action']=="chgpwd") {
 		$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
 			$md5pw =md5($_POST['newpw1']);
 			$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
@@ -295,7 +295,7 @@
 		}
 		$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$line = mysql_fetch_assoc($result);
+		$line = mysqli_fetch_assoc($result);
 		if ($line == null) {
 			echo "<html><body>\n";
 			echo "Course not found.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -474,7 +474,7 @@
 		if (isset($_POST['dochgpw'])) {
 			$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
 				$md5pw =md5($_POST['newpw1']);
 				$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";

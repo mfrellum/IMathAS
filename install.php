@@ -99,10 +99,8 @@ $contents .= '
 //no need to change anything from here on
   /* Connecting, selecting database */
   if (!isset($dbsetup)) {
-	 $link = mysql_connect($dbserver,$dbusername, $dbpassword) 
-	  or die("<p>Could not connect : " . mysqli_error($GLOBALS['link']) . "</p></div></body></html>");
-	 mysql_select_db($dbname) 
-	  or die("<p>Could not select database</p></div></body></html>");
+	 $link = mysqli_connect($dbserver,$dbusername, $dbpassword, $dbname) 
+	  or die("<p>Could not connect : " . mysqli_error($GLOBALS[\'link\']) . "</p></div></body></html>");
 	  
 	  unset($dbserver);
 	  unset($dbusername);

@@ -64,7 +64,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$query .= "'{$item[$itemtoadd]['deffeedback']}','{$item[$itemtoadd]['defpenalty']}','{$item[$itemtoadd]['shuffle']}','{$item[$itemtoadd]['password']}','{$item[$itemtoadd]['cntingb']}',";
 		*/
 		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-		$typeid = mysqli_insert_id($GLOBALS['link'])();
+		$typeid = mysqli_insert_id($GLOBALS['link']);
 					
 		//determine question to be added
 		//$qtoadd = explode(',',$item[$itemtoadd]['questions']);  //FIX!!! can be ~ separated as well
@@ -99,7 +99,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now,hasimg=$hasimg ";
 					$query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>3)";
 					mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-					if (mysqli_affected_rows($GLOBALS['link'])()>0 && $hasimg==1) {
+					if (mysqli_affected_rows($GLOBALS['link'])>0 && $hasimg==1) {
 						//not efficient, but sufficient :)
 						$query = "DELETE FROM imas_qimages WHERE qsetid='{$questions[$qid]['qsetid']}'";
 						mysqli_query($GLOBALS['link'],$query) or die("Import failed on $query: " . mysqli_error($GLOBALS['link']));
@@ -133,7 +133,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$query .= "'{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}',";
 				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['extref'][$n]}',$hasimg)";
 				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-				$questions[$qid]['qsetid'] = mysqli_insert_id($GLOBALS['link'])();
+				$questions[$qid]['qsetid'] = mysqli_insert_id($GLOBALS['link']);
 				if ($hasimg==1) {
 					$qimgs = explode("\n",$qset['qimgs'][$n]);
 					foreach($qimgs as $qimg) {
@@ -155,7 +155,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$query .= "VALUES ($typeid,'{$questions[$qid]['qsetid']}','{$questions[$qid]['points']}',";
 			$query .= "'{$questions[$qid]['attempts']}','{$questions[$qid]['penalty']}','{$questions[$qid]['category']}','{$questions[$qid]['regen']}','{$questions[$qid]['showans']}')";
 			mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-			$questions[$qid]['systemid'] = mysqli_insert_id($GLOBALS['link'])();
+			$questions[$qid]['systemid'] = mysqli_insert_id($GLOBALS['link']);
 		}
 		
 		//resolve any includecodefrom links
@@ -212,13 +212,13 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['postby']}','{$item[$itemtoadd]['replyby']}',";
 		$query .= "'{$item[$itemtoadd]['defdisplay']}','{$item[$itemtoadd]['points']}','{$item[$itemtoadd]['cntingb']}','{$item[$itemtoadd]['settings']}')";
 		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-		$typeid = mysqli_insert_id($GLOBALS['link'])();
+		$typeid = mysqli_insert_id($GLOBALS['link']);
 	} else if ($item[$itemtoadd]['type'] == "InlineText") {
 		$query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag)";
 		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['text']}',";
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}')";
 		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-		$typeid = mysqli_insert_id($GLOBALS['link'])();
+		$typeid = mysqli_insert_id($GLOBALS['link']);
 		if (isset($item[$itemtoadd]['instrfiles'])) {
 			$item[$itemtoadd]['instrfiles'] = explode("\n",$item[$itemtoadd]['instrfiles']);
 			$fileorder = array();
@@ -230,7 +230,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ";
 				$query .= "('$filedescr','$filename',$typeid)";
 				mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-				$fileorder[] = mysqli_insert_id($GLOBALS['link'])();
+				$fileorder[] = mysqli_insert_id($GLOBALS['link']);
 			}
 			$query = "UPDATE imas_inlinetext SET fileorder='".implode(',',$fileorder)."' WHERE id=$typeid";
 			mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
@@ -240,7 +240,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['text']}',";
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}','{$item[$itemtoadd]['target']}')";
 		mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-		$typeid = mysqli_insert_id($GLOBALS['link'])();
+		$typeid = mysqli_insert_id($GLOBALS['link']);
 	} else {
 		return false;
 	}
@@ -249,7 +249,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','{$item[$itemtoadd]['type']}',$typeid)";
 	mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-	$item[$itemtoadd]['systemid'] = mysqli_insert_id($GLOBALS['link'])();
+	$item[$itemtoadd]['systemid'] = mysqli_insert_id($GLOBALS['link']);
 	
 	return ($item[$itemtoadd]['systemid']);		
 }

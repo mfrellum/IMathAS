@@ -40,7 +40,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$newtypeid = mysqli_insert_id($GLOBALS['link'])();
+		$newtypeid = mysqli_insert_id($GLOBALS['link']);
 		
 		$query = "SELECT description,filename,id FROM imas_instr_files WHERE itemid='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
@@ -51,7 +51,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$row = "'".implode("','",addslashes_deep($row))."'";
 			$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ($row,$newtypeid)";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-			$addedfiles[$curid] = mysqli_insert_id($GLOBALS['link'])(); 
+			$addedfiles[$curid] = mysqli_insert_id($GLOBALS['link']); 
 		}
 		if (count($addedfiles)>0) {
 			$addedfilelist = array();
@@ -80,7 +80,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$newtypeid = mysqli_insert_id($GLOBALS['link'])();
+		$newtypeid = mysqli_insert_id($GLOBALS['link']);
 		if ($istool) {
 			$exttooltrack[$newtypeid] = intval($tool[0]);
 		}
@@ -102,7 +102,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$newtypeid = mysqli_insert_id($GLOBALS['link'])();
+		$newtypeid = mysqli_insert_id($GLOBALS['link']);
 		if ($copystickyposts) {
 			//copy instructor sticky posts
 			$query = "SELECT subject,message,posttype,isanon,replyby FROM imas_forum_posts WHERE forumid='$typeid' AND posttype>0";
@@ -117,7 +117,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 				}
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				
-				$threadid = mysqli_insert_id($GLOBALS['link'])();
+				$threadid = mysqli_insert_id($GLOBALS['link']);
 				$query = "UPDATE imas_forum_posts SET threadid='$threadid' WHERE id='$threadid'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				
@@ -138,7 +138,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$newtypeid = mysqli_insert_id($GLOBALS['link'])();
+		$newtypeid = mysqli_insert_id($GLOBALS['link']);
 	} else if ($itemtype == "Assessment") {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
@@ -160,16 +160,17 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 
 		$query .= "VALUES ('$cid',$row)";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$newtypeid = mysqli_insert_id($GLOBALS['link'])();
+		$newtypeid = mysqli_insert_id($GLOBALS['link']);
 		if ($reqscoreaid>0) {
 			$reqscoretrack[$newtypeid] = $reqscoreaid;
 		}
 		$assessnewid[$typeid] = $newtypeid;
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		if (trim(mysql_fetch_first($result))!='') {
-			$aitems = explode(',',mysql_fetch_first($result));
-			$newaitems = array();
+		$itemorder = mysqli_fetch_first($result);
+		if (trim($itemorder)!='') {
+			$aitems = explode(',',$itemorder);
+			
 			foreach ($aitems as $k=>$aitem) {
 				if (strpos($aitem,'~')===FALSE) {
 					///$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
@@ -183,7 +184,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 					$query .= "VALUES ('$newtypeid',$row)";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-					$newid = mysqli_insert_id($GLOBALS['link'])();
+					$newid = mysqli_insert_id($GLOBALS['link']);
 					if ($rubric != 0) {
 						$qrubrictrack[$newid] = $rubric;
 					}
@@ -206,7 +207,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 						$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 						$query .= "VALUES ('$newtypeid',$row)";
 						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-						$newid = mysqli_insert_id($GLOBALS['link'])();
+						$newid = mysqli_insert_id($GLOBALS['link']);
 						if ($rubric != 0) {
 							$qrubrictrack[$newid] = $rubric;
 						}
@@ -226,7 +227,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','$itemtype',$newtypeid)";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-	return (mysqli_insert_id($GLOBALS['link'])());	
+	return (mysqli_insert_id($GLOBALS['link']));	
 }
 	
 function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
@@ -444,14 +445,14 @@ function copyrubrics($offlinerubrics=array()) {
 		$query = "SELECT id FROM imas_rubrics WHERE rubric='{$rubrow[2]}' AND (ownerid=$userid OR groupid=$groupid)";
 		$rr = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		if (mysqli_num_rows($rr)>0) {
-			$newid = mysql_fetch_first($rr);
+			$newid = mysqli_fetch_first($rr);
 			echo "found existing of mine, $newid<br/>";
 		} else {
 			$rub = "'".implode("','",$rubrow)."'";
 			$query = "INSERT INTO imas_rubrics (ownerid,groupid,name,rubrictype,rubric) VALUES ";
 			$query .= "($userid,-1,$rub)";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$newid = mysqli_insert_id($GLOBALS['link'])();
+			$newid = mysqli_insert_id($GLOBALS['link']);
 			echo "created $newid<br/>";
 		}
 		
@@ -495,7 +496,7 @@ function handleextoolcopy($sourcecid) {
 			$query = "SELECT id FROM imas_external_tools WHERE url='".addslashes($row[4])."' AND courseid='$cid'";
 			$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysqli_num_rows($res)>0) {
-				$toolmap[$row[0]] = mysql_fetch_first($res);
+				$toolmap[$row[0]] = mysqli_fetch_first($res);
 			}
 		}
 		if (isset($toolmap[$row[0]])) {
@@ -509,7 +510,7 @@ function handleextoolcopy($sourcecid) {
 			$query = "INSERT INTO imas_external_tools (courseid,groupid,name,url,ltikey,secret,custom,privacy) ";
 			$query .= "VALUES ('$cid','$groupid','$rowlist')";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$toolmap[$row[0]] = mysqli_insert_id($GLOBALS['link'])();
+			$toolmap[$row[0]] = mysqli_insert_id($GLOBALS['link']);
 			$doremap = true;
 		} else if ($row[1]==0 && ($row[2]==0 || $row[2]==$groupid)) {
 			//no need to copy anything - tool will just work

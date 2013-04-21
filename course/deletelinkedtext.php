@@ -34,14 +34,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='LinkedText'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemid = mysql_fetch_first($result);
+		$itemid = mysqli_fetch_first($result);
 		
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
 		$query = "SELECT text FROM imas_linkedtext WHERE id='$textid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$text = trim(mysql_fetch_first($result));
+		$text = trim(mysqli_fetch_first($result));
 		if (substr($text,0,5)=='file:') { //delete file if not used
 			$safetext = addslashes($text);
 			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
@@ -61,7 +61,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -80,7 +80,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$query = "SELECT title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemname = mysql_fetch_first($result);
+		$itemname = mysqli_fetch_first($result);
 	}
 }
 	

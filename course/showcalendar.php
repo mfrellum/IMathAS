@@ -25,7 +25,7 @@
 	 if (!isset($teacherid) && $previewshift==-1) {
 		 $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		 $latepasses = mysql_fetch_first($result);
+		 $latepasses = mysqli_fetch_first($result);
 	 } else {
 		$latepasses = 0;
 	 }

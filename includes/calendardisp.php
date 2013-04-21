@@ -138,7 +138,7 @@ while ($row = mysqli_fetch_row($result)) {
 		   if (mysqli_num_rows($r2)==0) {
 			   continue;
 		   } else {
-			   $scores = mysql_fetch_first($r2);
+			   $scores = mysqli_fetch_first($r2);
 			   if (getpts($scores)<$row[6]) {
 				   continue;
 			   }
@@ -279,7 +279,7 @@ while ($row = mysqli_fetch_row($result)) {
 }
 $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-$itemorder = unserialize(mysql_fetch_first($result));
+$itemorder = unserialize(mysqli_fetch_first($result));
 $itemsimporder = array();
 
 flattenitems($itemorder,$itemsimporder);

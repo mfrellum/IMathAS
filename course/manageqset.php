@@ -428,7 +428,7 @@ if ($myrights<20) {
 				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,author,description,userights,qtype,control,qcontrol,qtext,answer,hasimg) VALUES ";
 				$query .= "('$uqid','$now','$now','$userid','$myname','".implode("','",addslashes_deep($row))."')";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-				$nqid = mysqli_insert_id($GLOBALS['link'])();
+				$nqid = mysqli_insert_id($GLOBALS['link']);
 				$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','$nqid','$userid')";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 				
@@ -516,7 +516,7 @@ if ($myrights<20) {
 				}
 			}
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysqli_affected_rows($GLOBALS['link'])($link)>0) {
+			if (mysqli_affected_rows($GLOBALS['link'])>0) {
 				$query = "DELETE FROM imas_library_items WHERE qsetid='{$_GET['remove']}'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				//delqimgs($_GET['remove']);
@@ -727,7 +727,7 @@ if ($myrights<20) {
 		$lastlib = -1;
 		$ln=1;
 		
-		while ($line = mysql_fetch_assoc($resultLibs)) {
+		while ($line = mysqli_fetch_assoc($resultLibs)) {
 			if (isset($page_questionTable[$line['id']])) {
 				continue;
 			}

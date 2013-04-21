@@ -18,7 +18,7 @@
 		echo "Access key invalid";
 		exit;
 	}
-	$userid = mysql_fetch_first($result);
+	$userid = mysqli_fetch_first($result);
 	$tzoffset = $_GET['tzoffset'];
 	
 	function tzdate($string,$time) {
@@ -63,7 +63,7 @@
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
 	
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();
 			}
@@ -93,7 +93,7 @@
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
 	
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();
 			}
@@ -130,7 +130,7 @@
 		$lastforum = '';
 		$lastcourse = '';
 		$forumcontent = array();
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (!isset($forumcontent[$line['forumid']])) {
 				$forumcontent[$line['forumid']] = '';
 			}
@@ -174,7 +174,7 @@
 	} else {
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; '>No New Messages</div>";	
 	}
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$n = 0;
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';

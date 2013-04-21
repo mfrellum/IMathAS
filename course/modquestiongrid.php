@@ -26,7 +26,7 @@
 					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
 					$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$qid = mysqli_insert_id($GLOBALS['link'])();
+					$qid = mysqli_insert_id($GLOBALS['link']);
 					if ($newitemorder=='') {
 						$newitemorder = $qid;
 					} else {
@@ -75,7 +75,7 @@
 			
 			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$itemorder = mysql_fetch_first($result);
+			$itemorder = mysqli_fetch_first($result);
 			
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
@@ -108,7 +108,7 @@
 						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
 						$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-						$newqid = mysqli_insert_id($GLOBALS['link'])();
+						$newqid = mysqli_insert_id($GLOBALS['link']);
 						
 						$itemarr = explode(',',$itemorder);
 						$key = array_search($qid,$itemarr);

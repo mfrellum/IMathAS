@@ -42,7 +42,7 @@ if ($canviewall) {
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_fetch_first($result);
+		$gbmode = mysqli_fetch_first($result);
 		
 		
 	}
@@ -51,7 +51,7 @@ if ($canviewall) {
 	} else {
 		$query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$colorize = mysql_fetch_first($result);
+		$colorize = mysqli_fetch_first($result);
 		setcookie("colorize-$cid",$colorize);
 	}
 	if (isset($_GET['catfilter'])) {
@@ -110,7 +110,7 @@ if ($isteacher) {
 		//recording a toggle.  Called via AHAH
 		$query = "SELECT newflag FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$newflag = mysql_fetch_first($result);
+		$newflag = mysqli_fetch_first($result);
 		$newflag = $newflag ^ 1;  //XOR
 		$query = "UPDATE imas_courses SET newflag = $newflag WHERE id='$cid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -649,7 +649,7 @@ function gbstudisp($stu) {
 	if ($stu>0) {
 		$query = "SELECT showlatepass FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$showlatepass = mysql_fetch_first($result);
+		$showlatepass = mysqli_fetch_first($result);
 		
 		if ($isteacher) {
 			if ($gbt[1][4][2]==1) {
@@ -857,7 +857,7 @@ function gbstudisp($stu) {
 	if (!$hidepast) {
 		$query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$show = mysql_fetch_first($result);
+		$show = mysqli_fetch_first($result);
 		//echo '</tbody></table><br/>';
 		if ($isteacher && $stu>0) {
 			echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" /> ';

@@ -11,7 +11,7 @@ if ($sessiondata['ltiitemtype']==0) {
 	$typeid = $sessiondata['ltiitemid'];
 	$query = "SELECT courseid FROM imas_assessments WHERE id='$typeid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$cid = mysql_fetch_first($result);
+	$cid = mysqli_fetch_first($result);
 	$query = "SELECT id FROM imas_teachers WHERE courseid='$cid' AND userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	if (mysqli_num_rows($result)==0) {
@@ -36,7 +36,7 @@ if ($sessiondata['ltiitemtype']==0) {
 		}
 	} else {
 		$hascourse = true;
-		$cid = mysql_fetch_first($result);
+		$cid = mysqli_fetch_first($result);
 	}
 	if ($hascourse) {
 		$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid='{$sessiondata['lti_context_id']}' ";
@@ -52,7 +52,7 @@ if ($sessiondata['ltiitemtype']==0) {
 					$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
 					$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$placementid = mysqli_insert_id($GLOBALS['link'])();
+					$placementid = mysqli_insert_id($GLOBALS['link']);
 					$hasplacement = true;
 				} 
 			} 
@@ -94,7 +94,7 @@ if (isset($_POST['createcourse'])) {
 		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
 		$query .= "('{$sessiondata['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$cid = mysqli_insert_id($GLOBALS['link'])();
+		$cid = mysqli_insert_id($GLOBALS['link']);
 		//if ($myrights==40) {
 			$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -124,12 +124,12 @@ if (isset($_POST['createcourse'])) {
 			$irow = "'".implode("','",addslashes_deep($row))."'";
 			$query .= "('$cid',$irow)";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-			$gbcats[$frid] = mysqli_insert_id($GLOBALS['link'])();
+			$gbcats[$frid] = mysqli_insert_id($GLOBALS['link']);
 		}
 		$copystickyposts = true;
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['createcourse']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_fetch_first($result));
+		$items = unserialize(mysqli_fetch_first($result));
 		$newitems = array();
 		require("includes/copyiteminc.php");
 		copyallsub($items,'0',$newitems,$gbcats);
@@ -157,7 +157,7 @@ if (isset($_POST['createcourse'])) {
 		if ($placementtype=='assess') {
 			$query = "SELECT name FROM imas_assessments WHERE id='$typeid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$atitle = mysql_fetch_first($result);
+			$atitle = mysqli_fetch_first($result);
 			
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_place_aid=$typeid";
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($atitle).'&text='.urlencode($atitle));
@@ -174,7 +174,7 @@ if (isset($_POST['createcourse'])) {
 		$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
 		$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$placementid = mysqli_insert_id($GLOBALS['link'])();
+		$placementid = mysqli_insert_id($GLOBALS['link']);
 		$hasplacement = true;
 	}
 }
@@ -253,7 +253,7 @@ if (!$hascourse) {
 } else if ($placementtype=='assess') {
 	$query = "SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id='$typeid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	echo "<h3>LTI Placement of {$line['name']}</h3>";
 	echo "<p><a href=\"assessment/showtest.php?cid=$cid&id=$typeid\">Preview assessment</a> | ";
 	echo "<a href=\"course/isolateassessgrade.php?cid=$cid&aid=$typeid\">Grade list</a> ";

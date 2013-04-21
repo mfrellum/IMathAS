@@ -64,7 +64,7 @@ END;
 	
 	$rights = array();
 	$sortorder = array();
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$id = $line['id'];
 		$name = $line['name'];
 		$parent = $line['parent'];

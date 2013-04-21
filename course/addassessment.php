@@ -65,7 +65,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$query = "SELECT name FROM imas_assessments WHERE id={$_GET['id']}";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$assessmentname = mysql_fetch_first($result);
+			$assessmentname = mysqli_fetch_first($result);
 			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			$body .= "&gt; <a href=\"addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
 			$body .= "<h3>$assessmentname</h3>";
@@ -197,14 +197,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$isok = true;
 			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_fetch_first($result)==0) {
+			if (mysqli_fetch_first($result)==0) {
 				//check to see if students have already started assessment
 				//don't really care if groups exist - just whether asids exist
 				//$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
 				$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 				$query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_fetch_first($result)>0) {//if (mysqli_num_rows($result)>0) {
+				if (mysqli_fetch_first($result)>0) {//if (mysqli_num_rows($result)>0) {
 					echo "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
 					exit;
 				}
@@ -216,7 +216,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//create new groupset	
 			$query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$_POST['groupsetid'] = mysqli_insert_id($GLOBALS['link'])();
+			$_POST['groupsetid'] = mysqli_insert_id($GLOBALS['link']);
 			$updategroupset = "groupsetid='{$_POST['groupsetid']}',";
 		}
 		
@@ -232,7 +232,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
 				$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_fetch_first($result)>0) {
+				if (mysqli_fetch_first($result)>0) {
 					$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
@@ -278,17 +278,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "'{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg','$deffb','{$_POST['msgtoinstr']}','{$_POST['posttoforum']}',$istutorial);";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$newaid = mysqli_insert_id($GLOBALS['link'])();
+			$newaid = mysqli_insert_id($GLOBALS['link']);
 			
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','Assessment','$newaid');";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			
-			$itemid = mysqli_insert_id($GLOBALS['link'])();
+			$itemid = mysqli_insert_id($GLOBALS['link']);
 						
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			$items = unserialize($line['itemorder']);
 			
 			$blocktree = explode('-',$block);
@@ -316,10 +316,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 			$query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query; " . mysqli_error($GLOBALS['link']));
-			$taken = (mysql_fetch_first($result)>0);
+			$taken = (mysqli_fetch_first($result)>0);
 			$query = "SELECT * FROM imas_assessments WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$line = mysql_fetch_assoc($result);
+			$line = mysqli_fetch_assoc($result);
 			list($testtype,$showans) = explode('-',$line['deffeedback']);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];

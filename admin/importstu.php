@@ -137,7 +137,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				}
 				$query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$id = mysqli_insert_id($GLOBALS['link'])();
+				$id = mysqli_insert_id($GLOBALS['link']);
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
 				if ($isadmin) {

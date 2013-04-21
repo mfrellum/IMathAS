@@ -53,7 +53,7 @@ if ($cid==0) {
 			$query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysqli_num_rows($result)>0) {
-				$curid = mysql_fetch_first($result);
+				$curid = mysqli_fetch_first($result);
 				$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id<$curid";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			}
@@ -194,7 +194,7 @@ if ($cid==0) {
 		
 		$query = "UPDATE imas_wiki_views SET lastview=$now WHERE userid='$userid' AND wikiid='$id' AND stugroupid='$groupid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysqli_affected_rows($GLOBALS['link'])()==0) {
+		if (mysqli_affected_rows($GLOBALS['link'])==0) {
 			$query = "INSERT INTO imas_wiki_views (userid,wikiid,stugroupid,lastview) VALUES ('$userid','$id',$groupid,$now)";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		}
@@ -240,7 +240,7 @@ if ($overwriteBody==1) {
 	if (isset($teacherid) && $groupid>0 && !isset($curgroupname)) {
 		$query = "SELECT name FROM imas_stugroups WHERE id='$groupid'";		
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$grpnote = 'group '.mysql_fetch_first($result)."'s";
+		$grpnote = 'group '.mysqli_fetch_first($result)."'s";
 	} else {
 		$grpnote = 'this';
 	}

@@ -9,7 +9,7 @@
 	$cid = $_GET['cid'];
 	$query = "SELECT name,theme,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	if ($line == null) {
 		echo "Course cannot be found";
 		exit;

@@ -32,7 +32,7 @@
 	$qsetid = $_GET['id'];
 	$query = "SELECT * FROM imas_questionset WHERE id='$qsetid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-	$line = mysql_fetch_assoc($result);
+	$line = mysqli_fetch_assoc($result);
 	
 	echo '<div id="headerviewsource" class="pagetitle"><h2>Question Source</h2></div>';
 	echo "<h4>Descr'ption</h4>\n";

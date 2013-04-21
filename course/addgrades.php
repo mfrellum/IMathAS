@@ -17,7 +17,7 @@
 		if (is_numeric($_GET['gbitem'])) {
 			$query = "SELECT tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_fetch_first($result)==1) {
+			if (mysqli_fetch_first($result)==1) {
 				$isok = true;
 				$_GET['isolate'] = true;
 			}
@@ -67,7 +67,7 @@
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit,rubric) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit,$rubric) ";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$_GET['gbitem'] = mysqli_insert_id($GLOBALS['link'])();
+			$_GET['gbitem'] = mysqli_insert_id($GLOBALS['link']);
 			$isnewitem = true;
 		} else {
 			$query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,rubric=$rubric ";
@@ -358,7 +358,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_fetch_first($result)>0) {
+		if (mysqli_fetch_first($result)>0) {
 			$hassection = true;
 		} else {
 			$hassection = false;
@@ -367,7 +367,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($hassection) {
 			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_fetch_first($result)==0) {
+			if (mysqli_fetch_first($result)==0) {
 				$sortorder = "sec";
 			} else {
 				$sortorder = "name";

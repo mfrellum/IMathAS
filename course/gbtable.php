@@ -165,14 +165,14 @@ function gbtable() {
 	}
 	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_fetch_first($result)>0) {
+	if (mysqli_fetch_first($result)>0) {
 		$hassection = true;
 	} else {
 		$hassection = false;
 	}
 	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_fetch_first($result)>0) {
+	if (mysqli_fetch_first($result)>0) {
 		$hascode = true;
 	} else {
 		$hascode = false;
@@ -209,7 +209,7 @@ function gbtable() {
 	$category = array();
 	$name = array();
 	$possible = array();
-	while ($line=mysql_fetch_assoc($result)) {
+	while ($line=mysqli_fetch_assoc($result)) {
 		$assessments[$kcnt] = $line['id'];
 		$timelimits[$kcnt] = $line['timelimit'];
 		$minscores[$kcnt] = $line['minscore'];
@@ -271,7 +271,7 @@ function gbtable() {
 	}
 	$query .= "ORDER BY showdate";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($line=mysql_fetch_assoc($result)) {
+	while ($line=mysqli_fetch_assoc($result)) {
 		$grades[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Offline";
 		$category[$kcnt] = $line['gbcategory'];
@@ -294,7 +294,7 @@ function gbtable() {
 	}
 	$query .= "ORDER BY enddate";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($line=mysql_fetch_assoc($result)) {
+	while ($line=mysqli_fetch_assoc($result)) {
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
@@ -517,7 +517,7 @@ function gbtable() {
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$alt = 0;
-	while ($line=mysql_fetch_assoc($result)) { //foreach student
+	while ($line=mysqli_fetch_assoc($result)) { //foreach student
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		//Student ID info
 		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
@@ -544,7 +544,7 @@ function gbtable() {
 		//Get assessment scores
 		$query = "SELECT id,assessmentid,bestscores,starttime,endtime,feedback FROM imas_assessment_sessions WHERE userid='{$line['id']}'";
 		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($l = mysql_fetch_assoc($result2)) {
+		while ($l = mysqli_fetch_assoc($result2)) {
 			$asid[$l['assessmentid']] = $l['id'];
 			$scores = explode(",",$l['bestscores']);
 			$total = 0;
@@ -627,7 +627,7 @@ function gbtable() {
 					$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['id']}' AND assessmentid='{$assessments[$i]}'";
 					$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					if (mysqli_num_rows($r2)>0) {
-						$exped = mysql_fetch_first($r2);
+						$exped = mysqli_fetch_first($r2);
 						if ($exped>$enddate[$i]) {
 							$thised = $exped;
 						}

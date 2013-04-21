@@ -26,7 +26,7 @@
 			$query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			if (mysqli_num_rows($r2)>0) {
-				$r2id = mysql_fetch_first($r2);
+				$r2id = mysqli_fetch_first($r2);
 				$query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			} else{
@@ -61,7 +61,7 @@
 	
 	$query = "SELECT name FROM imas_forums WHERE id='$forumid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$forumname = mysql_fetch_first($result);
+	$forumname = mysqli_fetch_first($result);
 	
 	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h2>Posts by Name - $forumname</h2>\n";
@@ -186,7 +186,7 @@
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	while ($line =  mysql_fetch_assoc($result)) {
+	while ($line =  mysqli_fetch_assoc($result)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
 				echo '</div>';

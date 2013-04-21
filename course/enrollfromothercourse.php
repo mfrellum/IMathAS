@@ -85,7 +85,7 @@ if ($overwriteBody==1) {
 	if (isset($resultCourseList)) {
 		echo '<p>Select a course to choose students from:</p><p>';
 		$cnt = 0;
-		while ($line=mysql_fetch_assoc($resultCourseList)) {
+		while ($line=mysqli_fetch_assoc($resultCourseList)) {
 			echo '<input type="radio" name="sourcecourse" value="'.$line['id'].'" ';
 			if ($cnt==0) {echo 'checked="checked"';}
 			echo '/> '.$line['name'].'<br/>';
@@ -98,7 +98,7 @@ if ($overwriteBody==1) {
 		echo '<p>Select students to enroll:</p><p>';
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">None</a>';
 		echo '<p>';
-		while ($line=mysql_fetch_assoc($resultStudentList)) {
+		while ($line=mysqli_fetch_assoc($resultStudentList)) {
 			echo '<input type=checkbox name="checked[]" value="'.$line['id'].'"/>';
 			echo $line['LastName'].', '.$line['FirstName'].'<br/>';
 		}

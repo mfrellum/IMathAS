@@ -86,7 +86,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 	$i=0;
 	$page_pChecked = array();
 	
-	while ($line = mysql_fetch_assoc($result)) {
+	while ($line = mysqli_fetch_assoc($result)) {
 		$page_pChecked[$i]['id'] = $line['id'];
 		$page_pChecked[$i]['description'] = $line['description'];
 		$page_pChecked[$i]['qtype'] = $line['qtype'];
@@ -133,7 +133,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$i=0;
 			$page_nChecked = array();
 	
-			while ($line = mysql_fetch_assoc($result)) {
+			while ($line = mysqli_fetch_assoc($result)) {
 				$page_nChecked[$i]['id'] = $line['id'];
 				$page_nChecked[$i]['description'] = $line['description'];
 				$page_nChecked[$i]['qtype'] = $line['qtype'];
@@ -159,7 +159,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$includedqs = array();
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
 			}
@@ -180,7 +180,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$qcnt = 0;
-		while ($line = mysql_fetch_assoc($result)) {
+		while ($line = mysqli_fetch_assoc($result)) {
 			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
 			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
 			echo "\nSTART QUESTION\n";

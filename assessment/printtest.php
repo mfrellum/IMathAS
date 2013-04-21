@@ -30,7 +30,7 @@
 	function getpointspossible($qn,$defpts,$defatt) {
 		$query = "SELECT points,attempts FROM imas_questions WHERE id='$qn'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 		 	if ($row[0] == 9999) {
 				$possible = $defpts;
 			} else {
@@ -62,7 +62,7 @@
 		if ($line['userid']!=$userid) {
 			$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 			$userfullname = $row[1]." ".$row[0];
 		}
 		$userid= $line['userid'];
@@ -78,7 +78,7 @@
 	if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result2);
+		$row = mysqli_fetch_row($result2);
 		if ($row!=null) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
@@ -133,7 +133,7 @@
 		if (isset($_GET['descr'])) {
 			$query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-			echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
+			echo '<div>ID:'.$qsetid.', '.mysqli_fetch_first($result).'</div>';
 		} else {
 			list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
 			echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";

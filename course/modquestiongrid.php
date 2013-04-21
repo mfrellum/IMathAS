@@ -10,8 +10,7 @@
 		if (isset($_POST['add'])) { //adding new questions
 			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$itemorder = mysql_result($result,0,0);
-			$viddata = mysql_result($result,0,1);
+			list($itemorder, $viddata) = mysqli_fetch_row($result);
 			
 			$newitemorder = '';
 			if (isset($_POST['addasgroup'])) {
@@ -76,7 +75,7 @@
 			
 			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$itemorder = mysql_result($result,0,0);
+			$itemorder = mysql_fetch_first($result);
 			
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
@@ -90,7 +89,7 @@
 			if (count($lookupid)>0) {
 				$query = "SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$qidtoqsetid[$row[0]] = $row[1];
 				}
 			}
@@ -161,7 +160,7 @@ Leave items blank to use the assessment's default values<br/>
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
 			$query .= "imas_questions.id IN ('".implode("','",$qids)."')";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if ($row[2]==9999) {
 					$row[2] = '';
 				} 
@@ -211,7 +210,7 @@ Leave items blank to use the assessment's default values<br/>
 			
 			$query = "SELECT id,description,extref FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				echo '<tr><td>'.$row[1].'</td>';
 				if ($row[2]!='') {
 					$extref = explode('~~',$row[2]);

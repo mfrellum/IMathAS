@@ -26,7 +26,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$query = "SELECT userid FROM imas_students WHERE courseid='$cid' AND userid IN ($todolist)";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$dontdo = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$dontdo[] = $row[0];
 		}
 		$vals = array();

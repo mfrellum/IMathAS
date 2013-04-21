@@ -27,10 +27,9 @@ $isdiag = false;
 if ($canviewall) {
 	$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		$isdiag = true;
-		$sel1name = mysql_result($result,0,0);
-		$sel2name = mysql_result($result,0,1);
+		list($sel1name, $sel2name) = mysqli_fetch_row($result);
 	}
 }
 
@@ -148,7 +147,7 @@ function gbtable() {
 	//Pull Gradebook Scheme info
 	$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	list($useweights,$orderby,$defaultcat,$usersort) = mysqli_fetch_row($result);
 	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
 	
 	
@@ -164,14 +163,14 @@ function gbtable() {
 	}
 	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_result($result,0,0)>0) {
+	if (mysql_fetch_first($result)>0) {
 		$hassection = true;
 	} else {
 		$hassection = false;
 	}
 	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_result($result,0,0)>0) {
+	if (mysql_fetch_first($result)>0) {
 		$hascode = true;
 	} else {
 		$hascode = false;
@@ -190,7 +189,7 @@ function gbtable() {
 	if ($orderby>=10 && $orderby <=13) {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$courseitemorder = unserialize(mysql_result($result,0,0));
+		$courseitemorder = unserialize(mysql_fetch_first($result));
 		$courseitemsimporder = array();
 		function flattenitems($items,&$addto) {
 			foreach ($items as $item) {
@@ -206,7 +205,7 @@ function gbtable() {
 		$courseitemsassoc = array();
 		$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if (!isset($courseitemsimporder[$row[1]])) { //error catch items not in course.itemorder
 				$courseitemsassoc[$row[1].$row[2]] = 999+count($courseitemsassoc);
 			} else {
@@ -300,7 +299,7 @@ function gbtable() {
 		$query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$line['id']}'";
 		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		$totalpossible = 0;
-		while ($r = mysql_fetch_row($result2)) {
+		while ($r = mysqli_fetch_row($result2)) {
 			if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
@@ -410,7 +409,7 @@ function gbtable() {
 	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid' ";
 	$query .= "ORDER BY name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		if (in_array($row[0],$category)) { //define category if used
 			if ($row[1]{0}>='1' && $row[1]{0}<='9') {
 				$row[1] = substr($row[1],1);
@@ -755,7 +754,7 @@ function gbtable() {
 	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
 	$query .= "imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
 	$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($r = mysql_fetch_row($result2)) {
+	while ($r = mysqli_fetch_row($result2)) {
 		if (!isset($sturow[$r[1]])) { continue;}
 		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);	
 		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][6] = ($r[3]>0)?(1+$r[3]):1;
@@ -1005,7 +1004,7 @@ function gbtable() {
 	$query .= "GROUP BY imas_forum_posts.forumid,imas_forum_posts.userid ";
 	
 	$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($r = mysql_fetch_row($result2)) {
+	while ($r = mysqli_fetch_row($result2)) {
 		if (!isset($discussidx[$r[1]]) || !isset($sturow[$r[0]]) || !isset($discusscol[$r[1]])) {
 			continue;
 		}

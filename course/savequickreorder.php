@@ -31,7 +31,7 @@
 	 } else if ($type=="B") {
 		 $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		 $itemsforblock = unserialize(mysql_result($result,0,0));
+		 $itemsforblock = unserialize(mysql_fetch_first($result));
 		$blocktree = explode('-',$typeid);
 		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
 		$sub =& $itemsforblock;
@@ -49,7 +49,7 @@
  
  $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
  $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
- $items = unserialize(mysql_result($result,0,0));
+ $items = unserialize(mysql_fetch_first($result));
  
  $newitems = array();
 

@@ -14,7 +14,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_result($result,0,0);
+		$gbmode = mysql_fetch_first($result);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];
@@ -79,9 +79,10 @@
 	
 	$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$defpoints = mysql_result($result,0,0);
-	echo mysql_result($result,0,1).'</h2></div>';
-	$itemorder = mysql_result($result,0,2);
+	list($defpoints, $name, $itemorder) = mysqli_fetch_row($result);
+
+	echo $name.'</h2></div>';
+
 	$itemarr = array();
 	$itemnum = array();
 	foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -105,7 +106,7 @@
 		$query .= " AND imas_students.section='$secfilter' ";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
-	$totstucnt = mysql_result($result,0,0);
+	$totstucnt = mysql_fetch_first($result);
 	
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
@@ -168,7 +169,7 @@
 		$withdrawn = array();
 		$qsetids = array();
 		$needmanualgrade = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$descrips[$row[1]] = $row[0];
 			$points[$row[1]] = $row[2];
 			$qsetids[$row[1]] = $row[3];
@@ -283,7 +284,7 @@
 	
 	$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
-	if (mysql_result($result,0,0)>0) {
+	if (mysql_fetch_first($result)>0) {
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints);
 	}

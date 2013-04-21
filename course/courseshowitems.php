@@ -579,10 +579,10 @@ function enditem($canedit) {
 			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now ) {
 				   $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
 				   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				   if (mysql_num_rows($result)==0) {
+				   if (mysqli_num_rows($result)==0) {
 					   $nothidden = false;
 				   } else {
-					   $scores = mysql_result($result,0,0);
+					   $scores = mysql_fetch_first($result);
 					   if (round(getpts($scores),1)+.02<$line['reqscore']) {
 					   	   $nothidden = false;
 					   }
@@ -795,11 +795,11 @@ function enditem($canedit) {
 				   echo filter("<div class=itemsum>{$line['text']}\n");
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				   if (mysql_num_rows($result)>0) {
+				   if (mysqli_num_rows($result)>0) {
 					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
-					   while ($row = mysql_fetch_row($result)) {
+					   while ($row = mysqli_fetch_row($result)) {
 						   $filenames[$row[0]] = $row[2];
 						   $filedescr[$row[0]] = $row[1];
 					   }
@@ -842,11 +842,11 @@ function enditem($canedit) {
 				   echo filter("</div><div class=itemsum>{$line['text']}\n");
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				   if (mysql_num_rows($result)>0) {
+				   if (mysqli_num_rows($result)>0) {
 					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
-					   while ($row = mysql_fetch_row($result)) {
+					   while ($row = mysqli_fetch_row($result)) {
 						   $filenames[$row[0]] = $row[2];
 						   $filedescr[$row[0]] = $row[1];
 					   }
@@ -1084,8 +1084,8 @@ function enditem($canedit) {
 				if (!$viewall) {
 					$query = "SELECT agroupid FROM imas_assessment_sessions WHERE assessmentid='{$line['grpaid']}' AND userid='$userid'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)>0) {
-						$agroupid = mysql_result($result,0,0);
+					if (mysqli_num_rows($result)>0) {
+						$agroupid = mysql_fetch_first($result);
 					} else {
 						$agroupid=0;
 					}
@@ -1095,17 +1095,17 @@ function enditem($canedit) {
 					$query = "SELECT userid FROM imas_assessment_sessions WHERE agroupid='$agroupid' AND assessmentid='{$line['grpaid']}'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 					$limids = array();
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						$limids[] = $row[0];
 					}
 					$query = "SELECT userid FROM imas_teachers WHERE courseid='$cid'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						$limids[] = $row[0];
 					}
 					$query = "SELECT userid FROM imas_tutors WHERE courseid='$cid'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						$limids[] = $row[0];
 					}
 					$limids = "'".implode("','",$limids)."'";
@@ -1117,7 +1117,7 @@ function enditem($canedit) {
 				   $query .= " AND userid IN ($limids)";
 			   }
 			   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			   $numthread = mysql_result($result,0,0);
+			   $numthread = mysql_fetch_first($result);
 			   $query = "SELECT imas_forum_views.lastview,MAX(imas_forum_posts.postdate) FROM imas_forum_views ";
 			   $query .= "LEFT JOIN imas_forum_posts ON imas_forum_views.threadid=imas_forum_posts.threadid AND imas_forum_views.userid='$userid' ";
 			   $query .= "WHERE imas_forum_posts.forumid='$typeid' ";
@@ -1127,10 +1127,10 @@ function enditem($canedit) {
 			   $query .= "GROUP BY imas_forum_posts.threadid";
 			   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			   $hasnewitems = false;
-			   if (mysql_num_rows($result)<$numthread) {
+			   if (mysqli_num_rows($result)<$numthread) {
 				   $hasnewitems = true;
 			   } else {
-				   while ($row = mysql_fetch_row($result)) {
+				   while ($row = mysqli_fetch_row($result)) {
 					   if ($row[0]<$row[1]) {
 						   $hasnewitems = true;
 						   break;
@@ -1249,11 +1249,11 @@ function enditem($canedit) {
 			   $hasnew = false;
 			   if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 			   	   if ($line['groupsetid']>0 && !$canedit) {
-			   	   	   $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+			   	   	   $query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			   	   	   $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='{$line['groupsetid']}'";
 			   	   	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			   	   	   if (mysql_num_rows($result)>0) {
-			   	   	   	   $wikigroupid = mysql_result($result,0,0);
+			   	   	   if (mysqli_num_rows($result)>0) {
+			   	   	   	   $wikigroupid = mysql_fetch_first($result);
 			   	   	   } else {
 			   	   	   	   $wikigroupid = 0;
 			   	   	   }
@@ -1261,7 +1261,7 @@ function enditem($canedit) {
 			   	   $wikilastviews = array();
 			   	   $query = "SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
 			   	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				   while ($row = mysql_fetch_row($result)) {
+				   while ($row = mysqli_fetch_row($result)) {
 				   	   $wikilastviews[$row[0]] = $row[1];
 				   }
 				   
@@ -1271,7 +1271,7 @@ function enditem($canedit) {
 				   }
 				   $query .= "GROUP BY stugroupid";
 				   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				   while ($row = mysql_fetch_row($result)) {
+				   while ($row = mysqli_fetch_row($result)) {
 				   	   if (!isset($wikilastviews[$row[0]]) || $wikilastviews[$row[0]] < $row[1]) {
 				   	   	   $hasnew = true;
 				   	   	   break;
@@ -1568,37 +1568,37 @@ function enditem($canedit) {
 	   $itemtypes = array();  $iteminfo = array();
 	   $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   while ($row = mysql_fetch_row($result)) {
+	   while ($row = mysqli_fetch_row($result)) {
 		   $itemtypes[$row[0]] = array($row[1],$row[2]);
 	   }
 	   $query = "SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   while ($row = mysql_fetch_row($result)) {
+	   while ($row = mysqli_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['Assessment'][$id] = $row;
 	   }
 	   $query = "SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   while ($row = mysql_fetch_row($result)) {
+	   while ($row = mysqli_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['InlineText'][$id] = $row;
 	   }
 	   $query = "SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   while ($row = mysql_fetch_row($result)) {
+	   while ($row = mysqli_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['LinkedText'][$id] = $row;
 	   }
 	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   while ($row = mysql_fetch_row($result)) {
+	   while ($row = mysqli_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['Forum'][$id] = $row;
 	   }
 	   
 	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   while ($row = mysql_fetch_row($result)) {
+	   while ($row = mysqli_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['Wiki'][$id] = $row;
 	   }

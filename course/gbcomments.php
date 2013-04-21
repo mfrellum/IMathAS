@@ -64,8 +64,8 @@
 						$query .= "0";
 					}
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)>0) {
-						$cuserid=mysql_result($result,0,0);
+					if (mysqli_num_rows($result)>0) {
+						$cuserid=mysql_fetch_first($result);
 						if ($comtype=='stu') {
 							$query = "UPDATE imas_students SET gbcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
 						} else if ($comtype=='instr') {
@@ -126,7 +126,7 @@
 	if (isset($_GET['record'])) {
 		$query = "SELECT id FROM imas_students WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			//if ($_POST[$row[0]]!='') {
 				if ($comtype=='stu') {
 					$query = "UPDATE imas_students SET gbcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
@@ -178,7 +178,7 @@
 	}
 	$query .= "WHERE i_s.userid=iu.id AND i_s.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo "<span class=form>{$row[1]}, {$row[2]}</span><span class=formright><textarea cols=50 rows=3 name=\"{$row[0]}\">{$row[3]}</textarea></span><br class=form>";
 	}
 	echo "<div class=\"submit\"><input type=submit value=\"Submit\"/></div>";

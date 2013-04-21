@@ -100,14 +100,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//update attached files
 			$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if (isset($_POST['delfile-'.$row[0]])) {
 					$filestoremove[] = $row[0];
 					$query = "DELETE FROM imas_instr_files WHERE id='{$row[0]}'";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$query = "SELECT id FROM imas_instr_files WHERE filename='{$row[2]}'";
 					$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($r2)==0) {
+					if (mysqli_num_rows($r2)==0) {
 						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 						//unlink($uploaddir . $row[2]);
 						deletecoursefile($row[2]);
@@ -200,7 +200,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($addedfile) || count($filestoremove)>0 || isset($_GET['movefile'])) {
 		$query = "SELECT fileorder FROM imas_inlinetext WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$fileorder = explode(',',mysql_result($result,0,0));
+		$fileorder = explode(',',mysql_fetch_first($result));
 		if ($fileorder[0]=='') {
 			$fileorder = array();
 		}
@@ -281,8 +281,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_fileorderCount = count($fileorder);
 	$i = 0;
 	$page_FileLinks = array();
-	if (mysql_num_rows($result)>0) {
-		while ($row = mysql_fetch_row($result)) {
+	if (mysqli_num_rows($result)>0) {
+		while ($row = mysqli_fetch_row($result)) {
 			$filedescr[$row[0]] = $row[1];
 			$filenames[$row[0]] = rawurlencode($row[2]);
 		}

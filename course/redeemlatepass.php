@@ -8,7 +8,7 @@
 	
 	$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$hours = mysql_result($result,0,0);
+	$hours = mysql_fetch_first($result);
 		
 	if (isset($_GET['undo'])) {
 		require("../header.php");
@@ -19,17 +19,17 @@
 		echo "Un-use LatePass</div>";
 		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)==0) {
+		if (mysqli_num_rows($result)==0) {
 			echo '<p>Invalid</p>';
 		} else {
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 			if ($row[1]==0) {
 				echo '<p>Invalid</p>';
 			} else {
 				$now = time();
 				$query = "SELECT enddate FROM imas_assessments WHERE id='$aid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$enddate = mysql_result($result,0,0);
+				$enddate = mysql_fetch_first($result);
 				//if it's past original due date and latepass is for less than latepasshrs past now, too late
 				if ($now > $enddate && $row[0] < $now + $hours*60*60) {
 					echo '<p>Too late to un-use this LatePass</p>';
@@ -68,14 +68,14 @@
 		$addtime = $hours*60*60;
 		$query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
+		list($allowlate,$enddate,$startdate) =mysqli_fetch_row($result);
 		if ($allowlate==1) {
 			$query = "UPDATE imas_students SET latepass=latepass-1 WHERE userid='$userid' AND courseid='$cid' AND latepass>0";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			if (mysqli_affected_rows($GLOBALS['link'])()>0) {
 				$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) { //already have exception
+				if (mysqli_num_rows($result)>0) { //already have exception
 					$query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid'";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				} else {
@@ -103,7 +103,7 @@
 		
 		$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$numlatepass = mysql_result($result,0,0);
+		$numlatepass = mysql_fetch_first($result);
 		
 		if ($numlatepass==0) { //shouldn't get here if 0
 			echo "<p>You have no late passes remaining</p>";

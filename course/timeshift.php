@@ -62,14 +62,16 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_POST['aid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$basedate = mysql_result($result,0,intval($_POST['base']));
+		$row = mysqli_fetch_row($result);
+		$basedate = $row[intval($_POST['base'])];
+
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$_POST['sdate'],$dmatches);
 		$newstamp = mktime(date('G',$basedate),date('i',$basedate),0,$dmatches[1],$dmatches[2],$dmatches[3]);
 		$shift = $newstamp-$basedate;
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 
 		shiftsub($items);
 		$itemorder = addslashes(serialize($items));
@@ -78,7 +80,7 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		while ($row=mysql_fetch_row($result)) {
+		while ($row=mysqli_fetch_row($result)) {
 			if ($row[0]=="InlineText") {
 				$table = "imas_inlinetext";
 			} else if ($row[0]=="LinkedText") {

@@ -98,7 +98,7 @@ $exceptions = array();
 if (!isset($teacherid)) {
 	$query = "SELECT assessmentid,startdate,enddate FROM imas_exceptions WHERE userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$exceptions[$row[0]] = array($row[1],$row[2]);
 	}
 }
@@ -108,7 +108,7 @@ $byid = array();
 $k = 0;
 $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
 		$row[2] = $exceptions[$row[0]][0];
 		$row[3] = $exceptions[$row[0]][1];
@@ -135,10 +135,10 @@ while ($row = mysql_fetch_row($result)) {
 	if (!isset($teacherid) && $row[6]>0 && $row[7]>0) {
 		$query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
 		   $r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		   if (mysql_num_rows($r2)==0) {
+		   if (mysqli_num_rows($r2)==0) {
 			   continue;
 		   } else {
-			   $scores = mysql_result($r2,0,0);
+			   $scores = mysql_fetch_first($r2);
 			   if (getpts($scores)<$row[6]) {
 				   continue;
 			   }
@@ -193,7 +193,7 @@ if (isset($teacherid)) {
 }
 
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if ($row[1]=='##hidden##') {
 		$row[1] = strip_tags( $row[3]);
 	}
@@ -221,7 +221,7 @@ if (isset($teacherid)) {
 	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid='$cid' ORDER BY title";
 }
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if ($row[5]==1) {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
 	} else {
@@ -250,7 +250,7 @@ while ($row = mysql_fetch_row($result)) {
 }
 $query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if (($row[4]>$now && !isset($teacherid))) {
 		continue;
 	}
@@ -279,7 +279,7 @@ while ($row = mysql_fetch_row($result)) {
 }
 $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-$itemorder = unserialize(mysql_result($result,0,0));
+$itemorder = unserialize(mysql_fetch_first($result));
 $itemsimporder = array();
 
 flattenitems($itemorder,$itemsimporder);
@@ -287,7 +287,7 @@ flattenitems($itemorder,$itemsimporder);
 $itemsassoc = array();
 $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$itemsassoc[$row[0]] = array($row[1],$row[2]);
 }
 
@@ -348,7 +348,7 @@ foreach ($itemsimporder as $item) {
 
 $query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid='$cid' ORDER BY title";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	$row[0] = str_replace('"','\"',$row[0]);
 	$assess[$moday][$k] = "{type:\"C\", time:\"$time\", tag:\"$row[1]\", name:\"$row[0]\"}";

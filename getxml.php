@@ -9,7 +9,7 @@
 	//look up user
 	$query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$userid = mysql_result($result,0,0);
+	$userid = mysql_fetch_first($result);
 	$tzoffset = $_GET['tzoffset'];
 	
 	function tzdate($string,$time) {
@@ -101,7 +101,7 @@
 	$cidlist = implode(',',array_keys($courseforums));
 	$query = "SELECT id,name FROM imas_courses WHERE id IN ($cidlist)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$coursenames[$row[0]] = $row[1];
 	}
 	asort($coursenames);

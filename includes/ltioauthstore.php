@@ -26,13 +26,11 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 	}
 	
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
-		$secret = mysql_result($result,0,0);
+	if (mysqli_num_rows($result)>0) {
+		list($secret, $rights) = mysqli_fetch_row($result);
 		if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 			$rights = 11;
-		} else {
-			$rights = mysql_result($result,0,1);
-		}
+		} 
 		if ($secret=='') {
 			//if secret isn't set, don't use blank as secret
 			return NULL;
@@ -52,8 +50,8 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
     function lookup_nonce($consumer, $token, $nonce, $timestamp) {
         $query = "SELECT id FROM imas_ltinonces WHERE nonce='$nonce'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
-		return mysql_result($result,0,0);
+	if (mysqli_num_rows($result)>0) {
+		return mysql_fetch_first($result);
 	} else {
 		return NULL;
 	}

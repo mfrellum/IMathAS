@@ -25,7 +25,7 @@ $att = $_GET['att'];
 $qsids = array();
 $query = "SELECT id,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$qsids[$row[0]] = $row[1];
 }
 
@@ -33,7 +33,7 @@ while ($row = mysql_fetch_row($result)) {
 $qsdata = array();
 $query = "SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$qsdata[$row[0]] = array($row[1],$row[2],$row[3]);
 }
 
@@ -50,7 +50,7 @@ $query .= "WHERE assessmentid='$aid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $sessioncnt = 0;
 $qdata = array();
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$questions = explode(',',$row[0]);
 	$scores = explode(',',$row[3]);
 	$seeds = explode(',',$row[1]);
@@ -112,9 +112,10 @@ echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Results: ';
 
 $query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-$defpoints = mysql_result($result,0,0);
-echo mysql_result($result,0,1).'</h2></div>';
-$itemorder = mysql_result($result,0,2);
+list($defpoints, $name, $itemorder) = mysqli_fetch_row($result);
+
+echo $name.'</h2></div>';
+
 $itemarr = array();
 $itemnum = array();
 foreach (explode(',',$itemorder) as $k=>$itel) {

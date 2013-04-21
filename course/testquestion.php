@@ -80,14 +80,9 @@ if ($myrights<20) {
 	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid,imas_questionset.broken ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$email = mysql_result($result,0,0);
-	$author = mysql_result($result,0,1);
-	$descr = mysql_result($result,0,2);
-	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
-	$ancestors = mysql_result($result,0,4);
-	$deleted = mysql_result($result,0,5);
-	$ownerid = mysql_result($result,0,6);
-	$broken = mysql_result($result,0,7);
+	list($email, $author, $descr, $lastmod, $ancestors, $deleted, $ownerid, $broken) = mysqli_fetch_row($result);
+	$lastmod = date("m/d/y g:i a",$lastmod);
+	
 	if (isset($CFG['AMS']['showtips'])) {
 		$showtips = $CFG['AMS']['showtips'];
 	} else {
@@ -267,7 +262,7 @@ if ($overwriteBody==1) {
 
 	echo '<p>Question is in these libraries:';
 	echo '<ul>';
-	while ($row = mysql_fetch_row($resultLibNames)) {
+	while ($row = mysqli_fetch_row($resultLibNames)) {
 		echo '<li>'.$row[0];
 		if ($myrights==100) {
 			echo ' ('.$row[1].', '.$row[2].')';

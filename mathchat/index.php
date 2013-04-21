@@ -18,12 +18,12 @@ $now = time();
 //check for session
 //$query = "SELECT * FROM mc_sessions WHERE sessionid='$sessionid'";
 //$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-//if (mysql_num_rows($result)==0) {
+//if (mysqli_num_rows($result)==0) {
 if (isset($_GET['isactive'])) { //request to see if room is being used
 	$on = $now - 15;
 	$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='{$_GET['isactive']}' AND lastping>$on";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	echo mysql_num_rows($result);
+	echo mysqli_num_rows($result);
 	exit;
 }
 if (!isset($_GET['userid'])) {
@@ -89,7 +89,7 @@ if (isset($_REQUEST['update'])) {
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	echo '{"msgs":[';
 	$i =0;
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		if ($i>0) {echo ',';}
 		$i++;
 		//echo '<div class="msg" id="'.$row[2].'"><div class="user">'.$row[0].'</div>';
@@ -106,7 +106,7 @@ if (isset($_REQUEST['update'])) {
 	$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='{$mcsession['room']}' AND lastping>$on ORDER BY name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$i =0;
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		//echo $row[0].'<br/>';
 		if ($i>0) {echo ',';}
 		$i++;

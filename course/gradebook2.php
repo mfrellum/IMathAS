@@ -31,7 +31,7 @@ if ($isteacher) {
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmodet = mysql_result($result,0,0);
+		$gbmodet = mysql_fetch_first($result);
 		$gbmode = 2;
 		if (($gbmodet&8)==8) { $gbmode += 1000;}
 		if (($gbmodet&16)==16) {$gbmode += 20;}
@@ -190,7 +190,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	echo '>Default</option>';
 	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo '<option value="'.$row[0].'"';
 		if ($catfilter==$row[0]) {echo "selected=1";}
 		echo '>'.$row[1].'</option>';
@@ -279,14 +279,14 @@ function gbstudisp($stu) {
 		$query = "SELECT imas_students.gbcomment,imas_users.email FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
+			list($gbcomment, $email) = mysqli_fetch_row($result);
 			if ($isteacher) {
-				echo '<a href="mailto:'.mysql_result($result,0,1).'">Email</a> | ';
+				echo '<a href="mailto:'.$email.'">Email</a> | ';
 				echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">Message</a> | ";
 				echo "<a href=\"exception.php?cid={$_GET['cid']}&uid=$stu\">Make Exception</a> | ";
 				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a>";
 			}
-			$gbcomment = mysql_result($result,0,0);
 		} else {
 			$gbcomment = '';
 		}
@@ -452,7 +452,7 @@ function gbinstrdisp() {
 			echo  '>All</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
 					echo  'selected=1';

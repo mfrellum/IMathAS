@@ -46,7 +46,7 @@ switch($_GET['action']) {
 				$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses JOIN imas_teachers ON ";
 				$query .= "imas_courses.id=imas_teachers.courseid WHERE imas_teachers.userid='{$CFG['GEN']['selfenrolluser']}' ORDER by imas_courses.name";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 				}
 				echo '</select></p>';
@@ -167,7 +167,7 @@ switch($_GET['action']) {
 			} else {
 				$query = "SELECT name FROM imas_libraries WHERE id='{$line['deflib']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$lname = mysql_result($result,0,0);
+				$lname = mysql_fetch_first($result);
 			}
 			
 			echo "<script type=\"text/javascript\">";
@@ -212,7 +212,7 @@ switch($_GET['action']) {
 			$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses JOIN imas_teachers ON ";
 			$query .= "imas_courses.id=imas_teachers.courseid WHERE imas_teachers.userid='{$CFG['GEN']['selfenrolluser']}' ORDER by imas_courses.name";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 			}
 			echo '</select></p>';
@@ -255,7 +255,7 @@ switch($_GET['action']) {
 	case "googlegadget":
 		$query = "SELECT remoteaccess FROM imas_users WHERE id='$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$code = mysql_result($result,0,0);
+		$code = mysql_fetch_first($result);
 		if ($code=='' || isset($_GET['regen'])) {
 			$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 			do {
@@ -265,7 +265,7 @@ switch($_GET['action']) {
 				}	
 				$query = "SELECT id FROM imas_users WHERE remoteaccess='$pass'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			} while (mysql_num_rows($result)>0);
+			} while (mysqli_num_rows($result)>0);
 			$query = "UPDATE imas_users SET remoteaccess='$pass' WHERE id='$userid'";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$code = $pass;

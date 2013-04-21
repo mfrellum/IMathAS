@@ -70,7 +70,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND userights>0";
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if (!in_array($row[2],$rootlibs)) { //don't export children here
 				$libs[$row[0]] = $libcnt;
 				$parents[$libcnt] = 0;
@@ -97,8 +97,8 @@ if (!(isset($teacherid)) && $myrights<20) {
 				$query .= " AND userights>0";
 			}
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
-				while ($row = mysql_fetch_row($result)) {
+			if (mysqli_num_rows($result)>0) {
+				while ($row = mysqli_fetch_row($result)) {
 					if (!isset($libs[$row[0]])) { //in case someone clicked a parent and it's child
 						$libs[$row[0]] = $libcnt;
 						$parents[$libcnt] = $libs[$lib];
@@ -142,7 +142,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$qassoc = Array();
 		$libitems = Array();
 		$qcnt = 0;
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if (!isset($qassoc[$row[0]])) {$qassoc[$row[0]] = $qcnt;}
 			$libitems[$libs[$row[1]]][] = $qcnt;
 			$qcnt++;
@@ -181,7 +181,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$includedlist = implode(',',$includedqs);
 			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$includedbackref[$row[0]] = $row[1];		
 			}
 		}
@@ -222,7 +222,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 				echo "\nQIMGS\n";
 				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
 				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($r2)) {
+				while ($row = mysqli_fetch_row($r2)) {
 					echo $row[0].','.$row[1]. "\n";
 					$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row[1];
 				}

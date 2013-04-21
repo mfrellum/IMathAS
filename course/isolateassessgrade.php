@@ -22,7 +22,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_result($result,0,0);
+		$gbmode = mysql_fetch_first($result);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	
@@ -35,7 +35,7 @@
 	$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 	$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	if (mysql_result($result,0,0)>0) {
+	if (mysql_fetch_first($result)>0) {
 		$hassection = true;
 	} else {
 		$hassection = false;
@@ -44,7 +44,7 @@
 	if ($hassection) {
 		$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		if (mysql_result($result,0,0)==0) {
+		if (mysql_fetch_first($result)==0) {
 			$sortorder = "sec";
 		} else {
 			$sortorder = "name";
@@ -55,7 +55,7 @@
 	
 	$query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder) = mysql_fetch_row($result);
+	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder) = mysqli_fetch_row($result);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 	
@@ -80,7 +80,7 @@
 	$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
 	$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$totalpossible = 0;
-	while ($r = mysql_fetch_row($result2)) {
+	while ($r = mysqli_fetch_row($result2)) {
 		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
 			if ($r[0]==9999) {
 				$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
@@ -103,7 +103,7 @@
 	$query = "SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$exceptions = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$exceptions[$row[0]] = array($row[1],$row[2]);
 	}
 	

@@ -173,13 +173,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$text = trim(mysql_result($result,0,0));
+			$text = trim(mysql_fetch_first($result));
 			if (substr($text,0,5)=='file:') { //has file
 				$safetext = addslashes($text);
 				if ($_POST['text']!=$safetext) { //if not same file, delete old if not used
 					$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)==1) { 
+					if (mysqli_num_rows($result)==1) { 
 						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 						$filename = substr($text,5);
 						deletecoursefile($filename);
@@ -310,7 +310,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ";
 		$query .= "OR (courseid=0 AND (groupid='$groupid' OR groupid=0)) ORDER BY name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$toolvals[] = $row[0];
 			$toollabels[] = $row[1];
 		}

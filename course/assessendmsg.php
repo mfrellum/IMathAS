@@ -52,7 +52,7 @@ if (!isset($imasroot)) {
 	if (!isset($_POST['checked'])) {
 		$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_GET['aid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$endmsg = mysql_result($result,0,0);
+		$endmsg = mysql_fetch_first($result);
 	} else {
 		$endmsg = '';
 		if (count($_POST['checked'])==0) {

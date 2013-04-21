@@ -16,7 +16,7 @@ if (isset($teacherid)) {
 		$userid = $_GET['userid'];
 		$query = "SELECT SID FROM imas_users WHERE id='$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$username = mysql_result($result,0,0);
+		$username = mysql_fetch_first($result);
 	}
 } else if (!isset($studentid) && !isset($teacherid)) {
 	echo 'Must be a student in this class to claim a badge';
@@ -31,10 +31,10 @@ if (isset($teacherid)) {
 	$badgeid = intval($_GET['badgeid']);
 	$query = "SELECT name, requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo 'Invalid badge ID for this course';
 	} else {
-		list($name,$req) = mysql_fetch_row($result);
+		list($name,$req) = mysqli_fetch_row($result);
 		$req = unserialize($req);
 		
 		//get student's scores
@@ -47,7 +47,7 @@ if (isset($teacherid)) {
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gtypes = array('0'=>'Past Due', '3'=>'Past and Attempted', '1'=>'Past and Available', '2'=>'All Items'); 
 		
-		while ($row=mysql_fetch_row($result)) {
+		while ($row=mysqli_fetch_row($result)) {
 			$gbcats[$row[0]] = $row[1];
 		}
 		

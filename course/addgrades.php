@@ -17,7 +17,7 @@
 		if (is_numeric($_GET['gbitem'])) {
 			$query = "SELECT tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_result($result,0,0)==1) {
+			if (mysql_fetch_first($result)==1) {
 				$isok = true;
 				$_GET['isolate'] = true;
 			}
@@ -87,7 +87,7 @@
 			$kl = implode(',',$keys);
 			$query = "SELECT userid FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['gbitem']}' AND userid IN ($kl)";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while($row = mysql_fetch_row($result)) {
+			while($row = mysqli_fetch_row($result)) {
 				$_POST['score'][$row[0]] = $_POST['newscore'][$row[0]];
 				unset($_POST['newscore'][$row[0]]);
 			}
@@ -99,7 +99,7 @@
 		//doing assessment snapshot
 		$query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid='{$_POST['assesssnapaid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while($row = mysql_fetch_row($result)) {
+		while($row = mysqli_fetch_row($result)) {
 			$sc = explode(',',$row[1]);
 			$tot = 0;
 			$att = 0;
@@ -237,7 +237,7 @@
 		} else {
 			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit,$rubric) = mysql_fetch_row($result);
+			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit,$rubric) = mysqli_fetch_row($result);
 		}
 		if ($showdate!=0) {
 			$sdate = tzdate("m/d/Y",$showdate);
@@ -250,7 +250,7 @@
 		$rubric_names = array('None');
 		$query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}
@@ -274,9 +274,9 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo "selected=1 ";
 		}
 		echo ">Default</option>\n";
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
 			
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				echo "<option value=\"{$row[0]}\" ";
 				if ($gbcat==$row[0]) {
 					echo "selected=1 ";
@@ -323,7 +323,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo '<span style="display:none;"><br/>Assessment to snapshot: <select name="assesssnapaid">';
 			$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while($row = mysql_fetch_row($result)) {
+			while($row = mysqli_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 			}
 			echo '<select><br/>';
@@ -336,22 +336,20 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 	    } else {
 		$query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		echo '<h3>'.mysql_result($result,0,0).'</h3>';
-		$rubric = mysql_result($result,0,1);
-		$points = mysql_result($result,0,2);
+		list($gbname,$rubric,$points) = mysqli_fetch_row($result);
+		echo '<h3>'.$gbname.'</h3>';
 	    }
 	} else {
 		$query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		echo '<h3>'.mysql_result($result,0,0).'</h3>';
-		$rubric = mysql_result($result,0,1);
-		$points = mysql_result($result,0,2);
+		list($gbname,$rubric,$points) = mysqli_fetch_row($result);
+		echo '<h3>'.$gbname.'</h3>';
 	}
 	if ($rubric != 0) {
 		$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id='$rubric'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
-			echo printrubrics(array(mysql_fetch_row($result)));
+		if (mysqli_num_rows($result)>0) {
+			echo printrubrics(array(mysqli_fetch_row($result)));
 		}
 	}
 ?>
@@ -360,7 +358,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_result($result,0,0)>0) {
+		if (mysql_fetch_first($result)>0) {
 			$hassection = true;
 		} else {
 			$hassection = false;
@@ -369,7 +367,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($hassection) {
 			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_result($result,0,0)==0) {
+			if (mysql_fetch_first($result)==0) {
 				$sortorder = "sec";
 			} else {
 				$sortorder = "name";
@@ -427,7 +425,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 				$query .= "AND userid='{$_GET['grades']}' ";
 			}
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if ($row[1]!=null) {
 					$score[$row[0]] = $row[1];
 				} else {
@@ -452,7 +450,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if ($row[4]==1) {
 				echo '<tr><td style="text-decoration: line-through;">';
 			} else {

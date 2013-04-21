@@ -10,7 +10,7 @@
 	
 		$query = "SELECT id,category FROM imas_questions WHERE assessmentid='$aid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if ($row[1] != $_POST[$row[0]]) {
 				$query = "UPDATE imas_questions SET category='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 				
@@ -53,7 +53,7 @@ END;
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$libnames = array();
 	$questionlibs = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$questionlibs[$row[0]][] = $row[1];
 		$libnames[$row[1]] = $row[2];
 	}

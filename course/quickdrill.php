@@ -57,7 +57,7 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	$query = "SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
 	$out = '';
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$out .= "<p><b>{$row[1]}</b><ul>";
 		foreach ($sessiondata['drillresults'][$row[0]] as $item) {
 			$out .= '<li>';
@@ -447,7 +447,7 @@ function printscore($sc,$qsetid,$seed) {
 	} else {
 		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
-		$control = mysql_result($result,0,0);
+		$control = mysql_fetch_first($result);
 		$ptposs = getansweights($control,$seed);
 		
 		for ($i=0; $i<count($ptposs)-1; $i++) {

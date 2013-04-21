@@ -151,10 +151,10 @@ require("../header.php");
 
 $query = "SELECT value FROM imas_bookmarks WHERE userid='$userid' AND courseid='$cid' AND name='TR{$_GET['folder']}'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	$openitem = '';
 } else {
-	$openitem = mysql_result($result,0,0);
+	$openitem = mysql_fetch_first($result);
 }
 
 $foundfirstitem = '';
@@ -164,7 +164,7 @@ $astatus = array();
 $query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 $query .= "WHERE ia.courseid='$cid' AND ias.userid='$userid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if (strpos($row[1],'-1')===false) {
 		$astatus[$row[0]] = 2; //completed
 	} else { //at least some undone

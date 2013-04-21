@@ -44,7 +44,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
 			} else {
@@ -4633,13 +4633,13 @@ function getqsetid($questionid) {
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
 	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	if ($row[2]==null) {
 		return (array($row[0],$row[1]));
 	} else {
 		return (array($row[0],$row[2]));
 	}
-	//return mysql_fetch_row($result);	
+	//return mysqli_fetch_row($result);	
 }
 
 function getallqsetid($questions) {
@@ -4649,7 +4649,7 @@ function getallqsetid($questions) {
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
 	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$out[0][$order[$row[3]]] = $row[0];// = array($row[0],$row[1]);
 		if ($row[2]==null) {
 			$out[1][$order[$row[3]]] = $row[1];

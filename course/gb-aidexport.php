@@ -81,9 +81,7 @@ if (isset($_POST['options'])) {
 	//get assessment info
 	$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$defpoints = mysql_result($result,0,0);
-	$assessname = mysql_result($result,0,1);
-	$itemorder = mysql_result($result,0,2);
+	list($defpoints, $assessname, $itemorder) = mysqli_fetch_row($result);
 	$itemarr = array();
 	$itemnum = array();
 	foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -106,7 +104,7 @@ if (isset($_POST['options'])) {
 	$qsetids = array();
 	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		if ($row[1]==9999) {
 			$qpts[$row[0]] = $defpoints;
 		} else {
@@ -125,7 +123,7 @@ if (isset($_POST['options'])) {
 		$qsetidlist = implode(',',$qsetids);
 		$query = "SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$qcontrols[$row[0]] = interpret('control',$row[1],$row[2]);
 			$qanswers[$row[0]] = interpret('answer',$row[1],$row[3]);
 		}
@@ -173,7 +171,7 @@ if (isset($_POST['options'])) {
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$r = 2;
 	$sturow = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$gb[$r] = array_fill(0,count($gb[0]),'');
 		$gb[$r][0] = $row[2].', '.$row[1];
 		$sturow[$row[0]] = $r;

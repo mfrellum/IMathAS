@@ -24,7 +24,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_POST['chgcnt'])) {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		
 		$cnt = $_POST['chgcnt'];
 		$blockchg = 0;
@@ -244,13 +244,13 @@ if ($overwriteBody==1) {
 		$itemsassoc = array();
 		$query = "SELECT id,typeid,itemtype FROM imas_items WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$itemsassoc[$row[0]] = $row[2].$row[1];
 		}
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$itemorder = unserialize(mysql_result($result,0,0));
+		$itemorder = unserialize(mysql_fetch_first($result));
 		$itemsimporder = array();
 		function flattenitems($items,&$addto,$parent) {
 			global $itemsimporder,$itemsassoc;
@@ -281,7 +281,7 @@ if ($overwriteBody==1) {
 	if ($filter=='all' || $filter=='assessments') {
 		$query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$types[] = "Assessment";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -295,7 +295,7 @@ if ($overwriteBody==1) {
 	if ($filter=='all' || $filter=='inlinetext') {
 		$query = "SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid='$cid' ";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$types[] = "InlineText";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -309,7 +309,7 @@ if ($overwriteBody==1) {
 	if ($filter=='all' || $filter=='linkedtext') {
 		$query = "SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid='$cid' ";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$types[] = "LinkedText";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -323,7 +323,7 @@ if ($overwriteBody==1) {
 	if ($filter=='all' || $filter=='forums') {
 		$query = "SELECT name,startdate,enddate,id,avail FROM imas_forums WHERE courseid='$cid' ";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$types[] = "Forum";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -337,7 +337,7 @@ if ($overwriteBody==1) {
 	if ($filter=='all' || $filter=='wikis') {
 		$query = "SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid='$cid' ";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$types[] = "Wiki";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -351,7 +351,7 @@ if ($overwriteBody==1) {
 	if ($filter=='all' || $filter=='blocks') {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		
 		function getblockinfo($items,$parent) {
 			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby;

@@ -52,14 +52,13 @@
 	
 	$query = "SELECT id FROM imas_items WHERE itemtype='Wiki' AND typeid='$id'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$itemid = mysql_result($result,0,0);
+	$itemid = mysql_fetch_first($result);
 	
 	$query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$items = unserialize(mysql_result($result,0,0));
+	list($items, $coursename, $coursetheme) = mysqli_fetch_row($result);
+	$items = unserialize($items);
 	if ($fcid==0) {
-		$coursename = mysql_result($result,0,1);
-		$coursetheme = mysql_result($result,0,2);
 		$breadcrumbbase = "<a href=\"$imasroot/course/public.php?cid=$cid\">$coursename</a> &gt; ";
 	} else {
 		$breadcrumbbase = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$fcid\">$coursename</a> &gt; ";
@@ -76,7 +75,7 @@
 	
 	$query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	$wikiname = $row[0];
 	$now = time();
 	if ($row[5]>0 || $row[4]==0 || ($row[4]==1 && ($now<$row[1] || $now>$row[2]))) {
@@ -94,7 +93,7 @@
 	$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 	$query .= "WHERE i_w_r.wikiid='$id' ORDER BY i_w_r.id DESC LIMIT 1";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	$text = $row[1];
 	if (strlen($text)>6 && substr($text,0,6)=='**wver') {
 		$wikiver = substr($text,6,strpos($text,'**',6)-6);

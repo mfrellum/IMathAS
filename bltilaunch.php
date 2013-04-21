@@ -47,6 +47,10 @@ function reporterror($err) {
 	require("footer.php");
 	exit;
 }
+function mysqli_fetch_first($res) {
+  	  $row = mysqli_fetch_row($res);
+  	  return $row[0];
+  }
 
 //start session
 if (isset($sessionpath)) { session_save_path($sessionpath);}
@@ -61,10 +65,10 @@ $askforuserinfo = false;
 if (isset($_GET['launch'])) {
 	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		reporterror("No authorized session exists");
 	}
-	list($enc,$userid) = mysql_fetch_row($result);
+	list($enc,$userid) = mysqli_fetch_row($result);
 	$sessiondata = unserialize(base64_decode($enc));
 	if ($_POST['access']==1) { //text-based
 		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
@@ -102,7 +106,7 @@ if (isset($_GET['launch'])) {
 		$aid = $sessiondata['ltiitemid'];
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$cid = mysql_result($result,0,0);
+		$cid = mysqli_fetch_first($result);
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
 		$cid = $sessiondata['ltiitemid'];
@@ -116,10 +120,10 @@ if (isset($_GET['launch'])) {
 } else if (isset($_GET['accessibility'])) {
 	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		reporterror("No authorized session exists");
 	}
-	list($enc,$userid) = mysql_fetch_row($result);
+	list($enc,$userid) = mysqli_fetch_row($result);
 	$sessiondata = unserialize(base64_decode($enc));
 	//time to output a postback to capture tzoffset and math/graph settings
 	$pref = 0;
@@ -219,11 +223,12 @@ if (isset($_GET['launch'])) {
 				$md5pw = md5($_POST['curPW']);
 				$query = "SELECT password,id FROM imas_users WHERE SID='{$_POST['curSID']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)==0) {
+				if (mysqli_num_rows($result)==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					if (mysql_result($result,0,0)==$md5pw) {
-						$userid=mysql_result($result,0,1);
+					$row = mysqli_fetch_assoc($result);
+					if ($row['password']==$md5pw) {
+						$userid=$row['id'];
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 					}
@@ -244,7 +249,7 @@ if (isset($_GET['launch'])) {
 				} else {
 					$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)>0) {
+					if (mysqli_num_rows($result)>0) {
 						$infoerr = "$loginprompt '{$_POST['SID']}' already used.  Please select another.";
 					}
 				}
@@ -371,10 +376,10 @@ if (isset($_GET['launch'])) {
 	//pull necessary info and continue
 	$query = "SELECT userid FROM imas_sessions WHERE sessionid='$sessionid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		reporterror("No session recorded");
 	} else {
-		$userid = mysql_result($result,0,0);
+		$userid = mysqli_fetch_first($result);
 	}
 	
 	$keyparts = explode('_',$_SESSION['ltikey']);
@@ -452,7 +457,7 @@ if (isset($_GET['launch'])) {
 			$placeaid = intval($_REQUEST['custom_place_aid']);
 			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sourcecid = mysql_result($result,0,0);
+			$sourcecid = mysqli_fetch_first($result);
 			if ($keyparts[1]==$sourcecid) { //is key is for source course; treat like aid_### placement
 				$keyparts[0] = 'aid';
 				$keyparts[1] = $placeaid;
@@ -468,7 +473,7 @@ if (isset($_GET['launch'])) {
 		$aid = intval($keyparts[1]);
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$ltiorg = mysql_result($result,0,0) . ':' . $ltiorg;
+		$ltiorg = mysqli_fetch_first($result) . ':' . $ltiorg;
 		$keytype = 'a';
 	} else if ($keyparts[0]=='sso') {  //ssouserid:org
 		$_SESSION['ltilookup'] = 'u';
@@ -483,7 +488,7 @@ if (isset($_GET['launch'])) {
 			$keytype = 'cc-g';
 			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sourcecid = mysql_result($result,0,0);
+			$sourcecid = mysqli_fetch_first($result);
 			$_SESSION['place_aid'] = array($sourcecid,$_REQUEST['custom_place_aid']);
 		}
 	}
@@ -518,8 +523,8 @@ if (isset($_GET['launch'])) {
 	//look if we know this student
 	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result) > 0) { //yup, we know them
-		$userid = mysql_result($result,0,0);
+	if (mysqli_num_rows($result) > 0) { //yup, we know them
+		$userid = mysqli_fetch_first($result);
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
 		
@@ -615,20 +620,20 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
 	$query .= "AND org='{$_SESSION['ltiorg']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		if (isset($_SESSION['place_aid'])) {
 			//look to see if we've already linked this context_id with a course
 			$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
 			$query .= "AND org='{$_SESSION['ltiorg']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)==0) {
+			if (mysqli_num_rows($result)==0) {
 				if ($_SESSION['lti_keytype']=='cc-g') {
 					//if instructor, see if the source course is ours
 					$copycourse = true;
 					if ($_SESSION['ltirole']=='instructor') {
 						$query = "SELECT id FROM imas_teachers WHERE courseid='{$_SESSION['place_aid'][0]}' AND userid='$userid'";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-						if (mysql_num_rows($result)>0) {
+						if (mysqli_num_rows($result)>0) {
 							$copycourse=false;
 							$destcid = $_SESSION['place_aid'][0];
 						}
@@ -677,7 +682,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 					$destcid = $keyparts[1];
 				}
 			} else {
-				$destcid = mysql_result($result,0,0);
+				$destcid = mysqli_fetch_first($result);
 			}
 			if ($destcid==$_SESSION['place_aid'][0]) {
 				//aid is in destination course - just make placement
@@ -686,24 +691,24 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 				//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
 				$query = "SELECT name FROM imas_assessments WHERE id='{$_SESSION['place_aid'][1]}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$sourceassessname = addslashes(mysql_result($result,0,0));
+				$sourceassessname = addslashes(mysqli_fetch_first($result));
 				$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) {
-					$aid = mysql_result($result,0,0);
+				if (mysqli_num_rows($result)>0) {
+					$aid = mysqli_fetch_first($result);
 				} else {
 				// no assessment with same title - need to copy assessment from destination to source course
 					require("includes/copyiteminc.php");
 					$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 					$cid = $destcid;
-					$newitem = copyitem(mysql_result($result,0,0),array());
+					$newitem = copyitem(mysqli_fetch_first($result),array());
 					$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$aid = mysql_result($result,0,0);
+					$aid = mysqli_fetch_first($result);
 					$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					$items = unserialize(mysql_result($result,0,0));
+					$items = unserialize(mysqli_fetch_first($result));
 					$items[] = $newitem;
 					$items = addslashes(serialize($items));
 					$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
@@ -719,7 +724,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 			reporterror("This placement is not yet set up");
 		}
 	} else {
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		if ($row[0]=='course') {
 			$keyparts = array('cid',$row[1]);
 		} else if ($row[0]=='assess') {
@@ -757,7 +762,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 		}
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result2);
+		$row = mysqli_fetch_row($result2);
 		if ($row!=null) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
@@ -791,25 +796,25 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 	if ($_SESSION['ltirole']=='instructor') {
 		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result) == 0) { //nope, not a teacher.  Set as tutor for this context_id
+		if (mysqli_num_rows($result) == 0) { //nope, not a teacher.  Set as tutor for this context_id
 			$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result) == 0) { //nope, not a tutor already.  Set as tutor for this context_id
+			if (mysqli_num_rows($result) == 0) { //nope, not a tutor already.  Set as tutor for this context_id
 				$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}')";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 		}
 		$timelimitmult = 1;
 	} else {
-		$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+		$query = "SELECT timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result) == 0) { //nope, not enrolled
+		if (mysqli_num_rows($result) == 0) { //nope, not enrolled
 			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result) == 0) { //nope, not a teacher either in stuview.  
+			if (mysqli_num_rows($result) == 0) { //nope, not a teacher either in stuview.  
 				$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result) == 0) { //nope, not a tutor either.  Add new student
+				if (mysqli_num_rows($result) == 0) { //nope, not a tutor either.  Add new student
 					$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}')";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
@@ -819,7 +824,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 			}
 			$timelimitmult = 1;
 		} else {
-			$timelimitmult = mysql_result($result,0,1);
+			$timelimitmult = mysqli_fetch_first($result);
 		}
 	}
 }
@@ -829,10 +834,11 @@ $promptforsettings = false;
 $query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $SESS = $_SESSION;
-if (mysql_num_rows($result)>0) {
+if (mysqli_num_rows($result)>0) {
 	//check that same userid, and that we're not jumping on someone else's 
 	//existing session.  If so, then we need to create a new session.
-	if (mysql_result($result,0,0)!=$userid) {
+	$row = mysqli_fetch_assoc($result);
+	if ($row['userid']!=$userid) {
 		session_destroy();
 		session_start();
 		session_regenerate_id();
@@ -842,7 +848,7 @@ if (mysql_num_rows($result)>0) {
 		$createnewsession = true;
 	} else {
 		//already have session.  Don't need to create one
-		$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
+		$sessiondata = unserialize(base64_decode($row['sessiondata']));
 		if (!isset($sessiondata['mathdisp'])) {
 			//for some reason settings are not set, so going to prompt
 			$promptforsettings = true;
@@ -858,7 +864,7 @@ if (mysql_num_rows($result)>0) {
 if ($keyparts[0]=='aid') {
 	$query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$timelimit = abs(mysql_result($result,0,0)*$timelimitmult);
+	$timelimit = abs(mysqli_fetch_first($result)*$timelimitmult);
 	if ($timelimit>0) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);

@@ -19,7 +19,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_result($result,0,0);
+		$gbmode = mysql_fetch_first($result);
 	}
 	
 	require("../header.php");
@@ -28,7 +28,7 @@
 	
 	$query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = mysql_fetch_row($result);
+	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = mysqli_fetch_row($result);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 	
@@ -53,7 +53,7 @@
 	$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
 	$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 	$totalpossible = 0;
-	while ($r = mysql_fetch_row($result2)) {
+	while ($r = mysqli_fetch_row($result2)) {
 		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
 			if ($r[0]==9999) {
 				$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
@@ -91,15 +91,16 @@
 	$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY id";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$grpnums = 1;
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		if ($row[1] == 'Unnamed group') { 
 			$row[1] .= " $grpnums";
 			$grpnums++;
 			$query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
 			$query .= "ON iu.id=isgm.userid AND isgm.stugroupid='{$row[0]}' ORDER BY isgm.id LIMIT 1";
 			$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($r)>0) {
-				$row[1] .= ' ('.mysql_result($r,0,1).', '.mysql_result($r,0,0).' &isin;)';
+			if (mysqli_num_rows($r)>0) {
+				$nv = mysqli_fetch_row($r);
+				$row[1] .= ' ('.$nv[1].', '.$nv[0].' &isin;)';
 			}
 		}
 		$groupnames[$row[0]] = $row[1];

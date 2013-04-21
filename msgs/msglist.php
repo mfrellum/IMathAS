@@ -83,7 +83,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 				$query = "SELECT baseid FROM imas_msgs WHERE id='{$_GET['replyto']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$baseid = mysql_result($result,0,0);
+				$baseid = mysql_fetch_first($result);
 				if ($baseid==0) {
 					$baseid = $_GET['replyto'];
 				}
@@ -92,15 +92,16 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} 
 			$query = "SELECT name FROM imas_courses WHERE id='{$_POST['courseid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$cname = mysql_result($result,0,0);
+			$cname = mysql_fetch_first($result);
 			
 			$query = "SELECT msgnotify,email FROM imas_users WHERE id='{$_POST['to']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_result($result,0,0)==1) {
-				$email = mysql_result($result,0,1);
+			list($msgnotify, $email) = mysqli_fetch_row($result);
+			if ($msgnotify==1) {
 				$query = "SELECT FirstName,LastName FROM imas_users WHERE id='$userid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$from = mysql_result($result,0,0).' '.mysql_result($result,0,1);
+				$nv = mysqli_fetch_row($result);
+				$from = $nv[0].' '.$nv[1];
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
@@ -160,21 +161,20 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($cid>0) {
 				$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$msgset = mysql_result($result,0,0);
+				$msgset = mysql_fetch_first($result);
 				$msgmonitor = (floor($msgset/5)&1);
 				$msgset = $msgset%5;
 			}
 			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
 				$query = "SELECT title,message,courseid FROM imas_msgs WHERE id='$replyto'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$title = "Re: ".str_replace('"','&quot;',mysql_result($result,0,0));
+				list($title, $message, $courseid) = mysqli_fetch_row($result);
+				$title = "Re: ".str_replace('"','&quot;', $title);
 				if (isset($_GET['toquote'])) {
-					$message = mysql_result($result,0,1);
 					$message = '<p> </p><br/><hr/>In reply to:<br/>'.$message;
 				} else {
 					$message = '';
 				}
-				$courseid = mysql_result($result,0,2);
 			} else if (isset($_GET['quoteq'])) {
 				require("../assessment/displayq2.php");
 				$parts = explode('-',$_GET['quoteq']);
@@ -187,7 +187,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				if (isset($parts[3])) {  //sending to instructor
 					$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+					$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_fetch_first($result));
 					if ($_GET['to']=='instr') {
 						unset($_GET['to']);
 						$msgset = 1; //force instructor only list
@@ -211,7 +211,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg FROM imas_users AS iu ";
 				$query .= "LEFT JOIN imas_students AS i_s ON iu.id=i_s.userid AND i_s.courseid='$courseid' WHERE iu.id='{$_GET['to']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$row = mysql_fetch_row($result);
+				$row = mysqli_fetch_row($result);
 				echo $row[0].', '.$row[1];
 				$ismsgsrcteacher = false;
 				if ($courseid==$cid && $isteacher) {
@@ -219,7 +219,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				} else if ($courseid!=$cid) {
 					$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$courseid'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)!=0) {
+					if (mysqli_num_rows($result)!=0) {
 						$ismsgsrcteacher = true;
 					}
 				}
@@ -246,7 +246,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";
 					$query .= "imas_teachers.courseid='$cid' ORDER BY imas_users.LastName";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
 					}
 					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -257,7 +257,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					}
 					$query .= "ORDER BY imas_users.LastName";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
 					} 
 					
@@ -268,7 +268,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					$query .= "imas_users,imas_students WHERE imas_users.id=imas_students.userid AND ";
 					$query .= "imas_students.courseid='$cid' ORDER BY imas_users.LastName";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
 					}
 				}
@@ -357,7 +357,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$query .= " AND (isread&8)=8";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
 	if ($numpages==0 && $filteruid>0) {
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
@@ -370,7 +370,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$query .= " AND (isread&8)=8";
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+		$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
 	}
 	$prevnext = '';
 	if ($numpages > 1 && !$limittotagged) {
@@ -419,7 +419,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	if ($myrights > 5 && $cid>0) {
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$msgset = mysql_result($result,0,0);
+		$msgset = mysql_fetch_first($result);
 		$msgmonitor = (floor($msgset/5)&1);
 		$msgset = $msgset%5;
 		if ($msgset<3 || $isteacher) {
@@ -455,7 +455,7 @@ function chgfilter() {
 	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto='$userid'";
 	$query .= " ORDER BY imas_courses.name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo "<option value=\"{$row[0]}\" ";
 		if ($filtercid==$row[0]) {
 			echo 'selected=1';
@@ -475,7 +475,7 @@ function chgfilter() {
 	}
 	$query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo "<option value=\"{$row[0]}\" ";
 		if ($filteruid==$row[0]) {
 			echo 'selected=1';
@@ -516,7 +516,7 @@ function chgfilter() {
 		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}
 	while ($line = mysql_fetch_assoc($result)) {

@@ -11,10 +11,10 @@ if ($sessiondata['ltiitemtype']==0) {
 	$typeid = $sessiondata['ltiitemid'];
 	$query = "SELECT courseid FROM imas_assessments WHERE id='$typeid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$cid = mysql_result($result,0,0);
+	$cid = mysql_fetch_first($result);
 	$query = "SELECT id FROM imas_teachers WHERE courseid='$cid' AND userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		$role = 'tutor';
 	} else {
 		$role = 'teacher';
@@ -23,7 +23,7 @@ if ($sessiondata['ltiitemtype']==0) {
 	$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$sessiondata['lti_context_id']}' ";
 	$query .= "AND org='{$sessiondata['ltiorg']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		$hascourse = false;
 		if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['cid'])) {
 			$cid = intval($sessiondata['lti_launch_get']['cid']);
@@ -36,13 +36,13 @@ if ($sessiondata['ltiitemtype']==0) {
 		}
 	} else {
 		$hascourse = true;
-		$cid = mysql_result($result,0,0);
+		$cid = mysql_fetch_first($result);
 	}
 	if ($hascourse) {
 		$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid='{$sessiondata['lti_context_id']}' ";
 		$query .= "AND org='{$sessiondata['ltiorg']}' AND linkid='{$sessiondata['lti_resource_link_id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)==0) {
+		if (mysqli_num_rows($result)==0) {
 			$hasplacement = false;
 			if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['aid'])) {
 				$aid = intval($sessiondata['lti_launch_get']['aid']);
@@ -58,7 +58,7 @@ if ($sessiondata['ltiitemtype']==0) {
 			} 
 		} else {
 			$hasplacement = true;
-			list($placementid,$placementtype,$typeid) = mysql_fetch_row($result);
+			list($placementid,$placementtype,$typeid) = mysqli_fetch_row($result);
 		}
 		$role = 'teacher';
 	}
@@ -68,7 +68,7 @@ if ($sessiondata['ltiitemtype']==0) {
 if (isset($_POST['createcourse'])) {
 	$query = "SELECT courseid FROM imas_teachers WHERE courseid='{$_POST['createcourse']}' AND userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		$cid = $_POST['createcourse'];
 	} else {
 		//creating a copy of a template course
@@ -111,14 +111,14 @@ if (isset($_POST['createcourse'])) {
 		
 		$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='{$_POST['createcourse']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$cid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		
 		$gbcats = array();
 		$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='{$_POST['createcourse']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES ";
 			$frid = array_shift($row);
 			$irow = "'".implode("','",addslashes_deep($row))."'";
@@ -129,7 +129,7 @@ if (isset($_POST['createcourse'])) {
 		$copystickyposts = true;
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['createcourse']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		$newitems = array();
 		require("includes/copyiteminc.php");
 		copyallsub($items,'0',$newitems,$gbcats);
@@ -157,7 +157,7 @@ if (isset($_POST['createcourse'])) {
 		if ($placementtype=='assess') {
 			$query = "SELECT name FROM imas_assessments WHERE id='$typeid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$atitle = mysql_result($result,0,0);
+			$atitle = mysql_fetch_first($result);
 			
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_place_aid=$typeid";
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($atitle).'&text='.urlencode($atitle));
@@ -196,9 +196,9 @@ if (!$hascourse) {
 	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse"> ';
 	$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' ORDER BY ic.name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		echo '<optgroup label="Your Courses">';
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 		}
 		echo '</optgroup>';
@@ -206,9 +206,9 @@ if (!$hascourse) {
 	if (isset($templateuser)) {
 		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
 			echo '<optgroup label="Template Courses">';
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 			}
 			echo '</optgroup>';
@@ -235,9 +235,9 @@ if (!$hascourse) {
 	}
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		echo '<optgroup label="Assessment">';
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 		}
 		echo '</optgroup>';

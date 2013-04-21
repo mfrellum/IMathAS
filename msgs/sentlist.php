@@ -93,7 +93,7 @@ Read   Deleted   Deleted by Sender   Tagged
 		$query .= " AND msgto='$filteruid'";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
 	if ($numpages==0 && $filteruid>0) {
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
@@ -103,7 +103,7 @@ Read   Deleted   Deleted by Sender   Tagged
 			$query .= " AND courseid='$filtercid'";
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+		$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
 	}
 	$prevnext = '';
 	if ($numpages > 1) {
@@ -169,7 +169,7 @@ function chgfilter() {
 	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom='$userid'";
 	$query .= " ORDER BY imas_courses.name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo "<option value=\"{$row[0]}\" ";
 		if ($filtercid==$row[0]) {
 			echo 'selected=1';
@@ -189,7 +189,7 @@ function chgfilter() {
 	}
 	$query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo "<option value=\"{$row[0]}\" ";
 		if ($filteruid==$row[0]) {
 			echo 'selected=1';
@@ -224,7 +224,7 @@ function chgfilter() {
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td><td></td></tr>";
 	}
 	while ($line = mysql_fetch_assoc($result)) {

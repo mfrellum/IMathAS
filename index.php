@@ -15,7 +15,7 @@ require("./validate.php");
 //[3]: 0 for newmsg note next to courses, 1 for newpost note next to courses
 $query = "SELECT homelayout FROM imas_users WHERE id='$userid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-$homelayout = mysql_result($result,0,0);
+$homelayout = mysql_fetch_first($result);
 
 $pagelayout = explode('|',$homelayout);
 foreach($pagelayout as $k=>$v) {
@@ -74,7 +74,7 @@ if ($showmessagesgadget) {
 	
 	$query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$newmsgcnt[$row[0]] = $row[1];
 	}
 }
@@ -86,7 +86,7 @@ $query = "SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_cours
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	$noclass = true;
 } else {
 	$noclass = false;
@@ -104,7 +104,7 @@ if ($myrights>10) {
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
 	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		$noclass = true;
 	} else {
 		$noclass = false;
@@ -124,7 +124,7 @@ $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_c
 $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	$noclass = true;
 } else {
 	$noclass = false;
@@ -183,7 +183,7 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "GROUP BY imas_forums.courseid";
 	
 	$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($r2)) {
+	while ($row = mysqli_fetch_row($r2)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
 }
@@ -236,7 +236,7 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	$query .= "GROUP BY courseid";*/
 	$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($r2)) {
+	while ($row = mysqli_fetch_row($r2)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
 }

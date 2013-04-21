@@ -122,20 +122,20 @@
 	
 	$query = "SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysql_fetch_row($result);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysqli_fetch_row($result);
 	
 	if ($isgroup>0) {
 		$groupnames = array();
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$groupnames[$row[0]] = $row[1];
 		}
 		$grplist = implode(',',array_keys($groupnames));
 		$groupmembers = array();
 		$query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
 			$groupmembers[$row[0]][] = $row[2].' '.$row[1];
 		}
@@ -145,10 +145,7 @@
 	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-	$points = mysql_result($result,0,0);
-	$qcontrol = mysql_result($result,0,1);
-	$rubric = mysql_result($result,0,2);
-	$qtype = mysql_result($result,0,3);
+	list($points, $qcontrol, $rubric, $qtype) = mysqli_fetch_row($result);
 	if ($points==9999) {
 		$points = $defpoints;
 	}
@@ -295,8 +292,8 @@
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id='$qid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
-		echo printrubrics(array(mysql_fetch_row($result)));
+	if (mysqli_num_rows($result)>0) {
+		echo printrubrics(array(mysqli_fetch_row($result)));
 	}
 	if ($page==-1) {
 		echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
@@ -330,7 +327,7 @@
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$stulist[] = $row[0].', '.$row[1];
 		}
 	}
@@ -345,7 +342,7 @@
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		
 	while($line=mysql_fetch_assoc($result)) {
 		if ($page != -1) {

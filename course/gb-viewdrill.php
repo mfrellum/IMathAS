@@ -29,7 +29,7 @@ if (!isset($teacherid)) {
 
 $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	echo 'Invalid drill id.';
 	exit;
 }
@@ -62,7 +62,7 @@ $studata = array();
 $query = "SELECT iu.LastName,iu.FirstName,ids.scorerec FROM imas_drillassess_sessions AS ids ";
 $query .= "JOIN imas_users AS iu ON iu.id=ids.userid WHERE ids.drillassessid=$daid ORDER BY iu.LastName, iu.FirstName";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$scorerec = unserialize($row[2]);
 	$rowdata = array($row[0].', '.$row[1]);
 	foreach ($itemids as $qn=>$v) {

@@ -37,7 +37,7 @@ if (isset($_POST['checked'])) { //form submitted
 			$checkedlist = "'".implode("','",$checked)."'";
 			$query = "SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				echo $row[0].'<br/>';
 			}
 			echo '<p><p><input type="submit" value="Yes, Delete"/>';
@@ -83,8 +83,8 @@ $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $i=0;
 $page_gbcatSelect = array();
-if (mysql_num_rows($result)>0) {
-	while ($row = mysql_fetch_row($result)) {
+if (mysqli_num_rows($result)>0) {
+	while ($row = mysqli_fetch_row($result)) {
 		$page_gbcatSelect['val'][$i] = $row[0];
 		$page_gbcatSelect['label'][$i] = $row[1];
 		$i++;
@@ -109,7 +109,7 @@ echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 $gbitems = array();
 $query = "SELECT id,name FROM imas_gbitems WHERE courseid='$cid' ORDER BY name";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$gbitems[$row[0]] = $row[1];
 }
 if (count($gbitems)==0) {

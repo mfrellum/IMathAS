@@ -50,14 +50,12 @@
  $sessiondata = array();
  $query = "SELECT userid,tzoffset,sessiondata,time FROM imas_sessions WHERE sessionid='$sessionid'";
  $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
- if (mysql_num_rows($result)>0) {
-	 $userid = mysql_result($result,0,0);
-	 $tzoffset = mysql_result($result,0,1);
-	 $enc = mysql_result($result,0,2);
+ if (mysqli_num_rows($result)>0) {
+ 	 list($userid, $tzoffset, $enc, $sesstime) = mysqli_fetch_row($result);
 	 if ($enc!='0') {
 		 $sessiondata = unserialize(base64_decode($enc));
 		 //delete own session if old and not posting
-		 if ((time()-mysql_result($result,0,3))>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
+		 if ((time()-$sesstime)>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
 			$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			unset($userid);
@@ -176,7 +174,7 @@ END;
 	 if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username']=='guest') { // create a temp account when someone logs in w/ username: guest
 	 	$query = 'SELECT ver FROM imas_dbschema WHERE id=2';
 	 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	 	$guestcnt = mysql_result($result,0,0);
+	 	$guestcnt = mysql_fetch_first($result);
 	 	$query = 'UPDATE imas_dbschema SET ver=ver+1 WHERE id=2';
 	 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		
@@ -363,7 +361,7 @@ END;
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$cid = mysql_result($result,0,0);
+				$cid = mysql_fetch_first($result);
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
@@ -444,11 +442,11 @@ END;
 		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
-			$crow = mysql_fetch_row($result);
-			$coursename = $crow[0]; //mysql_result($result,0,0);
-			$coursetheme = $crow[5]; //mysql_result($result,0,5);
-			$coursenewflag = $crow[6]; //mysql_result($result,0,6);
+		if (mysqli_num_rows($result)>0) {
+			$crow = mysqli_fetch_row($result);
+			$coursename = $crow[0]; 
+			$coursetheme = $crow[5]; 
+			$coursenewflag = $crow[6]; 
 			$coursemsgset = $crow[7]%5;
 			$coursetopbar = explode('|',$crow[8]);
 			$coursetopbar[0] = explode(',',$coursetopbar[0]);
@@ -541,5 +539,11 @@ END;
   if (!isset($coursename)) {
 	  $coursename = "Course Page";
   } 
+  //list() = mysqli_fetch_row($result);
+  //mysqli_fetch_first($result)
+  function mysqli_fetch_first($res) {
+  	  $row = mysqli_fetch_row($res);
+  	  return $row[0];
+  }
  
 ?>

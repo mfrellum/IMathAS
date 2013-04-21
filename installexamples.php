@@ -8,7 +8,7 @@ if ($myrights<100) {
 
 $query = "SELECT * FROM imas_libraries WHERE uniqueid = 1143581427433 ";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Error: $query: " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)>0) {
+if (mysqli_num_rows($result)>0) {
 	echo "Library already exists; aborting";
 	exit;
 }

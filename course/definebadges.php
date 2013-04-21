@@ -17,9 +17,9 @@ if (empty($_GET['badgeid'])) {
 
 	$query = "SELECT id,name FROM imas_badgesettings WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)!=0) {
+	if (mysqli_num_rows($result)!=0) {
 		echo '<ul>';
-		while ($row=mysql_fetch_row($result)) {
+		while ($row=mysqli_fetch_row($result)) {
 			echo '<li><a href="definebadges.php?cid='.$cid.'&amp;badgeid='.$row[0].'">'.$row[1].'</a> ';
 			echo '<a class="small" href="definebadges.php?cid='.$cid.'&amp;badgeid='.$row[0].'&amp;delete=true" onclick="return confirm(\'Are you sure you want to delete this badge definition and invalidate all awarded badges?\');">[Delete]</a> ';
 			echo '<br/><a href="claimbadge.php?cid='.$cid.'&amp;badgeid='.$row[0].'">Link to claim badge</a> (provide to students)';
@@ -39,7 +39,7 @@ if (empty($_GET['badgeid'])) {
 		if ($badgeid==0) { echo 'Can not delete - invalid badgeid'; exit;}
 		$query = "SELECT courseid FROM imas_badgesettings WHERE id=$badgeid";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_result($result,0,0) != $cid) { echo 'Can not delete - badgeid is for a different course'; exit;}
+		if (mysql_fetch_first($result) != $cid) { echo 'Can not delete - badgeid is for a different course'; exit;}
 		
 		$query = "DELETE FROM imas_badgesettings WHERE id=$badgeid";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -88,16 +88,16 @@ if (empty($_GET['badgeid'])) {
 			$badgeid = intval($_GET['badgeid']);
 			$query = "SELECT name,badgetext,description,longdescription,requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)==0) { echo 'Invalid badge id for this course'; exit;}
+			if (mysqli_num_rows($result)==0) { echo 'Invalid badge id for this course'; exit;}
 			
-			list($name, $badgetext, $descr, $longdescr, $req) = mysql_fetch_row($result);
+			list($name, $badgetext, $descr, $longdescr, $req) = mysqli_fetch_row($result);
 			$req = unserialize($req);
 		}
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbvals = array('-1');
 		$gblabels = array('Course total'); 
-		while ($row=mysql_fetch_row($result)) {
+		while ($row=mysqli_fetch_row($result)) {
 			$gbvals[]= $row[0];
 			$gblabels[] = $row[1];
 		}

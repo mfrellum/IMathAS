@@ -8,7 +8,7 @@ if (isset($_GET['cid']) && $_GET['cid']>0) {
 	$cid = $_GET['cid'];
 	$query = "SELECT topbar FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$topbar = explode('|',mysql_result($result,0,0));
+	$topbar = explode('|',mysql_fetch_first($result));
 	$topbar[0] = explode(',',$topbar[0]);
 	$topbar[1] = explode(',',$topbar[1]);
 	if (!isset($topbar[2])) {$topbar[2] = 0;}
@@ -64,7 +64,7 @@ $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ";
 $query .= "ORDER BY name";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	echo "<li><a href=\"$imasroot/course/course.php?cid={$row[1]}\">{$row[0]}</a></li>";
 }
 echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";

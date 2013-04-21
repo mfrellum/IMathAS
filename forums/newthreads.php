@@ -42,7 +42,7 @@
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			
 			$threadids = array();
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$threadids[] = $row[0];
 			}
 			if (count($threadids)>0) {
@@ -50,7 +50,7 @@
 				$toupdate = array();
 				$query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$toupdate[] = $row[0];
 				}
 				if (count($toupdate)>0) {

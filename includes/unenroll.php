@@ -12,11 +12,11 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	$threads = array();
 	$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$forums[] = $row[0];
 		$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
 		$r2 = mysqli_query($GLOBALS['link'],$q2) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($rw2 = mysql_fetch_row($r2)) {
+		while ($rw2 = mysqli_fetch_row($r2)) {
 			$threads[] = $rw2[0];
 		}
 	}
@@ -26,7 +26,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	$assesses = array();
 	$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$assesses[] = $row[0];
 	}
 	$aidlist =  implode(',',$assesses);
@@ -35,7 +35,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	$grpwikis = array();
 	$query = "SELECT id,groupsetid FROM imas_wikis WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$wikis[] = $row[0];
 		if ($row[1]>0) {
 			$grpwikis[] = $row[0];
@@ -47,7 +47,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	$drills = array();
 	$query = "SELECT id FROM imas_drillassess WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$drills[] = $row[0];
 	}
 	$drilllist =  implode(',',$drills);
@@ -56,7 +56,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	$stugroups = array();
 	$query = "SELECT imas_stugroups.id FROM imas_stugroups JOIN imas_stugroupset ON imas_stugroups.groupsetid=imas_stugroupset.id WHERE imas_stugroupset.courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$stugroups[] = $row[0];
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -65,7 +65,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		$gbitems = array();
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$gbitems[] = $row[0];
 		}
 		$gblist = implode(',',$gbitems);
@@ -111,7 +111,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		
 		$query = "SELECT id FROM imas_forum_posts WHERE forumid IN ($forumlist) AND files<>''";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			deleteallpostfiles($row[0]);	
 		}
 		

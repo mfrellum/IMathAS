@@ -77,7 +77,7 @@
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	$itemorder = unserialize(mysql_result($result,0,0));
+	$itemorder = unserialize(mysql_fetch_first($result));
 	$itemsimporder = array();
 	function flattenitems($items,&$addto) {
 		global $itemsimporder;
@@ -94,7 +94,7 @@
 	$itemsassoc = array();
 	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$itemsassoc[$row[0]] = $row[1];
 		if (!in_array($row[0],$itemsimporder)) {
 			//capture any forums that are in imas_items but not imas_courses.itemorder
@@ -224,7 +224,7 @@ if ($searchtype == 'thread') {
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$postcount = array();
 		$maxdate = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$postcount[$row[0]] = $row[1] - 1;
 			$maxdate[$row[0]] = $row[2];
 		}
@@ -377,7 +377,7 @@ if ($searchtype == 'thread') {
 	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$threadcount[$row[0]] = $row[1];
 	}
 
@@ -385,7 +385,7 @@ if ($searchtype == 'thread') {
 	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
 
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$postcount[$row[0]] = $row[1];
 		$maxdate[$row[0]] = $row[2];
 	}
@@ -409,7 +409,7 @@ if ($searchtype == 'thread') {
 	}
 	$query .= "GROUP BY imas_forum_threads.forumid";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$newcnt[$row[0]] = $row[1];
 	}
 	
@@ -423,7 +423,7 @@ if ($searchtype == 'thread') {
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	$itemorder = unserialize(mysql_result($result,0,0));
+	$itemorder = unserialize(mysql_fetch_first($result));
 	$itemsimporder = array();
 	function flattenitems($items,&$addto) {
 		global $itemsimporder;
@@ -440,7 +440,7 @@ if ($searchtype == 'thread') {
 	$itemsassoc = array();
 	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$itemsassoc[$row[0]] = $row[1];
 	}
 	*/

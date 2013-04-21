@@ -114,8 +114,8 @@ if (!(isset($teacherid)) && $myrights<100) {
 			}
 			$query = "SELECT id FROM imas_users WHERE SID='$arr[0]'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
-				$id = mysql_result($result,0,0);
+			if (mysqli_num_rows($result)>0) {
+				$id = mysqli_fetch_first($result);
 				echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
 			} else {
 				if (($_POST['pwtype']==0 || $_POST['pwtype']==1) && strlen($arr[0])<4) {
@@ -148,7 +148,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				$vals = "'$id','$ncid'";
 				$query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$ncid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) {
+				if (mysqli_num_rows($result)>0) {
 					echo "Username {$arr[0]} already enrolled in course.  Skipping<br/>";
 					continue;
 				}
@@ -227,7 +227,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$i=0;
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$page_adminUserSelectVals[$i] = $row[0];
 				$page_adminUserSelectLabels[$i] = "$row[1] ($row[2], $row[3])";
 				$i++;

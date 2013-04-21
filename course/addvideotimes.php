@@ -60,7 +60,7 @@ echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</
 
 $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-$row = mysql_fetch_row($result);
+$row = mysqli_fetch_row($result);
 $qorder = explode(',',$row[0]);
 $viddata = $row[1];
 $qidbynum = array();
@@ -82,7 +82,7 @@ $qtitlebyid = array();
 $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if (strlen($row[1])<30) {
 		$qtitle[$row[0]] = $row[1];
 	} else {

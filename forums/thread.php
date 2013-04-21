@@ -29,14 +29,14 @@
 		$existingscores = array();
 		$query = "SELECT refid,id FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid'";
 		$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($res)) {
+		while ($row = mysqli_fetch_row($res)) {
 			$existingscores[$row[0]] = $row[1];
 		}
 		$postuserids = array();
 		$refids = "'".implode("','",array_keys($_POST['score']))."'";
 		$query = "SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids)";
 		$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($res)) {
+		while ($row = mysqli_fetch_row($res)) {
 			$postuserids[$row[0]] = $row[1];
 		}
 		foreach($_POST['score'] as $k=>$v) {
@@ -71,13 +71,12 @@
 	}
 	$query = "SELECT name,postby,settings,groupsetid,sortby,taglist FROM imas_forums WHERE id='$forumid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$forumname = mysql_result($result,0,0);
-	$postby = mysql_result($result,0,1);
-	$allowmod = ((mysql_result($result,0,2)&2)==2);
-	$allowdel = (((mysql_result($result,0,2)&4)==4) || $isteacher);
-	$groupsetid = mysql_result($result,0,3);
-	$sortby = mysql_result($result,0,4);
-	$taglist = mysql_result($result,0,5);
+	
+	list($forumname, $postby, $settings, $groupsetid, $sortby, $taglist) = mysqli_fetch_row($result);
+	
+	$allowmod = (($settings&2)==2);
+	$allowdel = ((($settings&4)==4) || $isteacher);
+
 	$dofilter = false;
 	$now = time();
 	$grpqs = '';
@@ -90,8 +89,8 @@
 			$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
-				$groupid = mysql_result($result,0,0);
+			if (mysqli_num_rows($result)>0) {
+				$groupid = mysql_fetch_first($result);
 			} else {
 				$groupid=0;
 			}
@@ -113,7 +112,7 @@
 				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid=0 OR stugroupid='$groupid'";
 			}
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$limthreads[] = $row[0];
 			}
 			if (count($limthreads)==0) {
@@ -142,7 +141,7 @@
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$limthreads = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$limthreads[] = $row[0];
 		}
 		if (count($limthreads)==0) {
@@ -183,7 +182,7 @@
 		
 		$query .= " ORDER BY imas_forum_posts.postdate DESC";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo "<div class=block>";
 			echo "<b>{$row[2]}</b>";
 			if (isset($_GET['allforums'])) {
@@ -213,11 +212,11 @@
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$now = time();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($r2)>0) {
-				$r2id = mysql_result($r2,0,0);
+			if (mysqli_num_rows($r2)>0) {
+				$r2id = mysql_fetch_first($r2);
 				$query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			} else{
@@ -253,7 +252,7 @@
 	$postcount = array();
 	$maxdate = array();
 	
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$postcount[$row[0]] = $row[1] -1;
 		$maxdate[$row[0]] = $row[2];
 	}
@@ -266,7 +265,7 @@
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$lastview = array();
 	$flags = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$lastview[$row[0]] = $row[1];
 		if ($row[2]==1) {
 			$flags[$row[0]] = 1;
@@ -294,7 +293,7 @@
 		}
 	
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+		$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
 		
 		if ($numpages > 1) {
 			$prevnext .= "Page: ";
@@ -361,7 +360,7 @@
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY id";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$grpnums = 1;
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if ($row[1] == 'Unnamed group') { 
 				$row[1] .= " $grpnums";
 				$grpnums++;
@@ -461,7 +460,7 @@
 	} 
 	$query .= "GROUP BY imas_forum_posts.id";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$uniqviews[$row[0]] = $row[1]-1;
 	}
 	
@@ -486,7 +485,7 @@
 		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
 	}
 	while ($line = mysql_fetch_assoc($result)) {

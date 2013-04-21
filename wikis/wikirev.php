@@ -28,7 +28,7 @@ if ($cid==0) {
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$query = "SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$id'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	$wikiname = $row[0];
 	$now = time();
 	if (!isset($teacherid) && ($row[4]==0 || ($row[4]==1 && ($now<$row[1] || $now>$row[2])))) {
@@ -46,9 +46,9 @@ if ($cid==0) {
 		$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 		$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY i_w_r.id DESC";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$numrevisions = mysql_num_rows($result);
+		$numrevisions = mysqli_num_rows($result);
 		
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		$text = $row[1];
 		if (strlen($text)>6 && substr($text,0,6)=='**wver') {
 			$wikiver = substr($text,6,strpos($text,'**',6)-6);
@@ -65,7 +65,7 @@ if ($cid==0) {
 		
 		if ($numrevisions>1) {
 			$i = 0;
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$revisionusers[$row[5]] =  $row[3].', '.$row[4];
 				//$row[1] = filter(str_replace('"','@^@^@',$row[1]));
 				//$row[1] = str_replace('"','\\"',$row[1]);

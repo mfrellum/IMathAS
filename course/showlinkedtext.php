@@ -22,9 +22,7 @@
 	}
 	$query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$text = mysql_result($result, 0,0);
-	$title = mysql_result($result,0,1);
-	$target = mysql_result($result,0,2);
+	list($text, $title, $target) = mysqli_fetch_row($result);
 	$titlesimp = strip_tags($title);
 
 	if (substr($text,0,8)=='exttool:') {

@@ -252,7 +252,7 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$skip = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$exmatch);
 		//remove from todel list all files found in other sessions 
 		$todel = array_diff($todel,$exmatch[1]);
@@ -308,9 +308,9 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 	}
 	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchwhere";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {return 0;}
+	if (mysqli_num_rows($result)==0) {return 0;}
 	$todel = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$matches);
 		foreach ($matches[1] as $file) {
 			if (!in_array($file,$todel)) {
@@ -328,7 +328,7 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$skip = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$exmatch);
 		//remove from todel list all files found in other sessions 
 		$todel = array_diff($todel,$exmatch[1]);
@@ -378,7 +378,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions WHERE $cond";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$cnt = 0;
-		while (($row = mysql_fetch_row($result)) && ($lim==0 || $cnt<$lim)) {
+		while (($row = mysqli_fetch_row($result)) && ($lim==0 || $cnt<$lim)) {
 			if (strpos($row[2].$row[3].$row[4],'FILE:')===false) { continue;}
 			$delcnt += deleteasidfilesfromstring($row[2].$row[3].$row[4]);
 			$cnt++;

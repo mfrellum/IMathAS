@@ -172,7 +172,7 @@ function gbinstrdisp() {
 			echo  '>All</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {

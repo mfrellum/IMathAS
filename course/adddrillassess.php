@@ -16,7 +16,7 @@ $daid = intval($_GET['daid']);
 
 $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	//new to invalid
 	$itemdescr = array();
 	$itemids = array();
@@ -91,7 +91,7 @@ if (isset($_GET['record'])) {
 		$query = "SELECT id,description FROM imas_questionset WHERE id IN ($toaddlist)";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$descr = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$descr[$row[0]] = str_replace(',','',$row[1]);
 		}
 		foreach ($toadd as $k=>$v) {
@@ -189,7 +189,7 @@ if (isset($_GET['record'])) {
 $query = "SELECT ias.id FROM imas_drillassess_sessions AS ias,imas_students WHERE ";
 $query .= "ias.drillassessid='$daid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid' LIMIT 1";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)>0) {
+if (mysqli_num_rows($result)>0) {
 	$beentaken = true;
 } else {
 	$beentaken = false;
@@ -255,7 +255,7 @@ if (!$beentaken) {
 	
 	$query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$lnamesarr[$row[1]] = $row[0];
 		$libsortorder[$row[1]] = $row[2];
 	}
@@ -280,7 +280,7 @@ if (!$beentaken) {
 		$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
 		
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)==0) {
+		if (mysqli_num_rows($result)==0) {
 			$noSearchResults = true;
 		} else {
 			$alt=0;
@@ -366,7 +366,7 @@ if (!$beentaken) {
 				
 				/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 				$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$times = mysql_result($result2,0,0);
+				$times = mysql_fetch_first($result2);
 				$page_questionTable[$i]['times'] = $times;
 				*/
 				$page_questionTable[$i]['times'] = 0;
@@ -400,7 +400,7 @@ if (!$beentaken) {
 				$allusedqids = implode(',', array_keys($page_questionTable));
 				$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$page_questionTable[$row[0]]['times'] = $row[1];
 				}
 			}

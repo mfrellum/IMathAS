@@ -57,13 +57,13 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$query = "SELECT questionsetid FROM imas_questions WHERE id='{$_GET['id']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				$_GET['qsetid'] = mysql_result($result,0,0);
+				$_GET['qsetid'] = mysql_fetch_first($result);
 			}
 		} 
 		if (isset($_GET['qsetid'])) { //new - adding
 			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$itemorder = mysql_result($result,0,0);
+			$itemorder = mysql_fetch_first($result);
 			for ($i=0;$i<$_POST['copies'];$i++) {
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints) ";
 				$query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}',$rubric,$showhints)";
@@ -125,7 +125,7 @@ if (!(isset($teacherid))) {
 		$rubric_names = array('None');
 		$query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}
@@ -133,7 +133,7 @@ if (!(isset($teacherid))) {
 		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 		$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result) > 0) {
+		if (mysqli_num_rows($result) > 0) {
 			$page_beenTakenMsg = "<h3>Warning</h3>\n";
 			$page_beenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
 			$page_beenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";

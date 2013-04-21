@@ -3,7 +3,7 @@
 function deletegroupset($grpsetid) {
 	$query = "SELECT id FROM imas_stugroups WHERE groupsetid='$grpsetid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		deletegroup($row[0]);
 	}
 	$query = "DELETE FROM imas_stugroupset WHERE id='$grpsetid'";
@@ -27,7 +27,7 @@ function deletegroup($grpid,$delposts=true) {
 		$query = "SELECT id FROM imas_forum_threads WHERE stugroupid='$grpid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$todel = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$todel[] = $row[0];
 		}
 		if (count($todel)>0) {

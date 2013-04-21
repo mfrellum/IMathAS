@@ -81,19 +81,19 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		if (isset($_POST['username'])) {
 			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['username']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)==0) {
+			if (mysqli_num_rows($result)==0) {
 				$overwriteBody = 1;
 				$body = "Error, username doesn't exist. <a href=\"listusers.php?cid=$cid&enroll=student\">Try again</a>\n";
 				$body .= "or <a href=\"listusers.php?cid=$cid&newstu=new\">create and enroll a new student</a>";
 			} else {
-				$id = mysql_result($result,0,0);
+				$id = mysql_fetch_first($result);
 				if ($id==$userid) {
 					echo "Instructors can't enroll themselves as students.  Use Student View.";
 					exit;
 				}
 				$query = "SELECT id FROM imas_tutors WHERE userid='$id' AND courseid='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) {
+				if (mysqli_num_rows($result)>0) {
 					echo "Tutors can't be enrolled as students.";
 					exit;
 				}
@@ -121,7 +121,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		if (isset($_POST['SID'])) {
 			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				$overwriteBody = 1;
 				$body = "$loginprompt '{$_POST['SID']}' is used.  <a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
@@ -157,7 +157,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$stuemails = array();
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$stuemails[] = $row[0].' '.$row[1]. ' &lt;'.$row[2].'&gt;';
 			}
 			$stuemails = implode('; ',$stuemails);
@@ -172,7 +172,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$updateusername = true;
 			$query = "SELECT id FROM imas_users WHERE SID='$un'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				$updateusername = false;
 			}
 			$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}'";
@@ -292,12 +292,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		
 		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
 			$hassection = true;
 			$sectionselect = "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {$sectionselect .= 'selected=1';}
 			$sectionselect .=  '>All</option>';
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$sectionselect .=  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
 					$sectionselect .=  'selected=1';
@@ -310,7 +310,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 		$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_result($result,0,0)>0) {
+		if (mysql_fetch_first($result)>0) {
 			$hascode = true;
 		} else {
 			$hascode = false;

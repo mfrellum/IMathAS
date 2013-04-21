@@ -38,13 +38,13 @@
 			$existingsids = array();
 			$query = "SELECT u.SID FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$existingsids[] = $row[0];
 			}
 			//also don't want students enrolled as tutors
 			$query = "SELECT u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$existingsids[] = $row[0];
 			}
 			$sids = explode(',',$_POST['newtutors']);
@@ -57,8 +57,8 @@
 				//check if SID exists
 				$query = "SELECT id,SID FROM imas_users WHERE SID in ($tutsids)";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) {
-					while ($row = mysql_fetch_row($result)) {
+				if (mysqli_num_rows($result)>0) {
+					while ($row = mysqli_fetch_row($result)) {
 						$inspt[] = "('{$row[0]}','$cid','')";
 						$foundsid[] = $row[1];
 					}
@@ -92,10 +92,9 @@
 	//imas_students.section field, so filter will act the same.
 	$query = "SELECT sel2name,sel2list FROM imas_diags WHERE cid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		$isdiag = true;
-		$limitname = mysql_result($result,0,0);
-		$sel2list = mysql_result($result,0,1);
+		list($limitname, $sel2list) = mysqli_fetch_row($result);
 		$sel2list = str_replace('~',';',$sel2list);
 		$sections = array_unique(explode(';',$sel2list));
 	}
@@ -104,7 +103,7 @@
 	if (!$isdiag) {
 		$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' AND section IS NOT NULL";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$sections[] = $row[0];
 		}
 		$limitname = "Section";
@@ -117,7 +116,7 @@
 	$i = 0;
 	$query = "SELECT tut.id,u.LastName,u.FirstName,tut.section FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid='$cid' ORDER BY u.LastName,u.FirstName";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$tutorlist[$i]['id'] = $row[0];
 		$tutorlist[$i]['name'] = $row[1].', '.$row[2];
 		$tutorlist[$i]['section'] = $row[3];

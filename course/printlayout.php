@@ -92,7 +92,7 @@ if ($overwriteBody==1) {
 	$qlist = "'".implode("','",$questions)."'";
 	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
 		} else {
@@ -268,13 +268,13 @@ if ($overwriteBody==1) {
 		if (isset($_POST['cname'])) {
 			$query = "SELECT name FROM imas_courses WHERE id=$cid";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$headerleft .= mysql_result($result,0,0);
+			$headerleft .= mysql_fetch_first($result);
 			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
 		}
 		if (isset($_POST['iname'])) {
 			$query = "SELECT LastName FROM imas_users WHERE id=$userid";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$headerleft .= mysql_result($result,0,0);
+			$headerleft .= mysql_fetch_first($result);
 		}
 		$headerright = '';
 		if (isset($_POST['sname'])) {
@@ -399,7 +399,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
 		}
 	}

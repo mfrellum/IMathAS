@@ -31,7 +31,7 @@ if ($cid==0) {
 	
 	$query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	$wikiname = $row[0];
 	$now = time();
 	if (!isset($teacherid) && ($row[4]==0 || ($row[4]==1 && ($now<$row[1] || $now>$row[2])) || $now>$row[3])) {
@@ -43,14 +43,13 @@ if ($cid==0) {
 				$groupid = intval($_GET['grp']);
 				$query = "SELECT name FROM imas_stugroups WHERE id='$groupid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$groupname = mysql_result($result,0,0);
+				$groupname = mysql_fetch_first($result);
 			} else {
 				$groupsetid = $row[5];
 				$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$groupid = mysql_result($result,0,0);
-				$groupname = mysql_result($result,0,1);
+				list($groupid, $groupname) = mysqli_fetch_row($result);
 			}
 		} else {
 			$groupid = 0;
@@ -72,8 +71,8 @@ if ($cid==0) {
 			$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 			$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {//editing existing wiki
-				$row = mysql_fetch_row($result);
+			if (mysqli_num_rows($result)>0) {//editing existing wiki
+				$row = mysqli_fetch_row($result);
 				$revisionid = $row[0];
 				$revisiontext = $row[1];
 				if (strlen($revisiontext)>6 && substr($revisiontext,0,6)=='**wver') {
@@ -156,8 +155,8 @@ if ($cid==0) {
 			$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 			$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) { //wikipage exists already
-				$row = mysql_fetch_row($result);
+			if (mysqli_num_rows($result)>0) { //wikipage exists already
+				$row = mysqli_fetch_row($result);
 				$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 				$lasteditedby = $row[3].', '.$row[4];
 				$revisionid = $row[0];

@@ -5,7 +5,7 @@ function delitembyid($itemid) {
 		
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-	list($itemtype,$typeid) = mysql_fetch_row($result);
+	list($itemtype,$typeid) = mysqli_fetch_row($result);
 	
 	if ($itemtype == "InlineText") {
 		$query = "DELETE FROM imas_inlinetext WHERE id='$typeid'";
@@ -14,11 +14,11 @@ function delitembyid($itemid) {
 		$query = "SELECT filename FROM imas_instr_files WHERE itemid='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$safefn = addslashes($row[0]);
 			$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($r2)==1) {
+			if (mysqli_num_rows($r2)==1) {
 				//unlink($uploaddir . $row[0]);
 				deletecoursefile($row[0]);
 			}
@@ -30,12 +30,12 @@ function delitembyid($itemid) {
 	} else if ($itemtype == "LinkedText") {
 		$query = "SELECT text FROM imas_linkedtext WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$text = mysql_result($result,0,0);
+		$text = mysql_fetch_first($result);
 		if (substr($text,0,5)=='file:') { //delete file if not used
 			$safetext = addslashes($text);
 			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)==1) { 
+			if (mysqli_num_rows($result)==1) { 
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				$filename = substr($text,5);
 				//unlink($uploaddir . $filename);

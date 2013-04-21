@@ -13,7 +13,7 @@ $qtimes = array();
 
 $query = "SELECT questions,timeontask FROM imas_assessment_sessions WHERE timeontask<>''";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$q = explode(',',$row[0]);
 	$t = explode(',',$row[1]);
 	foreach ($q as $k=>$qn) {
@@ -28,7 +28,7 @@ while ($row = mysql_fetch_row($result)) {
 $qstimes = array();
 $query = "SELECT id,questionsetid FROM imas_questions WHERE 1";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if (isset($qtimes[$row[0]])) {
 		if (isset($qstimes[$row[1]])) {
 			$qstimes[$row[1]] .= '~'.$qtimes[$row[0]];

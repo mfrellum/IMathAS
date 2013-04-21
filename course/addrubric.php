@@ -89,7 +89,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$rubid = intval($_GET['id']);
 				$query = "SELECT name,groupid,rubrictype,rubric FROM imas_rubrics WHERE id=$rubid";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				list($rubname,$rubgrp,$rubtype,$rubric) = mysql_fetch_row($result);
+				list($rubname,$rubgrp,$rubtype,$rubric) = mysqli_fetch_row($result);
 				$rubric = unserialize($rubric);
 			}
 		} 
@@ -115,7 +115,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	echo '<p>Select a rubric to edit or <a href="addrubric.php?cid='.$cid.'&amp;id=new">Add a new rubric</a></p><p>';
 	$query = "SELECT id, name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$groupid' ORDER BY name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo "{$row[1]} <a href=\"addrubric.php?cid=$cid&amp;id={$row[0]}$fromstr\">Edit</a><br/>";
 	}
 	echo '</p>';

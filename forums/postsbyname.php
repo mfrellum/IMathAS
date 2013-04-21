@@ -22,11 +22,11 @@
 		$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 		$now = time();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($r2)>0) {
-				$r2id = mysql_result($r2,0,0);
+			if (mysqli_num_rows($r2)>0) {
+				$r2id = mysql_fetch_first($r2);
 				$query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 			} else{
@@ -36,16 +36,17 @@
 		}
 	}
 	
-	$query = "SELECT settings,replyby,defdisplay,name,points,rubric FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,points,rubric FROM imas_forums WHERE id='$forumid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$forumsettings = mysql_result($result,0,0);
-	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
+	
+	list($forumsettings, $replyby, $pointspos, $rubric) = mysqli_fetch_row($result);
+	
+	$allowreply = ($isteacher || (time()<$replyby));
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
-	$pointspos = mysql_result($result,0,4);
 	$haspoints = ($pointspos>0);
-	$rubric = mysql_result($result,0,5);
+
 	
 	$caller = "byname";
 	include("posthandler.php");
@@ -60,7 +61,7 @@
 	
 	$query = "SELECT name FROM imas_forums WHERE id='$forumid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$forumname = mysql_result($result,0,0);
+	$forumname = mysql_fetch_first($result);
 	
 	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h2>Posts by Name - $forumname</h2>\n";
@@ -155,8 +156,8 @@
 	if ($haspoints && $rubric != 0) {
 		$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=$rubric";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
-			$row = mysql_fetch_row($result);
+		if (mysqli_num_rows($result)>0) {
+			$row = mysqli_fetch_row($result);
 			echo printrubrics(array($row));
 		}
 	}
@@ -166,7 +167,7 @@
 	if ($haspoints) {
 		$query = "SELECT refid,score,feedback FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$scores[$row[0]] = $row[1];
 			$feedback[$row[0]] = $row[2];
 		}

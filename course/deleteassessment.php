@@ -35,7 +35,7 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$aid' AND itemtype='Assessment'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemid = mysql_result($result,0,0);
+		$itemid = mysql_fetch_first($result);
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$query = "DELETE FROM imas_assessments WHERE id='$aid'";
@@ -43,7 +43,7 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -63,7 +63,7 @@ if (!(isset($teacherid))) {
 	} else {
 		$query = "SELECT name FROM imas_assessments WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemname = mysql_result($result,0,0);
+		$itemname = mysql_fetch_first($result);
 	}
 }
 

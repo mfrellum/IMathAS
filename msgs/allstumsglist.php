@@ -57,7 +57,7 @@
 		$query .= " AND msgto='$filterstu'";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	$numpages = ceil(mysql_fetch_first($result)/$threadsperpage);
 	
 	$prevnext = '';
 	if ($numpages > 1) {
@@ -123,7 +123,7 @@ function chgfilter() {
 	$query .= "imas_students.userid=imas_users.id AND imas_students.courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
 	$stulist = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$stulist[$row[0]] = "{$row[1]}, {$row[2]}";
 		echo "<option value=\"{$row[0]}\" ";
 		if ($filterstu==$row[0]) {
@@ -136,7 +136,7 @@ function chgfilter() {
 	$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_teachers.userid=imas_users.id AND imas_teachers.courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$stulist[$row[0]] = "{$row[1]}, {$row[2]}";
 	}
 	
@@ -160,7 +160,7 @@ function chgfilter() {
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}
 	while ($line = mysql_fetch_assoc($result)) {

@@ -27,7 +27,7 @@ if (!(isset($teacherid))) {
 		}
 		$query = "SELECT imas_users.id,imas_users.SID FROM imas_users JOIN imas_students ON imas_students.userid=imas_users.id WHERE imas_students.courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query;  " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$useridarr[$row[1]] = $row[0];
 		}
 		$coltoadd = $_POST['addcol'];
@@ -48,8 +48,8 @@ if (!(isset($teacherid))) {
 				//we're going to check that this id really belongs to this course.  Don't want cross-course hacking :)
 				$query = "SELECT id FROM imas_gbitems WHERE id='{$_POST["coloverwrite$col"]}' AND courseid='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) { //if this fails, we'll end up creating a new item
-					$gbitemid[$col] = mysql_result($result,0,0);
+				if (mysqli_num_rows($result)>0) { //if this fails, we'll end up creating a new item
+					$gbitemid[$col] = mysql_fetch_first($result);
 					//delete old grades
 					//$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]}";
 					//mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -178,7 +178,7 @@ if (!(isset($teacherid))) {
 				$namelist = "'".implode("','",$names)."'";
 				$query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$loc = array_search($row[1],$names);
 					if ($loc===false) {continue; } //shouldn't happen
 					$columndata[$loc][3] = $row[0];  //store existing gbitems.id 
@@ -238,8 +238,8 @@ if ($overwriteBody==1) {
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$gbcatoptions = '<option value="0" selected=1>Default</option>';
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		if (mysqli_num_rows($result)>0) {
+			while ($row = mysqli_fetch_row($result)) {
 				$gbcatoptions .= "<option value=\"{$row[0]}\">{$row[1]}</option>\n";
 			}
 		}	

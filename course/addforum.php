@@ -109,7 +109,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$oldgroupsetid = mysql_result($result,0,0);
+			$oldgroupsetid = mysql_fetch_first($result);
 			if ($oldgroupsetid!=$_POST['groupsetid']) {
 				//change of groupset; zero out stugroupid 
 				$query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid='{$_GET['id']}';";
@@ -156,7 +156,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$query = "SELECT id FROM imas_forum_subscriptions WHERE forumid='$newforumid' AND userid='$userid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
 			if (!isset($_POST['subscribe'])) {
 				$query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$newforumid' AND userid='$userid'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -173,7 +173,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$hassubscrip = false;
 			$query = "SELECT id FROM imas_forum_subscriptions WHERE forumid='{$_GET['id']}' AND userid='$userid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				$hassubscrip = true;
 			}
 			$query = "SELECT * FROM imas_forums WHERE id='{$_GET['id']}';";
@@ -193,7 +193,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($groupsetid>0) {
 				$query = "SELECT * FROM imas_forum_threads WHERE forumid='{$_GET['id']}' AND stugroupid>0 LIMIT 1";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) {
+				if (mysqli_num_rows($result)>0) {
 					$hasgroupthreads = true;
 				} else {
 					$hasgroupthreads = false;
@@ -267,7 +267,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
 		$page_groupSelect = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use groups of $row[1]";
 			$i++;
@@ -277,7 +277,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
 		$page_groupSelect = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 			$i++;
@@ -287,8 +287,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$page_gbcatSelect = array();
 		$i=0;
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		if (mysqli_num_rows($result)>0) {
+			while ($row = mysqli_fetch_row($result)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
 				$page_gbcatSelect['label'][$i] = $row[1];
 				$i++;
@@ -298,7 +298,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$rubric_names = array('None');
 		$query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}

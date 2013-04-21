@@ -11,7 +11,7 @@
 	$query = "SELECT iu.LastName,iu.FirstName,ig.score,ig.feedback,igi.name FROM imas_users as iu, imas_grades AS ig, imas_gbitems AS igi WHERE ";
 	$query .= "iu.id=ig.userid AND igi.id=ig.gradetypeid AND ig.gradetype='offline' AND ig.id='$gid' AND ig.userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	$pagetitle = "View Grade";
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";

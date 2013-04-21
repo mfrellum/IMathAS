@@ -65,7 +65,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$query = "SELECT name FROM imas_assessments WHERE id={$_GET['id']}";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$assessmentname = mysql_result($result,0,0);
+			$assessmentname = mysql_fetch_first($result);
 			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			$body .= "&gt; <a href=\"addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
 			$body .= "<h3>$assessmentname</h3>";
@@ -165,7 +165,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['copyfrom']!=0) {
 			$query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial) = addslashes_deep(mysql_fetch_row($result));
+			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial) = addslashes_deep(mysqli_fetch_row($result));
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = $cpintro;
 			}
@@ -197,14 +197,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$isok = true;
 			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_result($result,0,0)==0) {
+			if (mysql_fetch_first($result)==0) {
 				//check to see if students have already started assessment
 				//don't really care if groups exist - just whether asids exist
 				//$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
 				$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 				$query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_result($result,0,0)>0) {//if (mysql_num_rows($result)>0) {
+				if (mysql_fetch_first($result)>0) {//if (mysqli_num_rows($result)>0) {
 					echo "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
 					exit;
 				}
@@ -232,7 +232,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
 				$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_result($result,0,0)>0) {
+				if (mysql_fetch_first($result)>0) {
 					$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}
@@ -316,7 +316,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 			$query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query; " . mysqli_error($GLOBALS['link']));
-			$taken = (mysql_result($result,0,0)>0);
+			$taken = (mysql_fetch_first($result)>0);
 			$query = "SELECT * FROM imas_assessments WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$line = mysql_fetch_assoc($result);
@@ -458,8 +458,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$page_copyFromSelect = array();
 		$i=0;
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		if (mysqli_num_rows($result)>0) {
+			while ($row = mysqli_fetch_row($result)) {
 				$page_copyFromSelect['val'][$i] = $row[0];
 				$page_copyFromSelect['label'][$i] = $row[1];
 				$i++;
@@ -470,8 +470,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$page_gbcatSelect = array();
 		$i=0;
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		if (mysqli_num_rows($result)>0) {
+			while ($row = mysqli_fetch_row($result)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
 				$page_gbcatSelect['label'][$i] = $row[1];
 				$i++;
@@ -490,7 +490,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$page_groupsets['val'][0] = 0;
 		$page_groupsets['label'][0] = 'Create new set of groups';
 		$i=1;
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_groupsets['val'][$i] = $row[0];
 			$page_groupsets['label'][$i] = $row[1];
 			$i++;
@@ -504,7 +504,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$page_forumSelect['val'][0] = 0;
 		$page_forumSelect['label'][0] = "None";
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];
 		}

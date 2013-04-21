@@ -80,7 +80,7 @@ $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysql
 <tbody>
 <?php
 $cnt = 0;
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	echo '<tr>';
 	echo '<td><input type=checkbox name="del['.$row[0].']" /></td>';
 	$date = tzdate("m/d/Y",$row[1]);

@@ -61,7 +61,7 @@ if ($myrights<60) {
 	if (isset($_POST['id'])) {
 		$query = "SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id='{$_POST['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		$s1l = explode(',',$row[0]);
 		$s2l = explode(';',$row[2]);
 		for ($i=0;$i<count($s1l);$i++) {
@@ -87,7 +87,7 @@ if ($myrights<60) {
 		$query = "SELECT id,name FROM imas_assessments WHERE courseid='{$_POST['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query);
 		
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_selectValList[$k][$i] = $row[0];
 			$page_selectLabelList[$k][$i] = $row[1];
 			if (isset($aids[$k]) && $row[0]==$aids[$k]) {
@@ -212,7 +212,7 @@ if ($myrights<60) {
 	
 	$i=0;
 	$page_courseSelectList = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$page_courseSelectList['val'][$i]=$row[0];
 		$page_courseSelectList['label'][$i]=$row[1];
 		if ($cid==$row[0]) {

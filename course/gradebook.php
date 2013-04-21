@@ -42,7 +42,7 @@ if ($canviewall) {
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$gbmode = mysql_result($result,0,0);
+		$gbmode = mysql_fetch_first($result);
 		
 		
 	}
@@ -51,7 +51,7 @@ if ($canviewall) {
 	} else {
 		$query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$colorize = mysql_result($result,0,0);
+		$colorize = mysql_fetch_first($result);
 		setcookie("colorize-$cid",$colorize);
 	}
 	if (isset($_GET['catfilter'])) {
@@ -110,7 +110,7 @@ if ($isteacher) {
 		//recording a toggle.  Called via AHAH
 		$query = "SELECT newflag FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$newflag = mysql_result($result,0,0);
+		$newflag = mysql_fetch_first($result);
 		$newflag = $newflag ^ 1;  //XOR
 		$query = "UPDATE imas_courses SET newflag = $newflag WHERE id='$cid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -435,7 +435,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '>Default</option>';
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo '<option value="'.$row[0].'"';
 			if ($catfilter==$row[0]) {echo "selected=1";}
 			echo '>'.$row[1].'</option>';
@@ -571,7 +571,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '>Default</option>';
 	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo '<option value="'.$row[0].'"';
 		if ($catfilter==$row[0]) {echo "selected=1";}
 		echo '>'.$row[1].'</option>';
@@ -649,7 +649,7 @@ function gbstudisp($stu) {
 	if ($stu>0) {
 		$query = "SELECT showlatepass FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$showlatepass = mysql_result($result,0,0);
+		$showlatepass = mysql_fetch_first($result);
 		
 		if ($isteacher) {
 			if ($gbt[1][4][2]==1) {
@@ -665,9 +665,10 @@ function gbstudisp($stu) {
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		echo '<div style="clear:both">';
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
+			list($gbcomment,$email,$latepasses) = mysqli_fetch_row($result); 
 			if ($isteacher) {
-				echo '<a href="mailto:'.mysql_result($result,0,1).'">Email</a> | ';
+				echo '<a href="mailto:'.$email.'">Email</a> | ';
 				echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">Message</a> | ";
 				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">Make Exception</a> | ";
 				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a> | ";
@@ -675,8 +676,7 @@ function gbstudisp($stu) {
 				echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">Edit Offline Scores</a>";
 				
 			}
-			$gbcomment = mysql_result($result,0,0);
-			$latepasses = mysql_result($result,0,2);
+			
 			if ($showlatepass==1) {
 				if ($latepasses==0) { $latepasses = 'No';}
 				if ($isteacher) {echo '<br/>';}
@@ -857,7 +857,7 @@ function gbstudisp($stu) {
 	if (!$hidepast) {
 		$query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$show = mysql_result($result,0,0);
+		$show = mysql_fetch_first($result);
 		//echo '</tbody></table><br/>';
 		if ($isteacher && $stu>0) {
 			echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" /> ';
@@ -1101,7 +1101,7 @@ function gbinstrdisp() {
 			echo  '>All</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {

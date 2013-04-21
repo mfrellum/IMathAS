@@ -105,7 +105,7 @@ if (isset($_POST['tname'])) {
 		echo "<h2>Delete Tool</h2>";
 		$query = "SELECT name FROM imas_external_tools WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$name = mysql_result($result,0,0);
+		$name = mysqli_fetch_first($result);
 		
 		echo '<p>Are you SURE you want to delete the tool <b>'.$name.'</b>?  Doing so will break ALL placements of this tool.</p>';
 		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$_GET['id'].'&amp;delete=true">';
@@ -126,8 +126,8 @@ if (isset($_POST['tname'])) {
 				$query .= " AND groupid='$groupid'";
 			}
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)==0) { die("invalid id");}
-			list($name,$url,$key,$secret,$custom,$privacy,$grp) = mysql_fetch_row($result);
+			if (mysqli_num_rows($result)==0) { die("invalid id");}
+			list($name,$url,$key,$secret,$custom,$privacy,$grp) = mysqli_fetch_row($result);
 			$custom = str_replace('&',"\n",$custom);
 		}
 		$tochg = array('name','url','key','secret','custom');
@@ -191,10 +191,10 @@ if (isset($_POST['tname'])) {
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		echo '<ul class="nomark">';
-		if (mysql_num_rows($result)==0) {
+		if (mysqli_num_rows($result)==0) {
 			echo '<li>No tools</li>';
 		} else {
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				echo '<li>'.$row[1];
 				if ($isadmin) {
 					if ($row[2]==null) {

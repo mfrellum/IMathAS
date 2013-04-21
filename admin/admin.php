@@ -86,7 +86,7 @@ if ($myrights < 40) {
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 	$i=0;
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$page_teacherSelectVal[$i] = $row[0];
 		$page_teacherSelectLabel[$i] = $row[1] . ", " . $row[2];
 		$i++;
@@ -103,7 +103,7 @@ if ($myrights < 40) {
 		$query .= " ORDER BY d.name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_diagnosticsId[$i] = $row[0];
 			$page_diagnosticsName[$i] = $row[1];
 			$page_diagnosticsAvailable[$i] = ($row[2]&1) ? "Yes" : "No";
@@ -160,7 +160,7 @@ if ($myrights < 40) {
 	$i=2;
 	$query = "SELECT id,name from imas_groups ORDER BY name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$page_userSelectVal[$i] = $row[0];
 		$page_userSelectLabel[$i] = $row[1];
 		$i++;

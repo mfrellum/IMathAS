@@ -146,7 +146,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$lookup = implode("','",$lookup);
 		$query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_questionset WHERE uniqueid IN ('$lookup')";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$exists[$row[1]] = $row[0];
 			$adddate[$row[0]] = $row[2];
 			$lastmod[$row[0]] = $row[3];
@@ -156,7 +156,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$checkli = implode(',',$exists);
 			$query = "SELECT libid,qsetid FROM imas_library_items WHERE qsetid IN ($checkli)";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$dontaddli[$row[0]] = $row[1]; //prevent adding library items for existing pairs
 			}
 		}
@@ -178,7 +178,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 					if ($isgrpadmin) {
 						$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE WHERE imas_questionset.id='$qsetid' AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-						if (mysql_num_rows($result)>0) {
+						if (mysqli_num_rows($result)>0) {
 						//$query = "UPDATE imas_questionset,imas_users SET imas_questionset.description='{$qdata[$qn]['description']}',imas_questionset.author='{$qdata[$qn]['author']}',";
 						//$query .= "imas_questionset.qtype='{$qdata[$qn]['qtype']}',imas_questionset.control='{$qdata[$qn]['control']}',imas_questionset.qcontrol='{$qdata[$qn]['qcontrol']}',imas_questionset.qtext='{$qdata[$qn]['qtext']}',";
 						//$query .= "imas_questionset.answer='{$qdata[$qn]['answer']}',imas_questionset.adddate=$now,imas_questionset.lastmodddate=$now WHERE imas_questionset.id='$qsetid'";
@@ -255,7 +255,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 		$includedqs = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$qidstoupdate[] = $row[0];
 			if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
@@ -271,14 +271,14 @@ if (!(isset($teacherid)) && $myrights<75) {
 				$includedlist = implode(',',$includedqs);
 				$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$includedbackref[$row[1]] = $row[0];		
 				}
 			}
 			$updatelist = implode(',',$qidstoupdate);
 			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
 				$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
 				$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
@@ -316,7 +316,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$lookup = implode("','",$lookup);
 		$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ('$lookup')";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
 			$existing = true;
 			$page_existingMsg = "<p>This file contains questions with uniqueids that already exist on this system.  With these questions, do you want to:<br/>\n";
 			$page_existingMsg .= "<input type=radio name=merge value=\"1\" CHECKED>Update existing questions, <input type=radio name=merge value=\"0\">Add as new question, or <input type=radio name=merge value=\"-1\">Keep existing question</p>\n";

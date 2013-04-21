@@ -9,8 +9,8 @@
 	}
 	$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link'])); 
-	$rawitemorder = mysql_result($result,0,0);
-	$viddata = mysql_result($result,0,1);
+	list($rawitemorder, $viddata) = mysqli_fetch_row($result);
+	
 	$itemorder = str_replace('~',',',$rawitemorder);
 	$curitems = array();
 	foreach (explode(',',$itemorder) as $qid) {

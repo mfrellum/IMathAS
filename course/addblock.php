@@ -97,8 +97,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$items = unserialize(mysql_result($result,0,0));
-	$blockcnt = mysql_result($result,0,1);
+	list($items,$blockcnt) = mysqli_fetch_row($result);
 
 	if (isset($_GET['block'])) { //adding new
 		$blocktree = explode('-',$_GET['block']);
@@ -174,7 +173,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_GET['id'])) { //teacher modifying existing block, load form with block data
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 			
 		$blocktree = explode('-',$_GET['id']);
 		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
@@ -236,7 +235,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$grouplimit = array();
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 	}
 
 	//set some default data for use with either the add or modify form
@@ -249,7 +248,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_sectionlistlabel = array("No restriction");
 	$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$page_sectionlistval[] = 's-'.$row[0];
 		$page_sectionlistlabel[] = 'Section '.$row[0];
 	}

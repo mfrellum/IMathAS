@@ -135,7 +135,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$settings = $line['settings'];
 			$query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='{$_GET['id']}';";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				$started = true;
 			} else {
 				$started = false;
@@ -182,7 +182,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$i=0;
 		$page_groupSelect = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 			$i++;

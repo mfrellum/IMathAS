@@ -123,8 +123,8 @@ if (isset($_POST['checked'])) { //form submitted
 			$query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$hassubscribe = array();
-			if (mysql_num_rows($result)>0) {
-				while ($row = mysql_fetch_row($result)) {
+			if (mysqli_num_rows($result)>0) {
+				while ($row = mysqli_fetch_row($result)) {
 					$hassubscribe[] = $row[0];
 				}
 			}
@@ -152,7 +152,7 @@ if (isset($_POST['checked'])) { //form submitted
 $forumitems = array();
 $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$forumitems[$row[0]] = $row[1];
 }
 
@@ -160,7 +160,7 @@ $query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY na
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $i=0;
 $page_groupSelect = array();
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$page_groupSelect['val'][$i] = $row[0];
 	$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 	$i++;
@@ -170,8 +170,8 @@ $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 $page_gbcatSelect = array();
 $i=0;
-if (mysql_num_rows($result)>0) {
-	while ($row = mysql_fetch_row($result)) {
+if (mysqli_num_rows($result)>0) {
+	while ($row = mysqli_fetch_row($result)) {
 		$page_gbcatSelect['val'][$i] = $row[0];
 		$page_gbcatSelect['label'][$i] = $row[1];
 		$i++;

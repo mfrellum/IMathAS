@@ -12,7 +12,7 @@ $to = $_GET['to'];
 $ids = array();
 $query = "SELECT assessmentid FROM imas_assessment_sessions WHERE userid='$to'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$ids[] = $row[0];
 }
 $idlist = implode(',',$ids);
@@ -29,7 +29,7 @@ echo mysqli_affected_rows($GLOBALS['link'])().' assessment sessions moved<br/><b
 $ids = array();
 $query = "SELECT gradetypeid FROM imas_grades WHERE userid='$to' AND gradetype='offline' AND score IS NOT NULL";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	$ids[] = $row[0];
 }
 $idlist = implode(',',$ids);

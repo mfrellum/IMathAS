@@ -15,7 +15,7 @@
 			$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
 			$query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid='$limitaid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$toignore[] = $row[0];
 			}
 		}
@@ -30,7 +30,7 @@
 			
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$emailaddys = array();
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if (!in_array($row[2],$toignore)) {
 					$fullnames[$row[2]] = $row[1]. ', '.$row[0];
 					$firstnames[$row[2]] = addslashes($row[0]);
@@ -61,7 +61,7 @@
 			} else if ($_POST['self']=="allt") {
 				$query = "SELECT imas_users.id FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$tolist[] = $row[0];
 				}
 			}
@@ -83,7 +83,7 @@
 			
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$emailaddys = array();
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if (!in_array($row[3],$toignore)) {
 					$emailaddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";
 					$firstnames[] = $row[0];
@@ -106,7 +106,7 @@
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
 			$headers .= "From: $self\r\n";
 			$teacheraddys = array();
@@ -125,7 +125,7 @@
 				$query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
 				$query .= "AND imas_users.id<>'$userid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$teacheraddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";	
 				}
 				$message .= "<p>A copy was also emailed to all instructors for this course</p>\n";
@@ -207,7 +207,7 @@
 		$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		echo '<p>Unless limited, message will be sent to:<ul>';
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo "<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
 		}
 		echo '</ul>';

@@ -96,7 +96,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			
 			$query = "SELECT userid FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)==0) {//parent post deleted
+			if (mysqli_num_rows($result)==0) {//parent post deleted
 				$sendemail = false;
 				require("../header.php");
 				echo '<h2>Error:</h2><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
@@ -108,7 +108,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				require("../footer.php");
 				exit;
 			} else {
-				$uid = mysql_result($result,0,0);
+				$uid = mysql_fetch_first($result);
 				
 				$now = time();
 				$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
@@ -122,8 +122,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
 					$query = "SELECT id FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['replyto']}'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)>0) {
-						$gradeid = mysql_result($result,0,0);
+					if (mysqli_num_rows($result)>0) {
+						$gradeid = mysql_fetch_first($result);
 						$query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
 						//$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
 						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
@@ -131,7 +131,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						//moved up as a "did the post get deleted" check
 						//$query = "SELECT userid FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 						//$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-						//$uid = mysql_result($result,0,0);
+						//$uid = mysql_fetch_first($result);
 						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
 						$query .= "('forum','$forumid','$uid','{$_GET['replyto']}','{$_POST['points']}')";
 						mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
@@ -155,7 +155,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$sendemail = false;
 			$query = "SELECT files FROM imas_forum_posts WHERE id='{$_GET['modify']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$files = mysql_result($result,0,0);
+			$files = mysql_fetch_first($result);
 			if ($files=='') {
 				$files = array();
 			} else {
@@ -166,7 +166,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid='$forumid' AND iu.id<>'$userid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
@@ -177,7 +177,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$message .= "<a href=\"" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl\">";
 				$message .= "View Posting</a>\r\n";
 			}
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$row[0] = trim($row[0]);
 				if ($row[0]!='' && $row[0]!='none@none.com') {
 					mail($row[0],'New forum post notification',$message,$headers);
@@ -251,16 +251,16 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
 				$query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id='{$_GET['replyto']}'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$sub = mysql_result($result,0,0);
+				list($sub, $points) = mysqli_fetch_row($result);
+
 				$sub = str_replace('"','&quot;',$sub);
 				$line['subject'] = "Re: $sub";
 				$line['message'] = "";
 				$line['files'] = '';
-				$points = mysql_result($result,0,1);
 				if ($isteacher) {
 					$query = "SELECT points FROM imas_forums WHERE id='$forumid'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					$haspoints = (mysql_result($result,0,0)>0);
+					$haspoints = (mysql_fetch_first($result)>0);
 				}
 				echo '<div id="headerposthandler" class="pagetitle"><h2>Post Reply</h2></div>';
 			} else if ($_GET['modify']=='new') {
@@ -281,23 +281,23 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						//wants to show ans
 						$query = "SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$parts[3]}'";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-						$seeds = explode(',',mysql_result($result,0,0));
+						list($seeds, $attempts, $qs) = mysqli_fetch_row($result);
+						$seeds = explode(',', $seeds);
 						$seeds = $seeds[$parts[0]];
-						$attempts = explode(',',mysql_result($result,0,1));
+						$attempts = explode(',', $attempts);
 						$attempts = $attempts[$parts[0]];
-						$qs = explode(',',mysql_result($result,0,2));
+						$qs = explode(',', $qs);
 						$qid = intval($qs[$parts[0]]);
 						$query = "SELECT questionsetid,attempts,showans FROM imas_questions WHERE id=$qid";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-						$parts[1] = mysql_result($result,0,0);
-						$allowedattempts = mysql_result($result,0,1);
-						$showans = mysql_result($result,0,2);
+						list($parts[1], $allowedattempts, $showans) = mysqli_fetch_row($result);
 						
 						$query = "SELECT defattempts,deffeedback,displaymethod FROM imas_assessments WHERE id='{$parts[3]}'";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-						list($displaymode,$defshowans) = explode('-',mysql_result($result,0,1));
+						list($defattempts, $deffeedback, $displaymethod) = mysqli_fetch_row($result);
+						list($displaymode,$defshowans) = explode('-', $deffeedback);
 						if ($allowedattempts==9999) {
-							$allowedattempts = mysql_result($result,0,0);	
+							$allowedattempts = $defattempts;	
 						}
 						if ($showans==0) {
 							$showans = $defshowans;
@@ -317,8 +317,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					if (isset($parts[3])) {  
 						$query = "SELECT name,itemorder FROM imas_assessments WHERE id='".intval($parts[3])."'";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-						$line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
-						$itemorder = mysql_result($result,0,1);
+						list($name, $itemorder) = mysqli_fetch_row($result);
+						$line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',$name);
 						$isgroupedq = false;
 						if (strpos($itemorder, '~')!==false) {
 							$itemorder = explode(',',$itemorder);
@@ -344,10 +344,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 								$query .= " AND ift.stugroupid='$groupid'";
 							}
 							$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-							if (mysql_num_rows($result)>0) {
+							if (mysqli_num_rows($result)>0) {
 								$notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>';
 								$notice .= 'Please read and participate in the existing discussion.';
-								while ($row = mysql_fetch_row($result)) {
+								while ($row = mysqli_fetch_row($result)) {
 									$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
 								}
 							}
@@ -358,12 +358,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$query = "SELECT name,settings,forumtype,taglist FROM imas_forums WHERE id='$forumid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$allowanon = mysql_result($result,0,1)%2;
+		list($name, $settings, $forumtype, $taglist) = mysqli_fetch_row($result);
+		$allowanon = $settings%2;
 		if ($_GET['modify']=='new') {
-			echo mysql_result($result,0,0).'</h2>';
+			echo $name.'</h2>';
 		}
-		$forumtype = mysql_result($result,0,2);
-		$taglist = mysql_result($result,0,3);
 		
 		if ($replyby!=null && $replyby<2000000000 && $replyby>0) {
 			$replybydate = tzdate("m/d/Y",$replyby);
@@ -470,7 +469,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					echo '>Non group-specific</option>';
 					$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						echo '<option value="'.$row[0].'" ';
 						if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
 						echo '>'.$row[1].'</option>';
@@ -535,7 +534,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if (!$isteacher) {
 			$query = "SELECT id FROM imas_forum_posts WHERE parent='{$_GET['remove']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				$go = false;
 			}
 		} 
@@ -543,12 +542,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			require_once("../includes/filehandler.php");
 			$query = "SELECT parent,files FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$parent = mysql_result($result,0,0);
-			$files = mysql_result($result,0,1);
+			list($parent, $files) = mysqli_fetch_row($result);
+			
 			if ($parent==0) {
 				$query = "SELECT id FROM imas_forum_posts WHERE threadid='{$_GET['remove']}' AND files<>''";
 				$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($r)) {
+				while ($row = mysqli_fetch_row($r)) {
 					deleteallpostfiles($row[0]); //delete files for each post
 				}
 				
@@ -588,12 +587,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$pagetitle = "Remove Post";
 		$query = "SELECT parent FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		$parent = mysql_result($result,0,0);
+		$parent = mysql_fetch_first($result);
 		require("../header.php");
 		if (!$isteacher) {
 			$query = "SELECT id FROM imas_forum_posts WHERE parent='{$_GET['remove']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				echo "Someone has replied to this post, so you cannot remove it.  <a href=\"$returnurl\">Back</a>";
 				require("../footer.php");
 				exit;
@@ -650,7 +649,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//if not head of thread, need to create new thread, move items to new thread, then move forum
 				$query = "SELECT lastposttime,lastpostuser FROM imas_forum_threads WHERE id='$threadid'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$row = mysql_fetch_row($result);
+				$row = mysqli_fetch_row($result);
 				//set all lower posts to new threadid and forumid
 				$query = "UPDATE imas_forum_posts SET threadid='{$_GET['move']}',forumid='{$_POST['movetof']}' WHERE id IN ($list)";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
@@ -667,7 +666,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($_POST['movetot'] != $threadid) {
 				$query = "SELECT id FROM imas_forum_posts WHERE threadid='{$_POST['movetot']}' AND parent=0";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				$base = mysql_result($result,0,0);
+				$base = mysql_fetch_first($result);
 				
 				$query = "UPDATE imas_forum_posts SET threadid='{$_POST['movetot']}' WHERE id IN ($list)";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
@@ -701,7 +700,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
 		$query = "SELECT parent FROM imas_forum_posts WHERE id='{$_GET['move']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		if (mysql_result($result,0,0)==0) {
+		if (mysql_fetch_first($result)==0) {
 			$ishead = true;
 			echo "<h3>Move Thread</h3>\n";
 		} else {
@@ -725,7 +724,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '>Move to forum:<br/>';
 		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo "<input type=\"radio\" name=\"movetof\" value=\"{$row[0]}\" ";
 			if ($row[0]==$forumid) {echo 'checked="checked"';}
 			echo "/>{$row[1]}<br/>";
@@ -737,7 +736,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '>Move to thread:<br/>';
 		$query = "SELECT threadid,subject FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 ORDER BY id DESC";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if ($ishead && $row[0]==$threadid) {continue;}
 			echo "<input type=\"radio\" name=\"movetot\" value=\"{$row[0]}\" ";
 			if ($row[0]==$threadid) {echo 'checked="checked"';}

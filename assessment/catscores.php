@@ -9,7 +9,7 @@ function catscores($quests,$scores,$defptsposs) {
 	$cat = array();
 	$pospts = array();
 	$tolookup = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$cat[$row[0]] = $row[1];
 		if (is_numeric($row[1]) && $row[1]>0) {
 			$tolookup[] = $row[1];
@@ -27,7 +27,7 @@ function catscores($quests,$scores,$defptsposs) {
 		$lulist = "'".implode("','",$tolookup)."'";
 		$query = "SELECT id,name FROM imas_libraries WHERE id IN ($lulist)";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query; " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$libnames[$row[0]] = $row[1];
 		}
 	}

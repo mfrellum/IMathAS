@@ -12,8 +12,8 @@ if (!empty($_GET['userid'])) {
 	$userid = intval($_GET['userid']);
 	$query = "SELECT SID FROM imas_users WHERE id='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
-		$s = mysql_result($result,0,0);
+	if (mysqli_num_rows($result)>0) {
+		$s = mysql_fetch_first($result);
 		if (empty($_GET['v']) || $_GET['v'] != hash('sha256', $s . $userid)) {
 			$userid = 0;
 		}
@@ -26,11 +26,11 @@ if (!empty($_GET['userid'])) {
 
 $query = "SELECT courseid, name, badgetext, description, longdescription, requirements FROM imas_badgesettings WHERE id=$badgeid";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) { 
+if (mysqli_num_rows($result)==0) { 
 	echo "Invalid Badge";
 	exit;
 } else {
-	list($cid, $name, $badgetext, $descr, $longdescr, $req) = mysql_fetch_row($result);
+	list($cid, $name, $badgetext, $descr, $longdescr, $req) = mysqli_fetch_row($result);
 	$req = unserialize($req);
 	if ($userid==0) {//this is a criteria request
 		if ($_GET['format']=='json') {
@@ -43,13 +43,13 @@ if (mysql_num_rows($result)==0) {
 	} else { //student specific
 		$query = "SELECT id FROM imas_students WHERE courseid=$cid AND userid=$userid";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)==0) {  //no longer in the student records - go to imas_badgerecords for backup
+		if (mysqli_num_rows($result)==0) {  //no longer in the student records - go to imas_badgerecords for backup
 			$query = "SELECT data FROM imas_badgerecords WHERE userid=$userid AND badgeid=$badgeid";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_fetch_row($result)==0) {  //no records.  Uh oh!
+			if (mysqli_fetch_row($result)==0) {  //no records.  Uh oh!
 				exit;
 			} else {
-				$data = unserialize(mysql_result($result,0,0));
+				$data = unserialize(mysql_fetch_first($result));
 				//if ($_GET['format']=='json') {
 					print_assertation($cid, $badgetext, $name, $descr, $userid, $data[5]);
 				//} else {
@@ -121,14 +121,14 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 	/*$query = "SELECT imas_courses.name AS cname, imas_users.LastName, imas_users.FirstName, imas_users.email, imas_groups.name FROM imas_courses JOIN imas_teachers ON imas_courses.id=imas_teachers.courseid ";
 	$query .= "JOIN imas_users ON imas_teachers.userid=imas_users.id LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_courses.id='$cid' LIMIT 1";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		$org = ' ';
 		$email = ' ';
 	} else {
 		$t = array();
 		$e = array();
 		$cname = '';
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$cname = $row[0];
 			if ($row[4]==null) {
 				$t[] = $row[1].', '.$row[0];
@@ -194,7 +194,7 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 	$gtypes = array('0'=>'Past Due', '3'=>'Past and Attempted', '1'=>'Past and Available', '2'=>'All Items'); 
 	$gbcats = array();
 	
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$gbcats[$row[0]] = $row[1];
 	}
 	$reqnameout = array();
@@ -262,7 +262,7 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 		if (isset($userid) && $userid!=0) {
 			$query = "SELECT FirstName, LastName, email FROM imas_users WHERE id=$userid";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 			$stuname = $row[1]. ', '.$row[0];
 			$email = $row[2];
 			$data = array($reqnameout, $reqout, $stuout, $metout, $stuname, $email);

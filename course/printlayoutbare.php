@@ -112,7 +112,7 @@ if ($overwriteBody==1) {
 	$qlist = "'".implode("','",$questions)."'";
 	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
 		} else {
@@ -290,7 +290,7 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	if ($qdata['hasimg']>0) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
 		}
 	}

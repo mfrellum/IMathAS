@@ -39,7 +39,7 @@ if (!(isset($teacherid))) {
 			
 			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
 				$sets[] = "$item='".addslashes($row[$k])."'";
@@ -225,22 +225,22 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
+			$sets[] = "intro='".addslashes(mysql_fetch_first($result))."'";
 		}
 		if (isset($_POST['chgsummary'])) {
 			$query = "SELECT summary FROM imas_assessments WHERE id='{$_POST['summary']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sets[] = "summary='".addslashes(mysql_result($result,0,0))."'";
+			$sets[] = "summary='".addslashes(mysql_fetch_first($result))."'";
 		}
 		if (isset($_POST['chgdates'])) {
 			$query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['dates']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 			$sets[] = "startdate='{$row[0]}',enddate='{$row[1]}',reviewdate='{$row[2]}'";
 		} if (isset($_POST['chgcopyendmsg'])) {
 			$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_POST['copyendmsg']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			$sets[] = "endmsg='".addslashes(mysql_result($result,0,0))."'";
+			$sets[] = "endmsg='".addslashes(mysql_fetch_first($result))."'";
 		}
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
@@ -292,7 +292,7 @@ if (!(isset($teacherid))) {
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		$gitypeids = array();
 		$ids = array();
 		$types = array();
@@ -304,13 +304,13 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)==0) {
+		if (mysqli_num_rows($result)==0) {
 			$page_assessListMsg = "<li>No Assessments to change</li>\n";
 		} else {
 			$page_assessListMsg = "";
 			$i=0;
 			$page_assessSelect = array();
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$page_assessSelect['val'][$i] = $row[0];
 				$page_assessSelect['label'][$i] = $row[1];
 				$agbcats[$row[0]] = $row[2];
@@ -324,8 +324,8 @@ if (!(isset($teacherid))) {
 		$page_gbcatSelect = array();
 		$page_gbcatSelect['val'][0] = 0;
 		$page_gbcatSelect['label'][0] ='Default';
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		if (mysqli_num_rows($result)>0) {
+			while ($row = mysqli_fetch_row($result)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
 				$page_gbcatSelect['label'][$i] = $row[1];
 				$i++;
@@ -337,7 +337,7 @@ if (!(isset($teacherid))) {
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		$page_forumSelect['val'][0] = 0;
 		$page_forumSelect['label'][0] = "None";
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];
 		}

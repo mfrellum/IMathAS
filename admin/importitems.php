@@ -79,12 +79,13 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//add question or get system id. 
 			$query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}' AND deleted=0";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-			$questionexists = (mysql_num_rows($result)>0);
+			$questionexists = (mysqli_num_rows($result)>0);
 			
 			if ($questionexists && $_POST['merge']==1) {
-				$questions[$qid]['qsetid'] = mysql_result($result,0,0);
+				list($thisqsetid,$thisadddate) = mysqli_fetch_row($result);
+				$questions[$qid]['qsetid'] = $thisqsetid;
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
-				if ($qset['lastmod'][$n]>mysql_result($result,0,1)) { //if old question
+				if ($qset['lastmod'][$n]>$thisadddate) { //if old question
 					$now = time();
 					if (!empty($qset['qimgs'][$n])) {
 						$hasimg = 1;
@@ -111,7 +112,8 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					}
 				}
 			} else if ($questionexists && $_POST['merge']==-1) {
-				$questions[$qid]['qsetid'] = mysql_result($result,0,0);
+				list($thisqsetid,$thisadddate) = mysqli_fetch_row($result);
+				$questions[$qid]['qsetid'] = $thisqsetid;
 			} else { //add question, and assign to default library
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
 				if ($questionexists && $_POST['merge']==0) {
@@ -163,7 +165,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
 		$includedqs = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$qidstoupdate[] = $row[0];
 			if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
@@ -179,14 +181,14 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$includedlist = implode(',',$includedqs);
 				$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					$includedbackref[$row[1]] = $row[0];		
 				}
 			}
 			$updatelist = implode(',',$qidstoupdate);
 			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("error on: $query: " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
 				$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
 				$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
@@ -455,8 +457,9 @@ if (!(isset($teacherid))) {
 		$checked = $_POST['checked'];
 		$query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		$blockcnt = mysql_result($result,0,0);
-		$ciditemorder = unserialize(mysql_result($result,0,1));
+		list ($blockcnt,$ciditemorder) = mysqli_fetch_row($result);
+		$ciditemorder = unserialize($ciditemorder);
+		
 		$items = unserialize($itemlist);
 		$newitems = array();
 		$missingfiles = array();

@@ -104,7 +104,7 @@ function sendtoall(type) {
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_result($result,0,0)>0) {
+		if (mysql_fetch_first($result)>0) {
 			$hassection = true;
 		} else {
 			$hassection = false;
@@ -113,7 +113,7 @@ function sendtoall(type) {
 		if ($hassection) {
 			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_result($result,0,0)==0) {
+			if (mysql_fetch_first($result)==0) {
 				$sortorder = "sec";
 			} else {
 				$sortorder = "name";
@@ -127,7 +127,7 @@ function sendtoall(type) {
 		}
 		$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$hours = mysql_result($result,0,0);
+		$hours = mysql_fetch_first($result);
 		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"$hours\"/> hours</p>";
 		echo "<p>To all:  <input type=\"text\" value=\"1\" id=\"toall\"/> ";
 		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';
@@ -148,7 +148,7 @@ function sendtoall(type) {
 		}
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo "<tr><td>{$row[1]}, {$row[2]}</td>";
 			if ($hassection) {
 				echo "<td>{$row[3]}</td>";

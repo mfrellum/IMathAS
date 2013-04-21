@@ -32,7 +32,7 @@
 	$teacherof = array();
 	$query = "SELECT courseid FROM imas_teachers WHERE userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$teacherof[$row[0]] = true;
 	}
 	
@@ -85,7 +85,7 @@
 		$query .= "AND (imas_msgs.msgto='$userid' OR imas_msgs.msgfrom='$userid')";
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "Message not found";
 		require("../footer.php");
 		exit;
@@ -108,12 +108,12 @@
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$query = "SELECT id FROM imas_assessments WHERE name='{$matches[2]}' AND courseid='{$line['courseid']}'";
 			$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($res)>0) {
-				$aid = mysql_result($res,0,0);
+			if (mysqli_num_rows($res)>0) {
+				$aid = mysql_fetch_first($res);
 				$query = "SELECT id FROM imas_assessment_sessions WHERE assessmentid='$aid' AND userid='{$line['msgfrom']}'";
 				$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($res)>0) {
-					$asid = mysql_result($res,0,0);
+				if (mysqli_num_rows($res)>0) {
+					$asid = mysql_fetch_first($res);
 					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid\" target=\"_popoutgradebook\">assignment</a>";
 				}
 			}
@@ -133,7 +133,7 @@
 		if ($line['courseid']>0) {
 			$query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			$msgset = mysql_result($result,0,0);
+			$msgset = mysql_fetch_first($result);
 			$msgmonitor = floor($msgset/5);
 			$msgset = $msgset%5;
 			if ($msgset<3 || $isteacher) {
@@ -141,13 +141,13 @@
 				if ($msgset==1 && !$isteacher) { //check if sending to teacher 
 					$query = "SELECT id FROM imas_teachers WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)==0) {
+					if (mysqli_num_rows($result)==0) {
 						$cansendmsgs = false;
 					}
 				} else if ($msgset==2 && !$isteacher) { //check if sending to stu
 					$query = "SELECT id FROM imas_students WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($result)==0) {
+					if (mysqli_num_rows($result)==0) {
 						$cansendmsgs = false;
 					}
 				} 

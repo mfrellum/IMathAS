@@ -14,11 +14,11 @@
 	//look up user
 	$query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "Access key invalid";
 		exit;
 	}
-	$userid = mysql_result($result,0,0);
+	$userid = mysql_fetch_first($result);
 	$tzoffset = $_GET['tzoffset'];
 	
 	function tzdate($string,$time) {
@@ -118,7 +118,7 @@
 	$cidlist = implode(',',array_keys($courseforums));
 	$query = "SELECT id,name FROM imas_courses WHERE id IN ($cidlist)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$coursenames[$row[0]] = $row[1];
 	}
 	asort($coursenames);
@@ -168,7 +168,7 @@
 	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgto='$userid' AND imas_msgs.msgfrom=imas_users.id ";
 	$query .= "AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ORDER BY imas_msgs.senddate DESC";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; '>New Messages</div>";
 		echo '<table border=0 cellspacing=2>';
 	} else {
@@ -195,7 +195,7 @@
 		echo "<td><span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
 		echo "<span style='color: gray;'>".htmlspecialchars(formatdate($line['senddate']))."</span></td></tr>";
 	}
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		echo '</table>';
 	}
 	

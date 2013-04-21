@@ -29,7 +29,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$forumid' AND itemtype='Forum'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemid = mysql_result($result,0,0);
+		$itemid = mysql_fetch_first($result);
 		
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -40,7 +40,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -60,7 +60,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		require_once("../includes/filehandler.php");
 		$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND files<>''";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			deleteallpostfiles($row[0]);
 		}
 		
@@ -77,7 +77,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 	} else {
 		$query = "SELECT name FROM imas_forums WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemname = mysql_result($result,0,0);
+		$itemname = mysql_fetch_first($result);
 	}	
 }
 

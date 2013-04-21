@@ -65,8 +65,8 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 
 $query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid';";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-$blockcnt = mysql_result($result,0,0);
-$items = unserialize(mysql_result($result,0,1));
+list($blockcnt, $items) = mysqli_fetch_row($result);
+$items = unserialize($items);
 
 $notimportant = array();
 copysubone($items,'0',false,$notimportant);

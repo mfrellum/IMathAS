@@ -48,13 +48,13 @@ $tolib = $_POST['libs'];
 $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid FROM imas_questions,imas_assessments,imas_questionset WHERE imas_questions.assessmentid=imas_assessments.id AND ";
 $query .= "imas_questionset.id=imas_questions.questionsetid AND imas_assessments.courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	echo "no Q found";
 	exit;
 }
 $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ";
 $first = true;
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if ($first) {
 		$first = false;
 	} else {

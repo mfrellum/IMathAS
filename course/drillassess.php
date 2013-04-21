@@ -21,7 +21,7 @@ $daid = intval($_GET['daid']);
 
 $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	echo "Invalid drill assessment id";
 	exit;
 }
@@ -45,7 +45,7 @@ $itemdescr = explode(',',$dadata['itemdescr']);
 
 $query = "SELECT * FROM imas_drillassess_sessions WHERE drillassessid='$daid' AND userid='$userid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)==0) {
+if (mysqli_num_rows($result)==0) {
 	//new
 	$curitem = -1;
 	$seed = rand(1,9999);
@@ -459,7 +459,7 @@ function printscore($sc,$qsetid,$seed) {
 	} else {
 		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed: $query: " . mysqli_error($GLOBALS['link']));
-		$control = mysql_result($result,0,0);
+		$control = mysql_fetch_first($result);
 		$ptposs = getansweights($control,$seed);
 		$weightsum = array_sum($ptposs);
 		if ($weightsum>1.1) {

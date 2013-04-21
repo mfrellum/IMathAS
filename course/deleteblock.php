@@ -26,7 +26,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 			
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		$sub =& $items;
 		if (count($blocktree)>1) {
 			for ($i=1;$i<count($blocktree);$i++) {
@@ -63,7 +63,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 			
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		$sub =& $items;
 		if (count($blocktree)>1) {
 			for ($i=1;$i<count($blocktree);$i++) {

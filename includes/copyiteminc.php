@@ -24,14 +24,14 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	$now = time();
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-	list($itemtype,$typeid) = mysql_fetch_row($result);
+	list($itemtype,$typeid) = mysqli_fetch_row($result);
 	if ($itemtype == "InlineText") {
 		//$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) ";
 		//$query .= "SELECT '$cid',title,text,startdate,enddate FROM imas_inlinetext WHERE id='$typeid'";
 		//mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		$query = "SELECT title,text,startdate,enddate,avail,oncal,caltag,fileorder FROM imas_inlinetext WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		if ($sethidden) {$row[4] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
 		$fileorder = $row[7];
@@ -45,7 +45,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query = "SELECT description,filename,id FROM imas_instr_files WHERE itemid='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		$addedfiles = array();
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$curid = $row[2];
 			array_pop($row);
 			$row = "'".implode("','",addslashes_deep($row))."'";
@@ -69,7 +69,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 		$query = "SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target FROM imas_linkedtext WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		$istool = (substr($row[2],0,8)=='exttool:');
 		if ($istool) {
 			$tool = explode('~~',substr($row[2],8));
@@ -90,7 +90,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist FROM imas_forums WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		if ($sethidden) {$row[8] = 0;}
 		if (isset($gbcats[$row[11]])) {
 			$row[11] = $gbcats[$row[11]];
@@ -107,7 +107,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			//copy instructor sticky posts
 			$query = "SELECT subject,message,posttype,isanon,replyby FROM imas_forum_posts WHERE forumid='$typeid' AND posttype>0";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$row = addslashes_deep($row);
 				$query = "INSERT INTO imas_forum_posts (forumid,userid,parent,postdate,subject,message,posttype,isanon,replyby) VALUES ";
 				if (is_null($row[4]) || trim($row[4])=='') {
@@ -131,7 +131,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	} else if ($itemtype == "Wiki") {
 		$query = "SELECT name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		if ($sethidden) {$row[5] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";
@@ -146,7 +146,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid FROM imas_assessments WHERE id='$typeid'";
 
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		if ($sethidden) {$row[23] = 0;}
 		if (isset($gbcats[$row[14]])) {
 			$row[14] = $gbcats[$row[14]];
@@ -167,8 +167,8 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$assessnewid[$typeid] = $newtypeid;
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$typeid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-		if (trim(mysql_result($result,0,0))!='') {
-			$aitems = explode(',',mysql_result($result,0,0));
+		if (trim(mysql_fetch_first($result))!='') {
+			$aitems = explode(',',mysql_fetch_first($result));
 			$newaitems = array();
 			foreach ($aitems as $k=>$aitem) {
 				if (strpos($aitem,'~')===FALSE) {
@@ -177,7 +177,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 					//mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
 					$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$aitem'";
 					$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-					$row = mysql_fetch_row($result);
+					$row = mysqli_fetch_row($result);
 					$rubric = array_pop($row);
 					$row = "'".implode("','",addslashes_deep($row))."'";
 					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
@@ -200,7 +200,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 						//mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 						$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$subi'";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed :$query " . mysqli_error($GLOBALS['link']));
-						$row = mysql_fetch_row($result);
+						$row = mysqli_fetch_row($result);
 						$rubric = array_pop($row);
 						$row = "'".implode("','",addslashes_deep($row))."'";
 						$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
@@ -327,11 +327,11 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 function getiteminfo($itemid) {
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "Uh oh, item #$itemid doesn't appear to exist";
 	}
-	$itemtype = mysql_result($result,0,0);
-	$typeid = mysql_result($result,0,1);
+	list($itemtype, $typeid) = mysqli_fetch_row($result);
+
 	if ($itemtype==='Calendar') {
 		return array($itemtype,'Calendar','');
 	}
@@ -353,8 +353,8 @@ function getiteminfo($itemid) {
 			break;
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	$name = mysql_result($result,0,0);
-	$summary = mysql_result($result,0,1);
+	list($name, $summary) = mysqli_fetch_row($result);
+
 	return array($itemtype,$name,$summary,$typeid);
 }
 
@@ -416,7 +416,7 @@ function copyrubrics($offlinerubrics=array()) {
 	//handle rubrics which I already have access to
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND (ownerid='$userid' OR groupid='$groupid')";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) { 
+	while ($row = mysqli_fetch_row($result)) { 
 		$qfound = array_keys($qrubrictrack,$row[0]);
 		if (count($qfound)>0) {
 			foreach ($qfound as $qid) {
@@ -436,15 +436,15 @@ function copyrubrics($offlinerubrics=array()) {
 	//handle rubrics which I don't already have access to - need to copy them
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid='$userid' OR groupid='$groupid')";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		echo "handing {$row[0]} which I don't have access to<br/>";
 		$query = "SELECT name,rubrictype,rubric FROM imas_rubrics WHERE id={$row[0]}";
 		$r = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$rubrow = addslashes_deep(mysql_fetch_row($r));
+		$rubrow = addslashes_deep(mysqli_fetch_row($r));
 		$query = "SELECT id FROM imas_rubrics WHERE rubric='{$rubrow[2]}' AND (ownerid=$userid OR groupid=$groupid)";
 		$rr = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($rr)>0) {
-			$newid = mysql_result($rr,0,0);
+		if (mysqli_num_rows($rr)>0) {
+			$newid = mysql_fetch_first($rr);
 			echo "found existing of mine, $newid<br/>";
 		} else {
 			$rub = "'".implode("','",$rubrow)."'";
@@ -481,21 +481,21 @@ function handleextoolcopy($sourcecid) {
 	$toolmap = array();
 	$query = "SELECT id FROM imas_teachers WHERE courseid='$sourcecid' AND userid='$userid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 		$oktocopycoursetools = true;
 	}
 	$toolidlist = implode(',',$exttooltrack);
 	$query = "SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools ";
 	$query .= "WHERE id IN ($toolidlist)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$doremap = false;
 		if (!isset($toolmap[$row[0]])) {
 			//try url matching of existing tools in the destination course
 			$query = "SELECT id FROM imas_external_tools WHERE url='".addslashes($row[4])."' AND courseid='$cid'";
 			$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($res)>0) {
-				$toolmap[$row[0]] = mysql_result($res,0,0);
+			if (mysqli_num_rows($res)>0) {
+				$toolmap[$row[0]] = mysql_fetch_first($res);
 			}
 		}
 		if (isset($toolmap[$row[0]])) {
@@ -524,7 +524,7 @@ function handleextoolcopy($sourcecid) {
 			$toupdate = implode(",",array_keys($exttooltrack, $row[0]));
 			$query = "SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)";
 			$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($r = mysql_fetch_row($res)) {
+			while ($r = mysqli_fetch_row($res)) {
 				$text = str_replace('exttool:'.$row[0].'~~','exttool:'.$toolmap[$row[0]].'~~',$r[1]);
 				$query = "UPDATE imas_linkedtext SET text='".addslashes($text)."' WHERE id={$r[0]}";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));

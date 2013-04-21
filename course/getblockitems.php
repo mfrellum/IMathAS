@@ -87,7 +87,7 @@
    if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	   $latepasses = mysql_result($result,0,0);
+	   $latepasses = mysql_fetch_first($result);
    } else {
 	   $latepasses = 0;
    }
@@ -104,7 +104,7 @@
 	
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	$newpostcnts = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$newpostcnts[$row[0]] = $row[1];
 	}
 	

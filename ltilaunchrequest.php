@@ -125,7 +125,7 @@ if (abs($now-$created)>60) {
 //check nonce unique 
 $query = "SELECT id FROM imas_ltinonces WHERE nonce='$nonce'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result)>0) {
+if (mysqli_num_rows($result)>0) {
 	if (!$debugmode) {
 		reporterror("Duplicate nonce");
 	}
@@ -142,8 +142,8 @@ if (base64_encode(pack("H*", sha1($nonce.$created.$secret))) != $digest) {
 //look if we know this student
 $query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result) > 0) { //yup, we know them
-	$userid = mysql_result($result,0,0);
+if (mysqli_num_rows($result) > 0) { //yup, we know them
+	$userid = mysql_fetch_first($result);
 } else {
 	//echo "student not known?  id $ltiuserid, org $ltiorg";
 	
@@ -169,7 +169,7 @@ if (mysql_num_rows($result) > 0) { //yup, we know them
 		$sid = $_REQUEST['user_eid'];
 		$query = "SELECT userid FROM imas_users WHERE SID='$sid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) { //eid already used as username; oh well
+		if (mysqli_num_rows($result)>0) { //eid already used as username; oh well
 			$sid = "lti-".$localltiuser;
 		}
 	} else {
@@ -186,7 +186,7 @@ if (mysql_num_rows($result) > 0) { //yup, we know them
 //see if student is enrolled
 $query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-if (mysql_num_rows($result) == 0) { //nope, not enrolled
+if (mysqli_num_rows($result) == 0) { //nope, not enrolled
 	$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$cid')";
 	mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 }

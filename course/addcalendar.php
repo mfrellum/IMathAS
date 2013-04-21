@@ -33,7 +33,7 @@ if (!(isset($teacherid))) {
 			
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$items = unserialize(mysql_result($result,0,0));
+	$items = unserialize(mysql_fetch_first($result));
 	
 	$blocktree = explode('-',$block);
 	$sub =& $items;

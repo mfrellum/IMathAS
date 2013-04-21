@@ -30,7 +30,7 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='InlineText'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemid = mysql_result($result,0,0);
+		$itemid = mysql_fetch_first($result);
 		
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
 		mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -41,11 +41,11 @@ if (!(isset($teacherid))) {
 		$query = "SELECT filename FROM imas_instr_files WHERE itemid='$textid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 		//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$safefn = addslashes($row[0]);
 			$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($r2)==1) {
+			if (mysqli_num_rows($r2)==1) {
 				//unlink($uploaddir . $row[0]);
 				deletecoursefile($row[0]);
 			}
@@ -55,7 +55,7 @@ if (!(isset($teacherid))) {
 					
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$items = unserialize(mysql_result($result,0,0));
+		$items = unserialize(mysql_fetch_first($result));
 		
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -73,7 +73,7 @@ if (!(isset($teacherid))) {
 	} else {
 		$query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$itemname = mysql_result($result,0,0);
+		$itemname = mysql_fetch_first($result);
 	}
 } 
 

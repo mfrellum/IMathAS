@@ -57,8 +57,7 @@ function getsubinfo($items,$parent,$pre) {
 function getiteminfo($itemid) {
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']) . " queryString: " . $query);
-	$itemtype = mysql_result($result,0,0);
-	$typeid = mysql_result($result,0,1);
+	list($itemtype,$typeid) = mysqli_fetch_row($result);
 	switch($itemtype) {
 		case ($itemtype==="InlineText"):
 			$query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
@@ -74,8 +73,8 @@ function getiteminfo($itemid) {
 			break;
 	}
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$name = mysql_result($result,0,0);
-	return array($itemtype,$name);
+	$row = mysqli_fetch_row($result); //name
+	return array($itemtype,$row[0]);
 }
 		
  //set some page specific variables and counters
@@ -101,7 +100,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$itemcnt = 0;
 	$toexport = array();
 	$qcnt = 0;
-	$items = unserialize(mysql_result($result,0,0));
+	$items = unserialize(mysqli_fetch_first($result));
 	$newitems = array();
 	$qtoexport = array();
 	$qsettoexport = array();
@@ -119,7 +118,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo $exportid."\n";
 		$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		echo "TYPE\n";
 		echo $row[0] . "\n";
 		switch ($row[0]) {
@@ -143,10 +142,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['caltag'] . "\n";
 				$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
 				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($r2)>0) {
+				if (mysqli_num_rows($r2)>0) {
 					   $filenames = array();
 					   $filedescr = array();
-					   while ($row = mysql_fetch_row($r2)) {
+					   while ($row = mysqli_fetch_row($r2)) {
 						   $filenames[$row[0]] = basename($row[2]);
 						   $filedescr[$row[0]] = $row[1];
 						   $coursefiles[] = $row[2];
@@ -336,7 +335,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$includedlist = implode(',',$includedqs);
 		$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			$includedbackref[$row[0]] = $row[1];		
 		}
 	}
@@ -373,7 +372,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			echo "\nQIMGS\n";
 			$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($r2)) {
+			while ($row = mysqli_fetch_row($r2)) {
 				echo $row[0].','.$row[1]. "\n";
 				
 			}
@@ -385,7 +384,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	
 	$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
 	$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($r2)) {
+	while ($row = mysqli_fetch_row($r2)) {
 		if ($GLOBALS['filehandertypecfiles'] == 's3') {
 			copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
 		}
@@ -423,7 +422,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 
-	$items = unserialize(mysql_result($result,0,0));
+	$items = unserialize(mysqli_fetch_first($result));
 	$ids = array();
 	$types = array();
 	$names = array();

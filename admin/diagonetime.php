@@ -47,7 +47,7 @@ if ($myrights<60) {
 		$code_list = array();
 		$query = "SELECT code,goodfor FROM imas_diag_onetime WHERE time=$now";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			if ($row[1]==0) {
 				$row[1] = "One-time";
 			} else if ($row[1]>1000000000) {
@@ -77,7 +77,7 @@ if ($myrights<60) {
 	$code_list = array();
 	$query = "SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag='$diag' ORDER BY time";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$row[0] = tzdate("F j, Y",$row[0]);
 		if ($row[2]==0) {
 			$row[2] = "One-time";
@@ -100,7 +100,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	echo '<div id="headerdiagonetime" class="pagetitle"><h2>Diagnostic One-time Passwords</h2></div>';
 	$query = "SELECT name FROM imas_diags WHERE id='$diag'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	echo '<h4>'.mysql_result($result,0,0).'</h4>';
+	echo '<h4>'.mysqli_fetch_first($result).'</h4>';
 	if (isset($_GET['generate'])) {
 		if (isset($_POST['n'])) {
 			echo "<b>Newly generated passwords</b> <a href=\"diagonetime.php?id=$diag&view=true\">View all</a>";

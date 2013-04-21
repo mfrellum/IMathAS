@@ -31,11 +31,12 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 function getquestionqtext($m) {
 	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "bad question id in includeqtextfrom";
 		return "";
 	} else {
-		return mysql_result($result,0,0);
+		$row = mysqli_fetch_row($result);
+		return $row[0];
 	}
 }
 //interpreter some code text.  Returns a PHP code string.
@@ -575,13 +576,14 @@ function tokenize($str,$anstype,$countcnt) {
 				$out = intval(substr($out,1,strlen($out)-2));
 				$query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)==0) {
+				if (mysqli_num_rows($result)==0) {
 					//was an error, return error token
 					return array(array('',9));
 				} else {
-					//$inside = interpretline(mysql_result($result,0,0),$anstype);
-					$inside = interpret('control',$anstype,mysql_result($result,0,0),$countcnt+1);
-					if (mysql_result($result,0,1)!=$anstype) {
+					list($control,$questype) = mysqli_result($result);
+					//$inside = interpretline(mysql_fetch_first($result),$anstype);
+					$inside = interpret('control',$anstype,$control,$countcnt+1);
+					if ($questype!=$anstype) {
 						//echo 'Imported code question type does not match current question answer type';
 					}
 				}

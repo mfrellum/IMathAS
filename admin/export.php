@@ -101,7 +101,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 	
 	$query = "SELECT name FROM imas_libraries WHERE id IN ($llist)";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		$lnames[] = $row[0];
 	}
 	$lnames = implode(", ",$lnames);
@@ -128,7 +128,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query" . mysqli_error($GLOBALS['link']));
 		
-		if (mysql_num_rows($result) != 0) {
+		if (mysqli_num_rows($result) != 0) {
 			$page_hasSearchResults = 1;		
 			$i=0;
 			$page_nChecked = array();
@@ -172,7 +172,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$includedlist = implode(',',$includedqs);
 			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query"  . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$includedbackref[$row[0]] = $row[1];		
 			}
 		}
@@ -211,7 +211,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				echo "\nQIMGS\n";
 				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
 				$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($r2)) {
+				while ($row = mysqli_fetch_row($r2)) {
 					echo $row[0].','.$row[1]. "\n";
 				}
 			}

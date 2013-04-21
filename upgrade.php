@@ -35,7 +35,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			fclose($handle);
 		}
 	} else {
-		$last = mysql_result($result,0,0);
+		$last = mysql_fetch_first($result);
 	}
 	
 	if ($last==$latest) {
@@ -91,7 +91,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			//for existing diag, put level2 selector as section
 			$query = "SELECT imas_students.id,imas_users.email FROM imas_students JOIN imas_users ON imas_users.id=imas_students.userid AND imas_users.SID LIKE '%~%~%'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$epts = explode('@',$row[1]);
 				$query = "UPDATE imas_students SET section='{$epts[1]}' WHERE id='{$row[0]}'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -102,7 +102,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$query = "SELECT u.id,t.id,t.courseid FROM imas_users as u JOIN imas_teachers as t ON u.id=t.userid AND u.rights=15";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$lastuser = -1;
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if ($row[0]!=$lastuser) {
 					$query = "UPDATE imas_users SET rights=10 WHERE id='{$row[0]}'";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -127,10 +127,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				$out = '';
 				$query = "SELECT id,ownerid,name FROM imas_diags";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0) {
+				if (mysqli_num_rows($result)>0) {
 					$owners = array();
 					$dnames = array();
-					while ($row = mysql_fetch_row($result)) {
+					while ($row = mysqli_fetch_row($result)) {
 						$owners[$row[1]][] = $row[0];
 						$dnames[$row[0]] = $row[2];
 					}
@@ -139,15 +139,15 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 					foreach ($ow as $ogrp) {
 						$query = "SELECT id,LastName,FirstName FROM imas_users WHERE groupid='$ogrp' AND rights>59 ORDER BY id";
 						$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-						if (mysql_num_rows($result)==0) {
+						if (mysqli_num_rows($result)==0) {
 							echo "Orphaned Diags: ".implode(',',$owners[$ogrp]).'<br/>';
-						} else if (mysql_num_rows($result)==1) {
-							$uid = mysql_result($result,0,0);
+						} else if (mysqli_num_rows($result)==1) {
+							$uid = mysql_fetch_first($result);
 							$query = "UPDATE imas_diags SET ownerid=$uid WHERE id IN (".implode(',',$owners[$ogrp]).")";
 							mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 						} else {
 							$ops = '';
-							while ($row = mysql_fetch_row($result)) {
+							while ($row = mysqli_fetch_row($result)) {
 								$ops .= "<option value=\"{$row[0]}\">{$row[1]}, {$row[2]}</option>";
 							}
 							foreach ($owners[$ogrp] as $did) {
@@ -464,7 +464,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				require("./includes/filehandler.php");
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$doneagroups = array();
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					//set path to aid/asid/  or aid/agroupid/  - won't interefere with random values, and easier to do.
 					if ($row[1]==0) {
 						$path = $row[5].'/'.$row[0];
@@ -501,7 +501,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$query = "SELECT courseid,id,name FROM imas_assessments WHERE isgroup>0";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 			$assessgrpset = array();
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('{$row[0]}','Group set for {$row[2]}')";
 				$res = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 				$assessgrpset[$row[1]] = mysqli_insert_id($GLOBALS['link'])();
@@ -514,7 +514,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
 			$agroupusers = array();
 			$agroupaids = array();
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if (!isset($assessgrpset[$row[3]])) { //why would agroupid>0 and not isgroup>0?
 					continue;
 				}
@@ -549,7 +549,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$query = "SELECT id,grpaid FROM imas_forums WHERE grpaid>0";
 			$forumaid = array();
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$forumaid[$row[0]] = $row[1];
 				$query = "UPDATE imas_forums SET groupsetid={$assessgrpset[$row[1]]} WHERE id={$row[0]}";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
@@ -558,7 +558,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				$forumlist = implode(',',array_keys($forumaid));
 				$query = "SELECT forumid,threadid,userid FROM imas_forum_posts WHERE forumid IN ($forumlist) AND parent=0";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query:" . mysqli_error($GLOBALS['link']));
-				while ($row = mysql_fetch_row($result)) {
+				while ($row = mysqli_fetch_row($result)) {
 					if (!isset($userref[$row[2].'-'.$forumaid[$row[0]]])) {
 						continue;
 					}
@@ -707,7 +707,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 $query = "SELECT id,forumid,userid,points FROM imas_forum_posts WHERE points IS NOT NULL";
 			 $res = mysqli_query($GLOBALS['link'],$query);
 			 $i = 0;
-			 while ($row = mysql_fetch_row($res)) {
+			 while ($row = mysqli_fetch_row($res)) {
 			 	 if ($i%500==0) {
 			 	 	 if ($i>0) {
 			 	 	 	 mysqli_query($GLOBALS['link'],$ins);
@@ -768,7 +768,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$query = "SELECT ig.id,ifp.userid FROM imas_grades AS ig JOIN imas_forum_posts AS ifp ";
 			$query .= "ON ig.gradetype='forum' AND ig.refid=ifp.id AND ifp.userid<>ig.userid";
 			$res = mysqli_query($GLOBALS['link'],$query);
-			while ($row = mysql_fetch_row($res)) {
+			while ($row = mysqli_fetch_row($res)) {
 				$query = "UPDATE imas_grades SET userid={$row[1]} WHERE id={$row[0]}";
 				mysqli_query($GLOBALS['link'],$query);
 			}
@@ -892,7 +892,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 //grab msg to instr settings and move to asssessments
 			 $query = "SELECT id,msgset FROM imas_courses WHERE msgset>9";
 			  $res = mysqli_query($GLOBALS['link'],$query);
-			  while ($row = mysql_fetch_row($res)) {
+			  while ($row = mysqli_fetch_row($res)) {
 			  	  $query = "UPDATE imas_assessments SET msgtoinstr=1 WHERE courseid={$row[0]}";
 			  	  mysqli_query($GLOBALS['link'],$query);
 			  }

@@ -24,7 +24,7 @@ if (!(isset($teacherid))) {
 			$curscores = array();
 			$query = "SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$curscores[$row[0]] = $row[1];
 			}
 			
@@ -69,8 +69,8 @@ if (!(isset($teacherid))) {
 					$feedback = addslashes($data[$feedbackcol]);
 				}
 				$score = addslashes($data[$scorecol]);
-				if (mysql_num_rows($result)>0) {
-					$cuserid=mysql_result($result,0,0);
+				if (mysqli_num_rows($result)>0) {
+					$cuserid=mysql_fetch_first($result);
 					if (isset($curscores[$cuserid])) {
 						$query = "UPDATE imas_grades SET score='$score',feedback='$feedback' WHERE userid='$cuserid' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 						$successes++;

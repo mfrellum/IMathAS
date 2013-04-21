@@ -144,10 +144,9 @@ function gbtable() {
 	if ($isteacher || $istutor) {
 		$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
 			$isdiag = true;
-			$sel1name = mysql_result($result,0,0);
-			$sel2name = mysql_result($result,0,1);
+			list($sel1name, $sel2name) = mysqli_fetch_row($result);
 		}
 	}
 	$gb = array();
@@ -166,14 +165,14 @@ function gbtable() {
 	}
 	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_result($result,0,0)>0) {
+	if (mysql_fetch_first($result)>0) {
 		$hassection = true;
 	} else {
 		$hassection = false;
 	}
 	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_result($result,0,0)>0) {
+	if (mysql_fetch_first($result)>0) {
 		$hascode = true;
 	} else {
 		$hascode = false;
@@ -249,7 +248,7 @@ function gbtable() {
 		$query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$line['id']}'";
 		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query: " . mysqli_error($GLOBALS['link']));
 		$totalpossible = 0;
-		while ($r = mysql_fetch_row($result2)) {
+		while ($r = mysqli_fetch_row($result2)) {
 			if (in_array($r[1],$aitems)) { //only use first item from grouped questions for total pts
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
@@ -314,7 +313,7 @@ function gbtable() {
 	//Pull Gradebook Scheme info
 	$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	list($useweights,$orderby,$defaultcat,$usersort) = mysqli_fetch_row($result);
 	
 	$cats = array();
 	$catcolcnt = 0;
@@ -330,7 +329,7 @@ function gbtable() {
 	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='$cid' ";
 	$query .= "ORDER BY name";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = mysqli_fetch_row($result)) {
 		if (in_array($row[0],$category)) { //define category if used
 			$cats[$row[0]] = array_slice($row,1);
 			array_push($cats[$row[0]],$catcolcnt);
@@ -563,7 +562,7 @@ function gbtable() {
 		$query = "SELECT imas_gbitems.id,imas_grades.id,imas_grades.score,imas_grades.feedback FROM imas_grades,imas_gbitems WHERE ";
 		$query .= "imas_grades.gradetypeid=imas_gbitems.id AND imas_grades.gradetype='offline' AND imas_grades.userid='{$line['id']}'";
 		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		while ($r = mysql_fetch_row($result2)) {
+		while ($r = mysqli_fetch_row($result2)) {
 			$gradeid[$r[0]] = $r[1];
 			$opts[$r[0]] = $r[2];
 			$gfeedback[$r[0]] = $r[3];
@@ -573,7 +572,7 @@ function gbtable() {
 		unset($discusspts);
 		$query = "SELECT forumid,SUM(points) FROM imas_forum_posts WHERE userid='{$line['id']}' GROUP BY forumid ";
 		$result2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-		while ($r = mysql_fetch_row($result2)) {
+		while ($r = mysqli_fetch_row($result2)) {
 			$discusspts[$r[0]] = $r[1];
 		}
 		
@@ -627,8 +626,8 @@ function gbtable() {
 				if (!$isteacher) {
 					$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['id']}' AND assessmentid='{$assessments[$i]}'";
 					$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-					if (mysql_num_rows($r2)>0) {
-						$exped = mysql_result($r2,0,0);
+					if (mysqli_num_rows($r2)>0) {
+						$exped = mysql_fetch_first($r2);
 						if ($exped>$enddate[$i]) {
 							$thised = $exped;
 						}

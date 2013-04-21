@@ -6,8 +6,8 @@ if ($myrights<100) {
 if (isset($_GET['cid'])) {
 	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_GET['cid']}'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$items = unserialize(mysql_result($result,0,0));
-	$blockcnt = mysql_result($result,0,1);
+	list($items, $blockcnt) = mysqli_fetch_row($result);
+	$items = unserialize($items);
 } else {
 	exit;
 }
@@ -41,7 +41,7 @@ $recovereditems = array();
 
 $query = "SELECT id FROM imas_items WHERE courseid='{$_GET['cid']}'";
 $result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-while ($row = mysql_fetch_row($result)) {
+while ($row = mysqli_fetch_row($result)) {
 	if (!in_array($row[0],$itemsfnd)) {
 		$recovereditems[] = $row[0];
 	}

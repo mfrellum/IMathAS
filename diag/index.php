@@ -26,10 +26,10 @@
 <div id="headerdiagindex" class="pagetitle"><h2>Available Diagnostics</h2></div>
 <ul class="nomark">
 END;
-		if (mysql_num_rows($result)==0) {
+		if (mysqli_num_rows($result)==0) {
 			echo "<li>No diagnostics are available through this page at this time</li>";
 		}
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = mysqli_fetch_row($result)) {
 			echo "<li><a href=\"$imasroot/diag/index.php?id={$row[0]}\">{$row[1]}</a></li>";
 		}
 		echo "</ul></div>";
@@ -79,7 +79,7 @@ END;
 	$query = "SELECT sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
 	$result =  mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	//if (isset($sessiondata['mathdisp'])) {
-	if (mysql_num_rows($result)>0) {
+	if (mysqli_num_rows($result)>0) {
 	   $query = "DELETE FROM imas_sessions WHERE sessionid='$sessionid'";
 	   mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 	   $sessiondata = array();
@@ -99,8 +99,8 @@ if (isset($_POST['SID'])) {
 	}
 	$query = "SELECT entryformat,sel1list from imas_diags WHERE id='$diagid'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	$entryformat = mysql_result($result,0,0);
-	$sel1 = explode(',',mysql_result($result,0,1));
+	list($entryformat, $sel1) = mysqli_fetch_row($result);
+	$sel1 = explode(',',$sel1);
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
 	$entrydig = substr($entryformat,1); //$entryformat{1};
 	$entrynotunique = false;
@@ -165,8 +165,8 @@ if (isset($_POST['SID'])) {
 			$query = "SELECT id,goodfor FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$passwordnotfound = false;
-			if (mysql_num_rows($result)>0) {
-				$row = mysql_fetch_row($result); //[0] = id, [1] = goodfor
+			if (mysqli_num_rows($result)>0) {
+				$row = mysqli_fetch_row($result); //[0] = id, [1] = goodfor
 				if ($row[1]==0) {  //onetime
 					$query = "DELETE FROM imas_diag_onetime WHERE id={$row[0]}";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
@@ -190,7 +190,7 @@ if (isset($_POST['SID'])) {
 			if ($passwordnotfound) {
 				$query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
 				$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				if (mysql_num_rows($result)>0 && strtoupper(mysql_result($result,0,0))==strtoupper($_POST['passwd'])) {
+				if (mysqli_num_rows($result)>0 && strtoupper(mysql_fetch_first($result))==strtoupper($_POST['passwd'])) {
 					
 				} else {
 					echo "<html><body>Error, password incorrect or expired.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
@@ -204,20 +204,20 @@ if (isset($_POST['SID'])) {
 	
 	$query = "SELECT id FROM imas_users WHERE SID='$diagSID'";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)>0) {
-		$userid = mysql_result($result,0,0);
+	if (mysqli_num_rows($result)>0) {
+		$userid = mysql_fetch_first($result);
 		$allowreentry = ($line['public']&4);
 		if (!in_array(strtolower($_POST['passwd']),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
 			$query = "SELECT id,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid'";
 			$r2 = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($r2)>0) {
+			if (mysqli_num_rows($r2)>0) {
 				if (!$allowreentry) {
 					echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
 					exit;
 				} else {
-					$d = mysql_fetch_row($r2);
+					$d = mysqli_fetch_row($r2);
 					$now = time();
 					if ($now - $d[1] > 60*$line['reentrytime']) {
 						echo "Your window to complete this diagnostic has expired.  <a href=\"index.php?id=$diagid\">Back</a>\n";

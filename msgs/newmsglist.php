@@ -66,7 +66,7 @@
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&3)=0 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
 	$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : $query " . mysqli_error($GLOBALS['link']));
-	if (mysql_num_rows($result)==0) {
+	if (mysqli_num_rows($result)==0) {
 		echo "<p>No new messages</p>";
 	} else {
 		$lastcourse = '';

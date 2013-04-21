@@ -31,7 +31,7 @@
 		}
 		$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
+		if (mysqli_num_rows($result)>0) {
 			echo "<html><body>\n";
 			echo "$loginprompt '{$_POST['SID']}' is used.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
@@ -75,7 +75,7 @@
 		if (!isset($_GET['confirmed'])) {
 			$query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				$nologo = true;
 				require("header.php");
 				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true'.$gb.'">';
@@ -191,9 +191,8 @@
 		if (isset($_POST['username'])) {
 			$query = "SELECT password,id,email FROM imas_users WHERE SID='{$_POST['username']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
-				$code = mysql_result($result,0,0);
-				$id = mysql_result($result,0,1);
+			if (mysqli_num_rows($result)>0) {
+				list($code,$id,$email) = mysqli_fetch_row($result);
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
@@ -203,7 +202,7 @@
 				$message .= "password will then be reset to: password.</p>";
 				$message .= "<a href=\"" .$urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
 				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
-				mail(mysql_result($result,0,2),'Password Reset Request',$message,$headers);
+				mail($email,'Password Reset Request',$message,$headers);
 			} else {
 				echo "Invalid Username.  <a href=\"index.php$gb\">Try again</a>";
 				exit;
@@ -212,22 +211,25 @@
 		} else if (isset($_GET['code'])) {
 			$query = "SELECT password FROM imas_users WHERE id='{$_GET['id']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0 && $_GET['code']===mysql_result($result,0,0)) {
-				$newpw = md5("password");
-				$query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['id']}' LIMIT 1";
-				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				echo "Password Reset.  ";
-				echo "<a href=\"index.php\">Login with password: password</a>";
-				echo "<p>After logging in, select Change User Info to change your password</p>";
-				exit;
+			if (mysqli_num_rows($result)>0) {
+				$row = mysqli_fetch_row($result);
+				if($_GET['code']===$row[0]) {
+					$newpw = md5("password");
+					$query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['id']}' LIMIT 1";
+					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
+					echo "Password Reset.  ";
+					echo "<a href=\"index.php\">Login with password: password</a>";
+					echo "<p>After logging in, select Change User Info to change your password</p>";
+					exit;
+				}
 			}
 		}
 	} else if ($_GET['action']=="lookupusername") {
 		require_once("config.php");
 		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_num_rows($result)>0) {
-			echo mysql_num_rows($result);
+		if (mysqli_num_rows($result)>0) {
+			echo mysqli_num_rows($result);
 			echo " usernames match this email address and were emailed.  <a href=\"index.php\">Return to login page</a>";
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
@@ -235,7 +237,7 @@
 			$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 			$message .= "<p>Your email was entered in the Username Lookup page on $installname.  If you did not do this, you may ignore and delete this message.  ";
 			$message .= "All usernames using this email address are listed below</p><p>";
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				if ($row[1]==0) {
 					$lastlogin = "Never";
 				} else {
@@ -312,7 +314,7 @@
 		}  else {
 			$query = "SELECT * FROM imas_teachers WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				echo "<html><body>\n";
 				echo "You are a teacher for this course, and can't enroll as a student.  Use Student View to see ";
 				echo "the class from a student's perspective, or create a dummy student account.  ";
@@ -322,7 +324,7 @@
 			}
 			$query = "SELECT * FROM imas_tutors WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				echo "<html><body>\n";
 				echo "You are a tutor for this course, and can't enroll as a student. ";
 				echo "Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
@@ -331,7 +333,7 @@
 			}
 			$query = "SELECT * FROM imas_students WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			if (mysql_num_rows($result)>0) {
+			if (mysqli_num_rows($result)>0) {
 				echo "<html><body>\n";
 				echo "You are already enrolled in the course.  Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
 				echo "</html></body>\n";
@@ -372,12 +374,12 @@
 		$cid = $_GET['cid'];
 		$query = "SELECT allowunenroll FROM imas_courses WHERE id='$cid'";
 		$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-		if (mysql_result($result,0,0)==1) {
+		if (mysqli_fetch_first()==1) {
 			$query = "DELETE FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 			mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
@@ -389,16 +391,16 @@
 			
 			$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$row[0]}' AND userid='$userid'";
 				mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 			}
 			$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
 			$result = mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-			while ($row = mysql_fetch_row($result)) {
+			while ($row = mysqli_fetch_row($result)) {
 				$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
 				$r2 = mysqli_query($GLOBALS['link'],$q2) or die("Query failed : " . mysqli_error($GLOBALS['link']));
-				while ($rw2 = mysql_fetch_row($r2)) {
+				while ($rw2 = mysqli_fetch_row($r2)) {
 					$query = "DELETE FROM imas_forum_views WHERE threadid='{$rw2[0]}' AND userid='$userid'";
 					mysqli_query($GLOBALS['link'],$query) or die("Query failed : " . mysqli_error($GLOBALS['link']));
 				}

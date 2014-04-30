@@ -160,6 +160,17 @@ if (isset($_GET['id'])) { //if starting or returning to test
 						echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid=$cid&amp;id=$aid\">";
 						echo '<input type="hidden" name="disptime" value="'.time().'" />';
 						$nongrouped = getnongroupedstudents($testsettings);
+						$selops = '<option value="0">' . _('Select a name..') . '</option>';
+						foreach ($nongrouped as $stu) {
+							$selops .= '<option value="'.$stu['id'].'">'.$stu['LastName'].', '.$stu['FirstName'].'</option>';
+						}
+						for ($i=0;$i<$testsettings['groupmax']-1;$i++) {
+							echo '<br />', _('Username'), ': <select name="user'.$i.'">'.$selops.'</select> ';
+							if ($testsettings['isgroup']==1) {
+								echo _('Password'), ': <input type="password" name="pw'.$i.'" />'."\n";
+							}
+						}
+						
 						echo '<p><input type=submit name="grpsubmit" value="', _('Record Group and Begin'), '"/></p>';
 						echo '</form>';
 						require("footer.php");
@@ -352,17 +363,95 @@ $isreview = checkassessmentdates($testsettings);
 
 //Check to see if we've been requested for the in-assessment group add form, or
 //if that form has been posted back.
-if (isset($_GET['getgroupaddlist'])) {
-	
-	exit;
-} else if (isset($_POST['recordgroupaddlist'])) {
+if (isset($_GET['getgroupaddlist']) || isset($_POST['recordgroupaddlist'])) {
 	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && !$isreview) {
-		
-	} else {
+		//get current group members
+		$curgrp = array();
+		$query = 'SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ';
+		$query .= 'imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid=? ORDER BY imas_users.LastName,imas_users.FirstName';
+		$STM = $DBH->prepare($query);
+		$STM->execute(array($sessiondata['groupid'])) or die("Query failed : " . $DBH->errorInfo());		
+		while ($row = $STM->fetch(PDO::FETCH_ASSOC)) {
+			$curgrp[] = $row;	
+		}
+		$curcnt = count($curgrp);
+		if ($curcnt>=$testsettings['groupmax']) {
+			echo '<p>'._('Group already has as many members as are allowed.').'</p>';
+			exit;
+		}
+			
+		if (isset($_GET['getgroupaddlist'])) {
+			if ($testsettings['isgroup']==1) {
+				echo '<p>'._('If you want to add group members, each group member should select their name and enter their login password.').'</p>';
+			} else {
+				echo '<p>'._('If you want to add group members, each group member to be added should select their name.').'</p>';
+			}
+			$nongrouped = getnongroupedstudents($testsettings);
+			echo '<form id="grpaddform">';
+			for ($i=0;$i<$testsettings['groupmax']-count($curgrp);$i++) {
+				echo '<br />', _('Username'), ': <select name="user'.$i.'">'.$selops.'</select> ';
+				if ($testsettings['isgroup']==1) {
+					echo _('Password'), ': <input type="password" name="pw'.$i.'" />'."\n";
+				}
+			}
+			echo '<p><button type="button" onclick="submitgrpform()>'._('Add new group members').'</button></p>';
+			echo '</form>';
+			exit;
+		} else if (isset($_POST['recordgroupaddlist'])) {
+			$err = '';
+			list($newmembers, $err) = processgroupform($testsettings, $curcnt);
+			//add new members to group
+			$STMg = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (?,?)");
+			foreach ($newmembers as $newmemid) {
+				$STMg->execute(array($newmemid,$sessiondata['groupid'])) or die("Query failed : " . $DBH->errorInfo());
+				//**TODO: need to add name lookup
+				//$err .= '<p>'. sprintf(_('%s added to group.'), $thisusername),'</p>';
+			}
+			
+			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reattempting,isreview';
+	
+			//prep the asid insert query
+			$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES ";
+			$query .= '(?'.str_repeat(',?', substr_count($fieldstocopy,',')+1).')';
+			$STMg = $DBH->prepare($query);
+			
+			//get asids and copy to group members.  Copy oldest first so ID order matches
+			$query = "SELECT $fieldstocopy FROM imas_assessment_sessions WHERE assessmentid=? AND userid=? AND isreview=0 ORDER BY id";
+			$STM = $DBH->prepare($query);
+			$STM->execute(array($testsettings['id'],$userid)) or die("Query failed : " . $DBH->errorInfo());
+			while ($data = $STM->fetch(PDO::FETCH_NUM)) {
+				foreach ($newmembers as $newmemid) {
+					$STMg->execute(array_merge($newmemid,$data)) or die("Query failed : " . $DBH->errorInfo());		
+				}
+			}
+			
+			//reload group
+			$curgrp = array();
+			$query = 'SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ';
+			$query .= 'imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid=? ORDER BY imas_users.LastName,imas_users.FirstName';
+			$STM = $DBH->prepare($query);
+			$STM->execute(array($sessiondata['groupid'])) or die("Query failed : " . $DBH->errorInfo());
+			echo '<ul>';
+			while ($row = $STM->fetch(PDO::FETCH_ASSOC)) {
+				echo '<li>'.$row['LastName'].', '.$row['FirstName'].'</li>';
+			}
+			echo '</ul>';
+			
+			if ($err != '') {
+				echo $err;
+			}
+			if ($curcnt + count($newmembers) < $testsettings['groupmax']) {
+				echo '<div id="grpformholder">';
+				echo '<p><a href="#" onclick="showgrpform();return false;">'._('Add members to group').'</a></p>';
+				echo '</div>';
+			}
+			exit;
+		}
+	}  else {
 		//shouldn't be here
 		echo '<p>'._('Not a group assessment, or settings do not allow adding group members').'</p>';
+		exit;
 	}
-	exit;
 }
 
 /* **TODO:  Handle change from regular mode to review mode */
@@ -529,6 +618,24 @@ $placeinhead .= '<script type="text/javascript">
 		$(el).html("'._("Show Intro/Instructions").'");
 	}
      }
+     
+     function showgrpform() {
+     	$.ajax({
+     		url: "showtest.php?getgroupaddlist",
+     	}).done(function(data) {
+     		$("#grpformholder").html(data);
+     	});
+     }
+     function submitgrpform() {
+     	var params = $("#grpaddform").serialize() + "&recordgroupaddlist=true";
+     	$.ajax({
+     		url: "showtest.php",
+     		type: "POST",
+     		data: params
+     	}).done(function(data) {
+     		$("#curgrplist").html(data);
+     	});  	
+     }
      </script>';
 if ($testsettings['displaymethod'] == "VideoCue") {
 	$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
@@ -585,55 +692,28 @@ if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
 //If is a group assignment, add group member info to intro, and link to add more
 if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && !$isreview) {
 	//get current group members
-	$curgrp = array();
 	$query = 'SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ';
 	$query .= 'imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid=? ORDER BY imas_users.LastName,imas_users.FirstName';
 	$STM = $DBH->prepare($query);
 	$STM->execute(array($sessiondata['groupid'])) or die("Query failed : " . $DBH->errorInfo());		
+	
+	echo '<p><b>'._('Current Group Members').'</b></p>';
+	echo '<div id="curgrplist">';
+	echo '<ul>';
+	$curcnt = 0;
 	while ($row = $STM->fetch(PDO::FETCH_ASSOC)) {
-		$curgrp[] = $row;	
+		echo '<li>'.$row['LastName'].', '.$row['FirstName'].'</li>';
+		$curcnt++;
 	}
-	//is this a postback of the add new members form?
-	if (isset($_POST['grpsubmit'])) {
-		if ($testsettings['groupmax']< count($curgrp)) {
-			$curcnt = count($curgrp);
-			list($newmembers, $err) = processgroupform($testsettings, $curcnt);
-			
-			//add new members to group
-			$STMg = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (?,?)");
-			foreach ($newmembers as $newmemid) {
-				$STMg->execute(array($newmemid,$sessiondata['groupid'])) or die("Query failed : " . $DBH->errorInfo());
-				//**TODO: need to add name lookup
-				//$err .= '<p>'. sprintf(_('%s added to group.'), $thisusername),'</p>';
-			}
-			//prep the asid insert query
-			$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES ";
-			$query .= '(?'.str_repeat(',?', substr_count($fieldstocopy,',')+1).')';
-			$STMg = $DBH->prepare($query);
-			
-			//get asids and copy to group members.  Copy oldest first so ID order matches
-			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reattempting,isreview';
-			$query = "SELECT $fieldstocopy FROM imas_assessment_sessions WHERE assessmentid=? AND userid=? AND isreview=0 ORDER BY id";
-			$STM = $DBH->prepare($query);
-			$STM->execute(array($testsettings['id'],$userid)) or die("Query failed : " . $DBH->errorInfo());
-			while ($data = $STM->fetch(PDO::FETCH_NUM)) {
-				foreach ($newmembers as $newmemid) {
-					$STMg->execute(array_merge($newmemid,$data)) or die("Query failed : " . $DBH->errorInfo());		
-				}
-			}
-		} else {
-			echo '<p>'._('Group already has as many members as are allowed.').'</p>';
-		}
-	}  //is this a request to add new group members? 
-	else if (isset($_GET['addgrpmem'])) {
-		
-		
-	} else {
-	//just load up current group member info	
-		
-		
+	echo '</ul>';
+	if ($curcnt < $testsettings['groupmax']) {
+		echo '<div id="grpformholder">';
+		echo '<p><a href="#" onclick="showgrpform();return false;">'._('Add members to group').'</a></p>';
+		echo '</div>';
 	}
-}	
+}
+
+
 
 
 //------------------------------------------
@@ -646,8 +726,7 @@ function processgroupform($testsettings, $existingcnt=1) {
 	$err = '';
 	$groupmembers = array();
 	$potentialgroupmembers = array();
-	$existingcnt--;  //remove self
-	for ($i=1;$i<$testsettings['groupmax']-$existingcnt;$i++) {
+	for ($i=0;$i<$testsettings['groupmax']-$existingcnt;$i++) {
 		if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 			if ($testsettings['isgroup']==1) {
 				$STMu->execute(array($_POST['user'.$i]));

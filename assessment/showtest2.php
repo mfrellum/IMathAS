@@ -95,11 +95,12 @@ if (isset($_GET['id'])) { //if starting or returning to test
 	$STM->execute(array($userid,$aid,$isreview?1:0)) or die("Query failed : " . $DBH->errorInfo());
 	$line = $STM->fetch(PDO::FETCH_ASSOC);
 	
+	//are they requesting a retake?
 	if (isset($_GET['retake']) && !$isreview) {
 		$STM = $DBH->prepare("SELECT COUNT(*) FROM imas_assessment_sessions WHERE userid=? AND assessmentid=? and isreview=0");
 		$STM->execute(array($userid,$aid)) or die("Query failed : " . $DBH->errorInfo());
 		$takenversions = $STM->fetchColumn(0);
-		if ($takenversions>$testsettings['defregens']) {
+		if ($takenversions>$testsettings['retakes']) {
 			require('header.php');
 			echo '<p>'._('You have used up all your retakes for this assessment.').' <a href="../course/course.php?cid='.$cid.'">'._('Back').'</a></p>';
 			require('footer.php');
@@ -122,6 +123,10 @@ if (isset($_GET['id'])) { //if starting or returning to test
 			if ($grpdata!==false) { //already in a group
 				$stugroupid = $grpdata['id'];
 				$sessiondata['groupid'] = $stugroupid;
+				//did we catch this on a postback?
+				if (isset($_POST['grpsubmit'])) {
+					$err = '<p>'._('Someone has already added you to a group.  Using that group.').'</p>';
+				}
 			} else { 
 				if ($testsettings['isgroup']==3) { 
 					//is an instructor-selected group, and student has not been put in a group yet.
@@ -185,8 +190,8 @@ if (isset($_GET['id'])) { //if starting or returning to test
 			$ltisourcedid = '';
 		}
 		
-		$STM = $DBH->prepare("INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,agroupid,feedback,lti_sourcedid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-		$STM->execute(array($userid,$aid,$qlist,$seedlist,$scorelist,$attemptslist,$lalist,$starttime,$bestscorelist,$bestattemptslist,$bestseedslist,$bestlalist,$stugroupid,$testsettings['deffeedbacktext'],$ltisourcedid));
+		$STM = $DBH->prepare("INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,agroupid,feedback,lti_sourcedid,isreview) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+		$STM->execute(array($userid,$aid,$qlist,$seedlist,$scorelist,$attemptslist,$lalist,$starttime,$bestscorelist,$bestattemptslist,$bestseedslist,$bestlalist,$stugroupid,$testsettings['deffeedbacktext'],$ltisourcedid,$isreview?1:0));
 		if ($STM->rowCount()==0) {
 			echo 'Error DupASID. <a href="showtest.php?cid='.$cid.'&aid='.$aid.'">Try again</a>';
 			exit;
@@ -208,7 +213,7 @@ if (isset($_GET['id'])) { //if starting or returning to test
 			}
 		}
 		
-		if ($stugroupid!=0) {
+		if ($stugroupid!=0 && !$isreview) {
 			//if a group assessment and already in a group, we'll create asids for all the group members now, and imas_grades records if needed
 			$STMu = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=? AND userid<>?");
 			$STMg = $DBH->prepare("SELECT id,refid FROM imas_grades WHERE userid=? AND gradetypeid=? and gradetype='online'");
@@ -216,7 +221,7 @@ if (isset($_GET['id'])) { //if starting or returning to test
 			$STMup = $DBH->prepare("UPDATE imas_grades SET refid=? WHERE id=?");
 			$STMu->execute(array($stugroupid,$userid));
 			while ($row = $STMu->fetch(PDO::FETCH_ASSOC)) {
-				$STM->execute(array($row['userid'],$aid,$qlist,$seedlist,$scorelist,$attemptslist,$lalist,$starttime,$bestscorelist,$bestattemptslist,$bestseedslist,$bestlalist,$stugroupid,$testsettings['deffeedback'],''));
+				$STM->execute(array($row['userid'],$aid,$qlist,$seedlist,$scorelist,$attemptslist,$lalist,$starttime,$bestscorelist,$bestattemptslist,$bestseedslist,$bestlalist,$stugroupid,$testsettings['deffeedback'],'',$isreview?1:0));
 				$thisgasid = $DBH->lastInsertId();
 				$STMg->execute(array($row['userid'],$aid));
 				if ($r = $STMg->fetch(PDO::FETCH_ASSOC)) {
@@ -335,6 +340,33 @@ if (isset($sessiondata['actas'])) {
 	$userid = $sessiondata['actas'];
 }
 
+//load assessment data
+$STM = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=?");
+$STM->execute(array($asiddata['assessmentid'])) or die("Query failed : " . $DBH->errorInfo());
+$testsettings = $STM->fetch(PDO::FETCH_ASSOC);
+
+$cid = $testsettings['courseid'];
+
+//check assessment dates, and give notice and exit if outside
+$isreview = checkassessmentdates($testsettings);
+
+//Check to see if we've been requested for the in-assessment group add form, or
+//if that form has been posted back.
+if (isset($_GET['getgroupaddlist'])) {
+	
+	exit;
+} else if (isset($_POST['recordgroupaddlist'])) {
+	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && !$isreview) {
+		
+	} else {
+		//shouldn't be here
+		echo '<p>'._('Not a group assessment, or settings do not allow adding group members').'</p>';
+	}
+	exit;
+}
+
+/* **TODO:  Handle change from regular mode to review mode */
+
 //load assessment_sessions data
 $STM = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=?");
 $STM->execute(array($testid)) or die("Query failed : " . $DBH->errorInfo());
@@ -377,13 +409,6 @@ if ($starttime == 0) {
 	$STM->execute(array($starttime,$testid)) or die("Query failed : " . $DBH->errorInfo());
 }
 
-//load assessment data
-$STM = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=?");
-$STM->execute(array($asiddata['assessmentid'])) or die("Query failed : " . $DBH->errorInfo());
-$testsettings = $STM->fetch(PDO::FETCH_ASSOC);
-
-$cid = $testsettings['courseid'];
-
 //Switch VideoCue to Embed if no video info
 if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
 	$testsettings['displaymethod']= 'Embed';
@@ -424,9 +449,6 @@ if ($testsettings['isgroup']>0 && !$isteacher &&  ($asiddata['agroupid']==0 || (
 
 $now = time();
 
-//check assessment dates, and give notice and exit if outside
-$isreview = checkassessmentdates($testsettings);
-
 if ($isreview) {
 	$testsettings['testtype']="Practice";
 	$testsettings['defattempts'] = 0;
@@ -443,7 +465,7 @@ if ($isreview) {
 }
 $qi = getquestioninfo($questions,$testsettings);
 
-
+//**TODO**
 //load options from testsettings
 $allowperqregen = 5;
 $allowretakes = 0;
@@ -517,6 +539,7 @@ if ($testsettings['noprint'] == 1) {
 	echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 }
 if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
+	//show breadcrumbs
 	if (isset($sessiondata['actas'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">{$sessiondata['coursename']}</a> ";
 		echo "&gt; <a href=\"../course/gb-viewasid.php?cid=$cid&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">", _('Gradebook Detail'), "</a> ";
@@ -533,6 +556,7 @@ if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
 		}
 	}
 } else if ($isltilimited) {
+	//show LTI specific header items
 	echo '<span style="float:right;">';
 	if ($testsettings['msgtoinstr']==1) {
 		$STM = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=? AND courseid=? AND (isread=0 OR isread=4)");
@@ -558,10 +582,63 @@ if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
 	echo '</span>';
 }
 
-     
+//If is a group assignment, add group member info to intro, and link to add more
+if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && !$isreview) {
+	//get current group members
+	$curgrp = array();
+	$query = 'SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ';
+	$query .= 'imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid=? ORDER BY imas_users.LastName,imas_users.FirstName';
+	$STM = $DBH->prepare($query);
+	$STM->execute(array($sessiondata['groupid'])) or die("Query failed : " . $DBH->errorInfo());		
+	while ($row = $STM->fetch(PDO::FETCH_ASSOC)) {
+		$curgrp[] = $row;	
+	}
+	//is this a postback of the add new members form?
+	if (isset($_POST['grpsubmit'])) {
+		if ($testsettings['groupmax']< count($curgrp)) {
+			$curcnt = count($curgrp);
+			list($newmembers, $err) = processgroupform($testsettings, $curcnt);
+			
+			//add new members to group
+			$STMg = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (?,?)");
+			foreach ($newmembers as $newmemid) {
+				$STMg->execute(array($newmemid,$sessiondata['groupid'])) or die("Query failed : " . $DBH->errorInfo());
+				//**TODO: need to add name lookup
+				//$err .= '<p>'. sprintf(_('%s added to group.'), $thisusername),'</p>';
+			}
+			//prep the asid insert query
+			$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES ";
+			$query .= '(?'.str_repeat(',?', substr_count($fieldstocopy,',')+1).')';
+			$STMg = $DBH->prepare($query);
+			
+			//get asids and copy to group members.  Copy oldest first so ID order matches
+			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reattempting,isreview';
+			$query = "SELECT $fieldstocopy FROM imas_assessment_sessions WHERE assessmentid=? AND userid=? AND isreview=0 ORDER BY id";
+			$STM = $DBH->prepare($query);
+			$STM->execute(array($testsettings['id'],$userid)) or die("Query failed : " . $DBH->errorInfo());
+			while ($data = $STM->fetch(PDO::FETCH_NUM)) {
+				foreach ($newmembers as $newmemid) {
+					$STMg->execute(array_merge($newmemid,$data)) or die("Query failed : " . $DBH->errorInfo());		
+				}
+			}
+		} else {
+			echo '<p>'._('Group already has as many members as are allowed.').'</p>';
+		}
+	}  //is this a request to add new group members? 
+	else if (isset($_GET['addgrpmem'])) {
+		
+		
+	} else {
+	//just load up current group member info	
+		
+		
+	}
+}	
+
+
 //------------------------------------------
 
-function processgroupform($testsettings) {
+function processgroupform($testsettings, $existingcnt=1) {
 	if ($testsettings['isgroup']==1 && isset($CFG['GEN']['newpasswords'])) {
 		require_once("../includes/password.php");
 	}
@@ -569,7 +646,8 @@ function processgroupform($testsettings) {
 	$err = '';
 	$groupmembers = array();
 	$potentialgroupmembers = array();
-	for ($i=1;$i<$testsettings['groupmax'];$i++) {
+	$existingcnt--;  //remove self
+	for ($i=1;$i<$testsettings['groupmax']-$existingcnt;$i++) {
 		if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 			if ($testsettings['isgroup']==1) {
 				$STMu->execute(array($_POST['user'.$i]));
@@ -584,7 +662,7 @@ function processgroupform($testsettings) {
 		}
 	}
 	//check to make sure potential users aren't already in a group
-	$STM = $DBH->prepare("SELECT id,agroupid FROM imas_assessment_sessions WHERE userid=? AND assessmentid=?");
+	$STM = $DBH->prepare("SELECT id,agroupid FROM imas_assessment_sessions WHERE userid=? AND assessmentid=? AND isreview=0");
 	foreach ($potentialgroupmembers as $potuser) {
 		$STM->execute(array($potuser, $aid));	
 		if (($row = $STM->fetch(PDO::FETCH_ASSOC))===false) {

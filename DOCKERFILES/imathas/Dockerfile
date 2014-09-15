@@ -1,6 +1,9 @@
 # IMathAS as a container
 # http://imathas.com
 #
+# Install Git
+RUN apt-get -y update
+RUN apt-get -y git
 
 # Remember to start a mysql server
 

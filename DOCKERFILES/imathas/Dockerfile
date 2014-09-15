@@ -7,7 +7,7 @@
 FROM tutum/apache-php:latest
 # Install Git
 RUN apt-get -y update
-RUN apt-get -y git
+RUN apt-get -y install git
 
 RUN rm -fr /app && git clone https://github.com/mfrellum/IMathAS.git /app
 #RUN rm -fr /app && git clone --single-branch https://github.com/mfrellum/IMathAS.git /app
